@@ -8,7 +8,19 @@
     <packaging>jar</packaging>
 
     <name>Bag</name>
-    <url>http://maven.apache.org</url>
+    <description>A Bag is a collection of values in text-based key/value pairs or arrays. Typing is
+        performed lazily on extraction, and presumes the user knows what they are expecting to get.
+        These classes are primarily intended for messaging, events, and other applications that
+        require complex values to be shared in a text-based data interchange format. Bag is loosely
+        based on a combination of XML in use, and the JSONObject from the website
+        (http://www.json.org).</description>
+    <url>http://brettonw-bag.azurewebsites.net</url>
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>http://www.opensource.org/licenses/mit-license.php</url>
+        </license>
+    </licenses>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
