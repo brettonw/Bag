@@ -21,7 +21,19 @@
             <url>http://www.opensource.org/licenses/mit-license.php</url>
         </license>
     </licenses>
-
+    <developers>
+        <developer>
+            <name>Bretton Wade</name>
+            <email>bretton.wade@gmail.com</email>
+            <organization>Github</organization>
+            <organizationUrl>https://github.com/brettonw</organizationUrl>
+        </developer>
+    </developers>
+    <scm>
+        <connection>scm:git:git@github.com:brettonw/bag.git</connection>
+        <developerConnection>scm:git:git@github.com:brettonw/bag.git</developerConnection>
+        <url>git@github.com:brettonw/bag.git</url>
+    </scm>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
