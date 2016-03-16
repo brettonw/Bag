@@ -1,6 +1,6 @@
-package lib.frost.bag;
+package com.github.brettonw.bag;
 
-import lib.frost.AppTest;
+import com.github.brettonw.AppTest;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

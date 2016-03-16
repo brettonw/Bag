@@ -1,7 +1,7 @@
-package lib.frost.bag;
+package com.github.brettonw.bag;
 
-import lib.frost.AppTest;
-import lib.frost.bag.test.TestClassA;
+import com.github.brettonw.AppTest;
+import com.github.brettonw.bag.test.TestClassA;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;

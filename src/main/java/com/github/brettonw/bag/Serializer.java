@@ -1,4 +1,4 @@
-package lib.frost.bag;
+package com.github.brettonw.bag;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

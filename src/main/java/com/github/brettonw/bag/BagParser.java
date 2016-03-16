@@ -1,4 +1,4 @@
-package lib.frost.bag;
+package com.github.brettonw.bag;
 
 // The BagParser is loosely modeled after a JSON parser grammar from the site (http://www.json.org).
 // The main difference is that we only expect to parse a string generated from a ToString call on a

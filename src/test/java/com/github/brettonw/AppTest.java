@@ -1,4 +1,4 @@
-package lib.frost;
+package com.github.brettonw;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

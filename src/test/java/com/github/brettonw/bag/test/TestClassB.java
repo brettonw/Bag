@@ -1,4 +1,4 @@
-package lib.frost.bag.test;
+package com.github.brettonw.bag.test;
 
 public class TestClassB {
     public int a;

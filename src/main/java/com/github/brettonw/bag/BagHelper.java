@@ -1,4 +1,4 @@
-package lib.frost.bag;
+package com.github.brettonw.bag;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,8 +23,8 @@ public class BagHelper {
                 case "java.lang.String":
                     return quote ((String) value);
 
-                case "lib.frost.bag.BagObject":
-                case "lib.frost.bag.BagArray":
+                case "com.github.brettonw.bag.BagObject":
+                case "com.github.brettonw.bag.BagArray":
                     return value.toString ();
 
                 default:
@@ -49,8 +49,8 @@ public class BagHelper {
                 case "java.lang.Double": case "java.lang.Float":
                     return value.toString ();
 
-                case "lib.frost.bag.BagObject":
-                case "lib.frost.bag.BagArray":
+                case "com.github.brettonw.bag.BagObject":
+                case "com.github.brettonw.bag.BagArray":
                     return value;
 
                 default:

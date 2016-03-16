@@ -1,4 +1,4 @@
-package lib.frost.bag;
+package com.github.brettonw.bag;
 
 public enum SerializationType {
     PRIMITIVE,

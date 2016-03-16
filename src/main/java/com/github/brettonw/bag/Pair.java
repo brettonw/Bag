@@ -1,4 +1,4 @@
-package lib.frost.bag;
+package com.github.brettonw.bag;
 
 import java.util.Comparator;
 
