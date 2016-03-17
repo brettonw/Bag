@@ -1,6 +1,6 @@
-package com.github.brettonw.bag;
+package com.brettonw.bag;
 
-import com.github.brettonw.AppTest;
+import com.brettonw.AppTest;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

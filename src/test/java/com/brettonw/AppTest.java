@@ -1,4 +1,4 @@
-package com.github.brettonw;
+package com.brettonw;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -6,8 +6,8 @@ import junit.framework.TestSuite;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class AppTest extends TestCase
-{    private static final Logger log = LogManager.getLogger (TestCase.class);
+public class AppTest extends TestCase {
+    private static final Logger log = LogManager.getLogger (AppTest.class);
 
     public static void report (Object actual, Object expect, String message) {
         boolean result = (actual != null) ? actual.equals (expect) : (actual == expect);

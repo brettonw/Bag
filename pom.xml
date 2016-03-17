@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.brettonw</groupId>
+    <groupId>com.brettonw</groupId>
     <artifactId>bag</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -14,7 +14,7 @@
         require complex values to be shared in a text-based data interchange format. Bag is loosely
         based on a combination of XML in use, and the JSONObject from the website
         (http://www.json.org).</description>
-    <url>http://brettonw-bag.azurewebsites.net</url>
+    <url>http://brettonw.com?bag/</url>
     <licenses>
         <license>
             <name>MIT License</name>
@@ -25,8 +25,8 @@
         <developer>
             <name>Bretton Wade</name>
             <email>bretton.wade@gmail.com</email>
-            <organization>Github</organization>
-            <organizationUrl>https://github.com/brettonw</organizationUrl>
+            <organization>BrettonW</organization>
+            <organizationUrl>http://brettonw.com/</organizationUrl>
         </developer>
     </developers>
     <scm>

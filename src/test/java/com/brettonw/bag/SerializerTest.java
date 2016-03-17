@@ -1,7 +1,7 @@
-package com.github.brettonw.bag;
+package com.brettonw.bag;
 
-import com.github.brettonw.AppTest;
-import com.github.brettonw.bag.test.TestClassA;
+import com.brettonw.AppTest;
+import com.brettonw.bag.test.TestClassA;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;

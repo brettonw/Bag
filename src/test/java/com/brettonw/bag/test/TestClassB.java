@@ -1,4 +1,4 @@
-package com.github.brettonw.bag.test;
+package com.brettonw.bag.test;
 
 public class TestClassB {
     public int a;

@@ -1,4 +1,4 @@
-package com.github.brettonw.bag;
+package com.brettonw.bag;
 
 import java.util.Comparator;
 
