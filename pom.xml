@@ -8,12 +8,9 @@
     <packaging>jar</packaging>
 
     <name>Bag</name>
-    <description>A Bag is a collection of values in text-based key/value pairs or arrays. Typing is
-        performed lazily on extraction, and presumes the user knows what they are expecting to get.
-        These classes are primarily intended for messaging, events, and other applications that
-        require complex values to be shared in a text-based data interchange format. Bag is loosely
-        based on a combination of XML in use, and the JSONObject from the website
-        (http://www.json.org).</description>
+    <description>Bag provides two container classes for text-based storage of constrained types in
+        an array (BagArray) or as a map (BagObject), with a means of serializing objects to and from
+        these container types.</description>
     <url>http://brettonw.com?github/bag/</url>
     <licenses>
         <license>
