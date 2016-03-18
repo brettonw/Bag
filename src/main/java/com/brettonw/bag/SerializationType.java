@@ -1,6 +1,6 @@
 package com.brettonw.bag;
 
-public enum SerializationType {
+enum SerializationType {
     PRIMITIVE,
     BAG_OBJECT,
     BAG_ARRAY,

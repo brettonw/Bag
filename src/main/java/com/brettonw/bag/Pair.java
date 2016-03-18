@@ -3,7 +3,7 @@ package com.brettonw.bag;
 import java.util.Comparator;
 
 // a Pair is the joining of a name and an object, a key-value pairing if you will
-public class Pair implements Comparator<Pair>, Comparable<Pair> {
+class Pair implements Comparator<Pair>, Comparable<Pair> {
     protected String key;
     protected Object value;
 

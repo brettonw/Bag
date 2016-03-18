@@ -3,7 +3,7 @@ package com.brettonw.bag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class BagHelper {
+class BagHelper {
     private static final Logger log = LogManager.getLogger (BagHelper.class);
 
     public static String enclose (String input, String bracket) {

@@ -13,10 +13,10 @@ import java.util.Arrays;
 public class BagObject {
     private static final Logger log = LogManager.getLogger (BagObject.class);
 
-    protected static final int START_SIZE = 1;
-    protected static final int DOUBLING_CAP = 16;
-    protected Pair[] container;
-    protected int count;
+    private static final int START_SIZE = 1;
+    private static final int DOUBLING_CAP = 16;
+    private Pair[] container;
+    private int count;
 
     public BagObject () {
         count = 0;

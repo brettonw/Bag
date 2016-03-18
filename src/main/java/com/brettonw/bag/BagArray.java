@@ -11,10 +11,10 @@ import org.apache.logging.log4j.Logger;
 public class BagArray {
     private static final Logger log = LogManager.getLogger (BagObject.class);
 
-    protected static final int START_SIZE = 1;
-    protected static final int DOUBLING_CAP = 128;
-    protected Object[] container;
-    protected int count;
+    private static final int START_SIZE = 1;
+    private static final int DOUBLING_CAP = 128;
+    private Object[] container;
+    private int count;
 
     public BagArray () {
         count = 0;

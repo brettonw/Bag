@@ -6,7 +6,7 @@ package com.brettonw.bag;
 // internally), don't handle extraneous whitespace, and assume the input is a well formed string
 // representation of a BagObject or BagArray
 
-public class BagParser {
+class BagParser {
     private int index;
     private String input;
 
