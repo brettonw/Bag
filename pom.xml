@@ -14,7 +14,7 @@
         require complex values to be shared in a text-based data interchange format. Bag is loosely
         based on a combination of XML in use, and the JSONObject from the website
         (http://www.json.org).</description>
-    <url>http://brettonw.com?bag/</url>
+    <url>http://brettonw.com?github/bag/</url>
     <licenses>
         <license>
             <name>MIT License</name>
