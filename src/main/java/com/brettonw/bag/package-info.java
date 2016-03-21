@@ -19,6 +19,10 @@
  * Bag is not meant to consume arbitrary JSON files, and it probably won't work for that. The text
  * format is generated using the "toString" and "fromString" operators, and that is all it is
  * currently spec'd to do, and all it is tested for.
+ * <p>
+ * The error handling philosophy is to return null and log failures. The user can choose to throw an
+ * exception if they want, but Bag should be robust and continue chugging without killing the parent
+ * application if an unanticipated fault happens.
  *
  * @author Bretton Wade
  */

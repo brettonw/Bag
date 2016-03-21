@@ -9,12 +9,31 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Map;
 
+/**
+ * A tool to convert data types to and from BagObjects for serialization. It is designed to support
+ * primitives, Plain Old Java Object (POJO) classes, object classes with getters and setters,
+ * arrays, and array or map-based containers of one of the previously mentioned types. It explicitly
+ * supports BagObject and BagArray as well.
+ */
 public class Serializer {
     private static final Logger log = LogManager.getLogger (Serializer.class);
 
     private static final String TYPE_KEY = "type";
+    private static final String VERSION_KEY = "version";
     private static final String KEY_KEY = "key";
     private static final String VALUE_KEY = "value";
+
+    // future changes might require the serializer to know a different type of encoding is expected.
+    // we use a two step version, where changes in the ".x" region don't require a new deserializer
+    // but for which we want old version of serialization to fail. changes in the "1." region
+    // indicate a completely new deserializer is needed. we will not ever support serializing to
+    // older formats (link against the old version of this package if you want that). we will decide
+    // whether or not to support multiple deserializer formats when the time comes.
+    private static final String SERIALIZER_VERSION_1 = "1.0";
+    private static final String SERIALIZER_VERSION = SERIALIZER_VERSION_1;
+
+    // don't let anybody create one of these
+    private Serializer () {}
 
     private static SerializationType serializationType (Class type) {
         if (BagHelper.isPrimitive (type)) return SerializationType.PRIMITIVE;
@@ -76,10 +95,21 @@ public class Serializer {
         return bagObject.put (VALUE_KEY, value);
     }
 
+    /**
+     * Convert the given object to a BagObject representation that can be used to reconstitute the
+     * given object after serialization.
+     *
+     * @param object the target element to serialize. It must be one of the following: primitive,
+     *               boxed-primitive, Plain Old Java Object (POJO) class, object class with getters
+     *               and setters for all members, BagObject, BagArrayarray, or list or map-based
+     *               container of one of the previously mentioned types.
+     * @return A BagObject encapsulation of the target object, or null if the conversion failed.
+     */
     public static BagObject toBagObject (Object object) {
         Class type = object.getClass ();
         BagObject bagObject = new BagObject (2)
-                .put (TYPE_KEY, type.getName ());
+                .put (TYPE_KEY, type.getName ())
+                .put (VERSION_KEY, SERIALIZER_VERSION);
 
         try {
             switch (serializationType (type)) {
@@ -213,20 +243,40 @@ public class Serializer {
         return target;
     }
 
+    /**
+     * Reconstitute the given BagObject representation back to the object it represents.
+     *
+     * @param bagObject the target BagObject to deserialize. It must be a valid representation of
+     *                  the encoded type(i.e. created by the toBagObject method).
+     * @return the reconstituted object (user must typecast it), or null if the reconstitution
+     * failed.
+     */
     public static Object fromBagObject (BagObject bagObject) {
-        try {
-            switch (serializationType (bagObject.getString (TYPE_KEY))) {
-                case PRIMITIVE: return deserializePrimitiveType (bagObject);
-                case BAG_OBJECT: return bagObject.getBagObject (VALUE_KEY);
-                case BAG_ARRAY: return bagObject.getBagArray (VALUE_KEY);
-                case JAVA_OBJECT: return deserializeJavaObjectType (bagObject);
-                case COLLECTION: return deserializeCollectionType (bagObject);
-                case MAP: return deserializeMapType (bagObject);
-                case ARRAY: return deserializeArrayType (bagObject);
+        // we expect a future change might use a different approach to deserialization, so we check
+        // to be sure this is the version we are working to
+        if (bagObject.getString (VERSION_KEY).equals (SERIALIZER_VERSION)) {
+            try {
+                switch (serializationType (bagObject.getString (TYPE_KEY))) {
+                    case PRIMITIVE:
+                        return deserializePrimitiveType (bagObject);
+                    case BAG_OBJECT:
+                        return bagObject.getBagObject (VALUE_KEY);
+                    case BAG_ARRAY:
+                        return bagObject.getBagArray (VALUE_KEY);
+                    case JAVA_OBJECT:
+                        return deserializeJavaObjectType (bagObject);
+                    case COLLECTION:
+                        return deserializeCollectionType (bagObject);
+                    case MAP:
+                        return deserializeMapType (bagObject);
+                    case ARRAY:
+                        return deserializeArrayType (bagObject);
+                }
+            } catch (Exception exception) {
+                log.error (exception);
             }
-        }
-        catch (Exception exception){
-            log.error (exception);
+        } else {
+            log.error ("Deserialization failed, unknown version (" + bagObject.getString (VERSION_KEY) + "), expected (" + SERIALIZER_VERSION + ")");
         }
         return null;
     }
