@@ -1,43 +1,27 @@
 package com.brettonw;
 
-import junit.framework.Test;
+import com.brettonw.bag.BagArrayTest;
+import com.brettonw.bag.BagObjectTest;
+import com.brettonw.bag.SerializerTest;
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
 
-public class AppTest extends TestCase {
+@RunWith(Suite.class)
+@Suite.SuiteClasses({
+        BagArrayTest.class,
+        BagObjectTest.class,
+        SerializerTest.class
+})
+
+public class AppTest {
     private static final Logger log = LogManager.getLogger (AppTest.class);
 
     public static void report (Object actual, Object expect, String message) {
         boolean result = (actual != null) ? actual.equals (expect) : (actual == expect);
         log.info (message + " (" + (result ? "PASS" : "FAIL") + ")");
-        assertEquals (message, expect, actual);
-    }
-
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public AppTest( String testName )
-    {
-        super( testName );
-    }
-
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite ( AppTest.class );
-    }
-
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
+        TestCase.assertEquals (message, expect, actual);
     }
 }

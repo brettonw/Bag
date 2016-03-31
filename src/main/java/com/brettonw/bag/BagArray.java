@@ -6,9 +6,9 @@ import org.apache.logging.log4j.Logger;
 /**
  * A collection of text-based values stored in a zero-based indexed array.
  * <p>
- * Note: the BagArray class, from a memory allocation standpoint, is not designed to store very
- * large numbers of elements (more than 1,000). It will work, but we have not chosen to focus on
- * this as a potential use-case.
+ * Note: the BagArray class, from a memory allocation standpoint, is not designed to efficiently
+ * work with dynamic storage of very large numbers of elements (more than 1,000s). It will work,
+ * but we have not chosen to focus on this as a potential use-case.
  */
 public class BagArray {
     private static final Logger log = LogManager.getLogger (BagArray.class);
@@ -49,15 +49,44 @@ public class BagArray {
     }
 
     private void grow (int gapIndex) {
+        // save the existing container
         Object src[] = container;
-        if (count == container.length) {
-            // if the array is smaller than the cap then double its size, otherwise just add the block
-            int newSize = (count > DOUBLING_CAP) ? (count + DOUBLING_CAP) : (count * 2);
-            container = new Object[newSize];
-            System.arraycopy (src, 0, container, 0, gapIndex);
+
+        // compute the number of values that will have to move, and from it, the new count - and
+        // therefore the new size needed to include all of the elements of the array. the cases are:
+        //
+        // 1) the gapIndex is in the area of the array already in use, some elements will have to be
+        //    moved to make room for the new element, and the array might need to be expanded to
+        //    accommodate that
+        //
+        // 2) the gapIndex is at the end of the array already in use, no elements will have to be
+        //    moved to make room for it, but the array might need to be expanded to accommodate the
+        //    new element
+        //
+        // 3) the gapIndex is outside of the range of the array already in use, no elements will
+        //    have to be moved o make room for it, but the array might need to be expanded to
+        //    accommodate the new element
+        int moveCount = count - gapIndex;
+        count = 1 + ((moveCount > 0) ? count : gapIndex);
+
+        // get the size of the array and resize it if necessary (copying the existing elements to
+        // the new array - note that this means a sparse insertion will result in null elements in
+        // the array
+        int size = container.length;
+        if (count > size) {
+            do {
+                // if the array is smaller than the cap then double its size, otherwise just add the block
+                size = (size > DOUBLING_CAP) ? (size + DOUBLING_CAP) : (size * 2);
+            }
+            while (count > size);
+            container = new Object[size];
+            System.arraycopy (src, 0, container, 0, Math.min (gapIndex, src.length));
         }
-        System.arraycopy (src, gapIndex, container, gapIndex + 1, count - gapIndex);
-        ++count;
+
+        // if needed, copy elements after the gapIndex
+        if (moveCount > 0) {
+            System.arraycopy (src, gapIndex, container, gapIndex + 1, moveCount);
+        }
     }
 
     /**

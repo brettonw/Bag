@@ -19,6 +19,10 @@ public class BagArrayTest {
         assertEquals ("Check get double", 123.456, bagArray.getDouble (3), 1.0e-9);
         assertEquals ("Check size", 5, bagArray.getCount ());
 
+        bagArray.insert (10, 456789);
+        assertEquals ("Check size", 11, bagArray.getCount ());
+
+
         BagArray testArray = new BagArray();
         testArray.add("Bretton");
         testArray.add("Wade");
