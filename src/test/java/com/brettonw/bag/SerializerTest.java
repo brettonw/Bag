@@ -62,7 +62,13 @@ public class SerializerTest {
         assertArrayEquals ("Check hash map reconstitution - keys", hashMap.keySet ().toArray (), reconHashMap.keySet ().toArray ());
         assertArrayEquals ("Check hash map reconstitution - values", hashMap.values ().toArray (), reconHashMap.values ().toArray ());
 
+        // add a few other simple serializations...
+        BagObject anotherBagObject = Serializer.toBagObject (bagObject);
+        AppTest.report (Serializer.fromBagObject (anotherBagObject), bagObject, "Serializer test reconstituting a bag object");
 
+        BagArray    bagArray = new BagArray (2).add (1).add (7.0);
+        anotherBagObject = Serializer.toBagObject (bagArray);
+        AppTest.report (Serializer.fromBagObject (anotherBagObject), bagArray, "Serializer test reconstituting a bag array");
         log.info ("got here");
     }
 }

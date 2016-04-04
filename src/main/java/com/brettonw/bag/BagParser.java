@@ -76,25 +76,11 @@ class BagParser {
         if (Expect('"'))
         {
             StringBuilder stringBuilder = new StringBuilder();
-            boolean isDone = false;
-            while (!isDone)
+            char c = input.charAt (index++);
+            while (c != '"')
             {
-                char c = input.charAt (index);
-                switch (c)
-                {
-                    case '\\':
-                        stringBuilder.append (input.charAt (++index));
-                        break;
-
-                    case '"':
-                        isDone = true;
-                        break;
-
-                    default:
-                        stringBuilder.append (c);
-                        break;
-                }
-                ++index;
+                stringBuilder.append (c);
+                c = input.charAt (index++);
             }
             result = stringBuilder.toString ();
         }

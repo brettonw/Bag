@@ -11,13 +11,17 @@
  * Type assignment is performed lazily on extraction, and presumes the user knows what they are
  * expecting to get.
  * <p>
+ * Strings are stored directly, and the parser is not smart about strings with quotes in them. We
+ * could change this behavior, but the bottom line is we don't want the Bag classes to do any kind
+ * of transformations on the stored data.
+ * <p>
  * These classes are primarily intended for messaging, events, and other applications that require
  * complex values to be shared in a text-based data interchange format without the formality of
  * declaring classes or establishing schemas.
  * <p>
- * Bag is not meant to consume arbitrary JSON files, and it probably won't work for that. The text
- * format is generated using the "toString" and "fromString" operators. That is all it is currently
- * spec'd to do, and all it is tested for.
+ * Bag is not meant to consume arbitrary JSON files, and it probably won't work for that, though the
+ * reverse will - Bag text files are valid JSON. The text format is generated using the "toString"
+ * and "fromString" operators. That is all it is currently spec'd to do, and all it is tested for.
  * <p>
  * For now, the error handling philosophy is to return null and log failures. The user can choose to
  * throw an exception if they want, but Bag should be robust and continue chugging without killing
