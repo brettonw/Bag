@@ -7,6 +7,5 @@ enum SerializationType {
     JAVA_OBJECT,
     COLLECTION,
     MAP,
-    ARRAY,
-    UNKNOWN
+    ARRAY
 }

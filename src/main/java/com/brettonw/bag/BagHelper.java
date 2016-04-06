@@ -9,7 +9,7 @@ enum BagHelper { ;
     public static String enclose (String input, String bracket) {
         char bracket0 = bracket.charAt (0);
         char bracket1 = bracket.length () > 1 ? bracket.charAt (1) : bracket0;
-        return new StringBuilder ().append (bracket0).append (input).append (bracket1).toString ();
+        return bracket0 + input + bracket1;
     }
 
     public static String quote (String input) {

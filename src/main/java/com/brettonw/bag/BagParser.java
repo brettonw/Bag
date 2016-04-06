@@ -8,7 +8,7 @@ package com.brettonw.bag;
 
 class BagParser {
     private int index;
-    private String input;
+    private final String input;
 
     public BagParser(String input)
     {
@@ -44,12 +44,14 @@ class BagParser {
     {
         // <Elements> ::= <Value> | <Value> , <Elements>
         bagArray.add (ReadValue());
+        //noinspection PointlessBooleanExpression
         return (Expect(',') && ReadElements(bagArray)) || true;
     }
 
     private boolean ReadMembers(BagObject bagObject)
     {
         // <Members> ::= <Pair> | <Pair> , <Members>
+        //noinspection ConstantConditions,PointlessBooleanExpression
         return ReadPair(bagObject) && ((Expect(',') && ReadMembers(bagObject)) || true);
     }
 

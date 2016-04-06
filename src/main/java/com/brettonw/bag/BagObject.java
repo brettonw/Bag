@@ -129,8 +129,6 @@ public class BagObject {
             int gapIndex = index + 1;
             System.arraycopy (container, gapIndex, container, index, count - gapIndex);
             --count;
-        } else {
-            // XXX what would we like to have happen here? do we care?
         }
         return this;
     }
@@ -168,6 +166,7 @@ public class BagObject {
      * @param key A string value used to index the element.
      * @return The element as a Long, or null if the element is not found.
      */
+    @SuppressWarnings ("WeakerAccess")
     public Long getLong (String key) {
         String string = getString (key);
         return (string != null) ? Long.parseLong (string) : null;

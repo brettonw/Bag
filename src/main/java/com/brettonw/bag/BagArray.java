@@ -141,7 +141,8 @@ public class BagArray {
 
     /**
      * Removes the element at the given index of the underlying array store. The underlying store
-     * is shifted to cover the removed item. The underlyig store will not be resized.
+     * is shifted to cover the removed item. The underlying store will not be resized. Using invalid
+     * indices is ignored.
      *
      * @param index An integer value specifying the offset from the beginning of the array.
      * @return The BagArray, so that operations can be chained together.
@@ -151,8 +152,6 @@ public class BagArray {
             int gapIndex = index + 1;
             System.arraycopy (container, gapIndex, container, index, count - gapIndex);
             --count;
-        } else {
-            // XXX what would we like to have happen here? do we care?
         }
         return this;
     }
@@ -194,6 +193,7 @@ public class BagArray {
      * @param index An integer value specifying the offset from the beginning of the array.
      * @return The element as a Long, or null if the element is not found.
      */
+    @SuppressWarnings ("WeakerAccess")
     public Long getLong (int index) {
         String string = getString (index);
         return (string != null) ? Long.parseLong (string) : null;
