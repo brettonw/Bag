@@ -66,6 +66,8 @@ class BagParser {
                 return true;
             }
         }
+
+        // this will only happen if we are reconstructing from invalid source
         return false;
     }
 

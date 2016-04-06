@@ -1,6 +1,7 @@
 package com.brettonw.bag;
 
 import com.brettonw.AppTest;
+import com.brettonw.bag.test.TestClassA;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
@@ -92,6 +93,10 @@ public class BagObjectTest {
         AppTest.report (recon.getString ("escaped"), escapedString, "BagObject simple test escaped string from reconstituted bagobject");
         */
 
+        // try to put a bare POJO into a bagObject
+        BagObject   bareBagObject = new BagObject ().put ("barecheck", new TestClassA (2, false, 123.456, "pdq"));
+        AppTest.report (bareBagObject.getObject ("barecheck"), null, "BagObject - test bare POJO rejection");
+
         // on with the show
         BagObject dateObject = new BagObject ();
         dateObject.put ("Year", 2015);
@@ -114,5 +119,10 @@ public class BagObjectTest {
 
         AppTest.report (recon.getBoolean ("DOB"), null, "BagObject simple bad type request (should be null)");
         AppTest.report (recon.getString ("Joseph"), null, "BagObject simple bad key request (should be null)");
+
+        // test a reconstruction from a bogus string
+        String bogusString = "{\"Children\":\"\",\"First Name\":\"Bretton\",\"\"Wade\",\"Married\":\"true\",\"Weight\":\"220.5\"}";
+        BagObject bogusBagObject = BagObject.fromString (bogusString);
+        AppTest.report (bogusBagObject, null, "BagObject - reconstitute from a bogus string should fail");
     }
 }

@@ -2,6 +2,7 @@ package com.brettonw.bag;
 
 import com.brettonw.AppTest;
 import com.brettonw.bag.test.TestClassA;
+import com.brettonw.bag.test.TestClassC;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
@@ -17,6 +18,13 @@ public class SerializerTest {
 
     @Test
     public void test() {
+        // serialize a bare type
+        int x = 24;
+        BagObject serializedX = Serializer.toBagObject (x);
+        int deserializedX = (int) Serializer.fromBagObject (serializedX);
+        AppTest.report (deserializedX, x, "Serializer - test bare type");
+
+        // serialize a POJO
         TestClassA testClass = new TestClassA (5, true, 123.0, "pdq");
         BagObject bagObject = Serializer.toBagObject (testClass);
         log.info (bagObject.toString ());
@@ -70,5 +78,101 @@ public class SerializerTest {
         anotherBagObject = Serializer.toBagObject (bagArray);
         AppTest.report (Serializer.fromBagObject (anotherBagObject), bagArray, "Serializer test reconstituting a bag array");
         log.info ("got here");
+
+        // test the version handler
+        String serializedString = "{\"type\":\"java.lang.String\",\"v\":\"0.9\",\"value\":\"pdq\"}";
+        BagObject serializedStringBagObject = BagObject.fromString (serializedString);
+        String deserializedString = (String) Serializer.fromBagObject (serializedStringBagObject);
+        AppTest.report (deserializedString, null, "Serializer test reconstituting a string with a bad version");
+
+        // test serializing a non pojo
+        TestClassC  testClassC = new TestClassC (1, 2L, 3.0f, 10, 20L, 30.0f);
+        BagObject bagObjectC = Serializer.toBagObject (testClassC);
+        log.info (bagObjectC.toString ());
+        TestClassC  reconClassC = (TestClassC) Serializer.fromBagObject (bagObjectC);
+        AppTest.report (reconClassC.test (1, 2L, 3.0f, 10, 20L, 30.0f), true, "Serializer - Confirm reconstituted object matches original");
+
+        // more basic type arrays
+        {
+            long testArrayLong[] = {0L, 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L};
+            bagObject = Serializer.toBagObject (testArrayLong);
+            assertArrayEquals (testArrayLong, (long[]) Serializer.fromBagObject (bagObject));
+
+            short testArrayShort[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+            bagObject = Serializer.toBagObject (testArrayShort);
+            assertArrayEquals (testArrayShort, (short[]) Serializer.fromBagObject (bagObject));
+
+            byte testArrayByte[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+            bagObject = Serializer.toBagObject (testArrayByte);
+            assertArrayEquals (testArrayByte, (byte[]) Serializer.fromBagObject (bagObject));
+
+            double testArrayDouble[] = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
+            bagObject = Serializer.toBagObject (testArrayDouble);
+            assertArrayEquals (testArrayDouble, (double[]) Serializer.fromBagObject (bagObject), 1.0e-9);
+
+            float testArrayFloat[] = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f};
+            bagObject = Serializer.toBagObject (testArrayFloat);
+            assertArrayEquals (testArrayFloat, (float[]) Serializer.fromBagObject (bagObject), 1.0e-6f);
+
+            boolean testArrayBoolean[] = {true, false, true, false, true, false, true, false};
+            bagObject = Serializer.toBagObject (testArrayBoolean);
+            assertArrayEquals (testArrayBoolean, (boolean[]) Serializer.fromBagObject (bagObject));
+
+            char testArrayCharacter[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+            bagObject = Serializer.toBagObject (testArrayCharacter);
+            assertArrayEquals (testArrayCharacter, (char[]) Serializer.fromBagObject (bagObject));
+        }
+
+        // more boxed type arrays
+        {
+            Long testArrayLong[] = {0L, 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L};
+            bagObject = Serializer.toBagObject (testArrayLong);
+            assertArrayEquals (testArrayLong, (Long[]) Serializer.fromBagObject (bagObject));
+
+            Short testArrayShort[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+            bagObject = Serializer.toBagObject (testArrayShort);
+            assertArrayEquals (testArrayShort, (Short[]) Serializer.fromBagObject (bagObject));
+
+            Byte testArrayByte[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+            bagObject = Serializer.toBagObject (testArrayByte);
+            assertArrayEquals (testArrayByte, (Byte[]) Serializer.fromBagObject (bagObject));
+
+            Double testArrayDouble[] = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
+            bagObject = Serializer.toBagObject (testArrayDouble);
+            assertArrayEquals (testArrayDouble, (Double[]) Serializer.fromBagObject (bagObject));
+
+            Float testArrayFloat[] = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f};
+            bagObject = Serializer.toBagObject (testArrayFloat);
+            assertArrayEquals (testArrayFloat, (Float[]) Serializer.fromBagObject (bagObject));
+
+            Boolean testArrayBoolean[] = {true, false, true, false, true, false, true, false};
+            bagObject = Serializer.toBagObject (testArrayBoolean);
+            assertArrayEquals (testArrayBoolean, (Boolean[]) Serializer.fromBagObject (bagObject));
+
+            Character testArrayCharacter[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+            bagObject = Serializer.toBagObject (testArrayCharacter);
+            assertArrayEquals (testArrayCharacter, (Character[]) Serializer.fromBagObject (bagObject));
+        }
+
+        // test an array of POJOs - a complex test to round out the suite
+        {
+            TestClassA  testArrayA[] = {
+                    new TestClassA (1, true, 3.5, "Joe"),
+                    new TestClassA (2, true, 3.6, "Dave"),
+                    new TestClassA (3, false, 19.2, "Bret"),
+                    new TestClassA (4, true, 4.5, "Roxy")
+            };
+            bagObject = Serializer.toBagObject (testArrayA);
+            TestClassA reconTestArrayA[] = (TestClassA[]) Serializer.fromBagObject (bagObject);
+            boolean pass = true;
+            for (int i = 0, end = testArrayA.length; i < end; ++i) {
+                TestClassA left = testArrayA[i];
+                TestClassA right = reconTestArrayA[i];
+
+                // not a *COMPLETE* test, but spot checking
+                pass = pass && (left.abc.equals (right.abc)) && (left.sub.b == right.sub.b);
+            }
+            AppTest.report (pass, true, "Serializer - test array of complex POJOs");
+        }
     }
 }

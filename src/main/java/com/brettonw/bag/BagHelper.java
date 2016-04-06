@@ -3,7 +3,7 @@ package com.brettonw.bag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-class BagHelper {
+enum BagHelper { ;
     private static final Logger log = LogManager.getLogger (BagHelper.class);
 
     public static String enclose (String input, String bracket) {
@@ -27,10 +27,9 @@ class BagHelper {
                 case "com.brettonw.bag.BagArray":
                     return value.toString ();
 
-                default:
-                    // no other type should be stored in the bag classes
-                    log.debug ("Unhandled type: " + value.getClass ().getName ());
-                    break;
+                // we omit the default case, because there should not be any other types stored in
+                // the Bag class - as in, they would not make it into the container, as the
+                // "objectify" method will gate that
             }
         }
         return null;
@@ -41,10 +40,12 @@ class BagHelper {
             String className = value.getClass ().getName ();
             switch (className) {
                 case "java.lang.String":
+                    // is this the right place to do a transformation that converts quotes to some
+                    // escape character?
                     return value;
 
                 case "java.lang.Long": case "java.lang.Integer": case "java.lang.Short": case "java.lang.Byte":
-                case "java.lang.Char":
+                case "java.lang.Character":
                 case "java.lang.Boolean":
                 case "java.lang.Double": case "java.lang.Float":
                     return value.toString ();
@@ -61,25 +62,5 @@ class BagHelper {
             }
         }
         return null;
-    }
-
-    public static boolean isPrimitive (Class cls) {
-        // obviously, if Java thinks it's a primitive, it is
-        if (cls.isPrimitive ()) {
-            return true;
-        }
-
-        // but we want this for boxed primitives and strings as well
-        switch (cls.getName ()) {
-            case "java.lang.Long": case "java.lang.Integer": case "java.lang.Short": case "java.lang.Byte":
-            case "java.lang.Char":
-            case "java.lang.Boolean":
-            case "java.lang.Double": case "java.lang.Float":
-            case "java.lang.String":
-                return true;
-        }
-
-        // it wasn't any of those, return false;
-        return false;
     }
 }

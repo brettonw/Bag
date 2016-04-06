@@ -6,8 +6,7 @@ import org.apache.logging.log4j.Logger;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
-import java.util.Map;
+import java.util.*;
 
 /**
  * A tool to convert data types to and from BagObjects for serialization. It is designed to support
@@ -15,11 +14,11 @@ import java.util.Map;
  * arrays, and array or map-based containers of one of the previously mentioned types. It explicitly
  * supports BagObject and BagArray as well.
  */
-public class Serializer {
+enum Serializer { ;
     private static final Logger log = LogManager.getLogger (Serializer.class);
 
     private static final String TYPE_KEY = "type";
-    private static final String VERSION_KEY = "version";
+    private static final String VERSION_KEY = "v";
     private static final String KEY_KEY = "key";
     private static final String VALUE_KEY = "value";
 
@@ -32,11 +31,24 @@ public class Serializer {
     private static final String SERIALIZER_VERSION_1 = "1.0";
     private static final String SERIALIZER_VERSION = SERIALIZER_VERSION_1;
 
-    // don't let anybody create one of these
-    private Serializer () {}
+    private static boolean isPrimitive (Class type) {
+        // an obvious check to do here is type.isPrimitive (), but that is never true because Java
+        // has boxed the primitives before they get here. So, we have to check for boxed primitives
+        // and strings as well
+        switch (type.getName ()) {
+            case "java.lang.Long": case "java.lang.Integer": case "java.lang.Short": case "java.lang.Byte":
+            case "java.lang.Character":
+            case "java.lang.Boolean":
+            case "java.lang.Double": case "java.lang.Float":
+            case "java.lang.String":
+                return true;
+        }
 
+        // it wasn't any of those, return false;
+        return false;
+    }
     private static SerializationType serializationType (Class type) {
-        if (BagHelper.isPrimitive (type)) return SerializationType.PRIMITIVE;
+        if (isPrimitive (type)) return SerializationType.PRIMITIVE;
         if (type.isArray ()) return SerializationType.ARRAY;
         if (Collection.class.isAssignableFrom (type)) return SerializationType.COLLECTION;
         if (Map.class.isAssignableFrom (type)) return SerializationType.MAP;
@@ -63,8 +75,16 @@ public class Serializer {
 
     private static BagObject serializeJavaObjectType (BagObject bagObject, Object object, Class type) throws IllegalAccessException {
         BagObject value = new BagObject ();
-        Field fields[] = type.getFields ();
-        for (Field field : fields) {
+        Set<Field> fieldSet = new HashSet<Field> (Arrays.asList (type.getFields ()));
+        fieldSet.addAll (Arrays.asList (type.getDeclaredFields ()));
+        for (Field field : fieldSet) {
+            // force accessibility for serialization - this is an issue with the reflection API
+            // that we want to step around because serialization is assumed to be the primary
+            // goal, as opposed to viewing a way to workaround an API that needs to be over-
+            // ridden. This should prevent the IllegalAccessException from ever happening.
+            field.setAccessible (true);
+
+            // get the name and type, and get the value to encode
             String name = field.getName ();
             log.info ("Add " + name + " as " + field.getType ().getName ());
             value.put (name, toBagObject (field.get (object)));
@@ -106,11 +126,13 @@ public class Serializer {
      * @return A BagObject encapsulation of the target object, or null if the conversion failed.
      */
     public static BagObject toBagObject (Object object) {
+        // fill out the header of the encapsulating bag
         Class type = object.getClass ();
-        BagObject bagObject = new BagObject (2)
+        BagObject bagObject = new BagObject (3)
                 .put (TYPE_KEY, type.getName ())
                 .put (VERSION_KEY, SERIALIZER_VERSION);
 
+        // the next step depends on the actual type of what's being serialized
         try {
             switch (serializationType (type)) {
                 case PRIMITIVE: return serializePrimitiveType (bagObject, object);
@@ -130,17 +152,32 @@ public class Serializer {
 
     @SuppressWarnings (value="unchecked")
     private static Object deserializePrimitiveType (BagObject bagObject) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
+        String valueString = bagObject.getString (VALUE_KEY);
         Class type = ClassLoader.getSystemClassLoader ().loadClass (bagObject.getString (TYPE_KEY));
-        return type.getConstructor (String.class).newInstance (bagObject.getString (VALUE_KEY));
+
+        // Character types don't have a constructor from a String, so we have to handle that as a
+        // special case. Fingers crossed we don't find any others
+        return (type.isAssignableFrom (Character.class)) ?
+            type.getConstructor (char.class).newInstance (valueString.charAt (0)) :
+            type.getConstructor (String.class).newInstance (valueString);
     }
 
     private static Object deserializeJavaObjectType (BagObject bagObject) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException {
         Class type = ClassLoader.getSystemClassLoader ().loadClass (bagObject.getString (TYPE_KEY));
         Object target = type.newInstance ();
 
-        // traverse the fields via reflection to set the values
+        // traverse the fields via reflection to set the values, only the public values
         BagObject value = bagObject.getBagObject (VALUE_KEY);
-        for (Field field : type.getFields ()) {
+        Set<Field> fieldSet = new HashSet<Field> (Arrays.asList (type.getFields ()));
+        fieldSet.addAll (Arrays.asList (type.getDeclaredFields ()));
+        for (Field field : fieldSet) {
+            // force accessibility for serialization - this is an issue with the reflection API
+            // that we want to step around because serialization is assumed to be the primary
+            // goal, as opposed to viewing a way to workaround an API that needs to be over-
+            // ridden. This should prevent the IllegalAccessException from ever happening.
+            field.setAccessible (true);
+
+            // get the name and type, and set the value from the encode value
             //log.info ("Add " + name + " as " + field.getType ().getName ());
             field.set (target, fromBagObject (value.getBagObject (field.getName ())));
         }
@@ -196,9 +233,13 @@ public class Serializer {
         // if we get here, the type is either a class name, or ???
         if (typeName.charAt (arrayDepth) == 'L') {
             ClassLoader classLoader = ClassLoader.getSystemClassLoader ();
-            return classLoader.loadClass (typeName.substring (arrayDepth + 1));
+            int semiColon = typeName.indexOf (';');
+            typeName = typeName.substring (arrayDepth + 1, semiColon);
+            // note that this could throw ClassNotFound if the typeName is not legitimate.
+            return classLoader.loadClass (typeName);
         }
 
+        // this will only happen if we are deserializing from modified source
         throw new ClassNotFoundException(typeName);
     }
 
@@ -243,6 +284,12 @@ public class Serializer {
         return target;
     }
 
+    private static void requireVersion (String got, String expected) throws BadVersionException {
+        if (! got.equals (expected)) {
+            throw new BadVersionException (got, expected);
+        }
+    }
+
     /**
      * Reconstitute the given BagObject representation back to the object it represents.
      *
@@ -254,30 +301,26 @@ public class Serializer {
     public static Object fromBagObject (BagObject bagObject) {
         // we expect a future change might use a different approach to deserialization, so we check
         // to be sure this is the version we are working to
-        if (bagObject.getString (VERSION_KEY).equals (SERIALIZER_VERSION)) {
-            try {
-                switch (serializationType (bagObject.getString (TYPE_KEY))) {
-                    case PRIMITIVE:
-                        return deserializePrimitiveType (bagObject);
-                    case BAG_OBJECT:
-                        return bagObject.getBagObject (VALUE_KEY);
-                    case BAG_ARRAY:
-                        return bagObject.getBagArray (VALUE_KEY);
-                    case JAVA_OBJECT:
-                        return deserializeJavaObjectType (bagObject);
-                    case COLLECTION:
-                        return deserializeCollectionType (bagObject);
-                    case MAP:
-                        return deserializeMapType (bagObject);
-                    case ARRAY:
-                        return deserializeArrayType (bagObject);
-                }
-            } catch (Exception exception) {
-                log.error (exception);
+        try {
+            requireVersion (bagObject.getString (VERSION_KEY), SERIALIZER_VERSION);
+            switch (serializationType (bagObject.getString (TYPE_KEY))) {
+                case PRIMITIVE:
+                    return deserializePrimitiveType (bagObject);
+                case BAG_OBJECT:
+                    return bagObject.getBagObject (VALUE_KEY);
+                case BAG_ARRAY:
+                    return bagObject.getBagArray (VALUE_KEY);
+                case JAVA_OBJECT:
+                    return deserializeJavaObjectType (bagObject);
+                case COLLECTION:
+                    return deserializeCollectionType (bagObject);
+                case MAP:
+                    return deserializeMapType (bagObject);
+                case ARRAY:
+                    return deserializeArrayType (bagObject);
             }
-        } else {
-            log.error ("Deserialization failed, unknown version (" + bagObject.getString (VERSION_KEY) + "), expected (" + SERIALIZER_VERSION + ")");
         }
+        catch (Exception exception) { log.error (exception); }
         return null;
     }
 }

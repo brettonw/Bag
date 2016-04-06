@@ -276,7 +276,10 @@ public class BagArray {
         for (int i = 0; i < count; ++i) {
             result.append (first ? "" : ",");
             first = false;
-            result.append (BagHelper.stringify (container[i]));
+            String string = BagHelper.stringify (container[i]);
+            if (string != null) {
+                result.append (string);
+            }
         }
         return BagHelper.enclose (result.toString (), "[]");
     }

@@ -8,6 +8,7 @@ import static org.junit.Assert.*;
 public class BagArrayTest {
     @Test
     public void test() {
+        // a first basic test
         BagArray bagArray = new BagArray ()
             .add ("abdefg")
             .add (123456)
@@ -22,6 +23,12 @@ public class BagArrayTest {
         bagArray.insert (10, 456789);
         assertEquals ("Check size", 11, bagArray.getCount ());
 
+        // convert that bag to a string
+        String bagArrayAsString = bagArray.toString ();
+        BagArray reconBagArray = BagArray.fromString (bagArrayAsString);
+        AppTest.report (reconBagArray.toString (), bagArrayAsString, "BagArray - simple round trip with null values");
+
+        // a more complicated array test
         BagArray testArray = new BagArray();
         testArray.add("Bretton");
         testArray.add("Wade");
@@ -74,6 +81,9 @@ public class BagArrayTest {
         reconArray.replace (1, childArray);
         AppTest.report (reconArray.getBagArray (1), childArray, "BagArray store and retrieve a BagArray");
         AppTest.report (reconArray.getBagObject (1), null, "BagArray simple invalid type extraction as BagObject");
+        reconString = reconArray.toString ();
+        testArray = BagArray.fromString (reconString);
+        AppTest.report (testArray.toString (), reconString, "BagArray reconstitute with an array containing an array");
 
     }
 }
