@@ -20,9 +20,9 @@ transformations on the stored data.
 complex values to be shared in a text-based data interchange format without the formality of
 declaring classes or establishing schemas.
 
-* Bag is not meant to consume arbitrary JSON files, and it probably won't work for that, though the
-reverse will - Bag text files are valid JSON. The text format is generated using the "toString" and
-"fromString" operators. That is all it is currently spec'd to do, and all it is tested for.
+ * Bag can consume a superset of valid JSON files, and Bag text output files are valid JSON. The
+text format is generated using the "toString" and "fromString" operators, but the parsing is
+slightly simplified compared to a JSON file.
 
 * For now, the error handling philosophy is to return null and log failures. The user can choose to
 throw an exception if they want, but Bag should be robust and continue chugging without killing the

@@ -91,11 +91,16 @@ class BagParser {
         String result = null;
         if (Expect('"')) {
             int start = index;
-            char c = input.charAt (index++);
+            char c = input.charAt(index);
             while (c != '"') {
-                c = input.charAt (index++);
+                // using the escape mechanism is like a free pass for the next character, but we
+                // don't do any transformation on the substring, just return it as written
+                if (c == '\\') {
+                    ++index;
+                }
+                c = input.charAt(++index);
             }
-            result = input.substring (start, index - 1);
+            result = input.substring (start, index++);
         } else {
             // technically, we're being sloppy allowing bare values where quoted strings are
             // expected, but it's part of the simplified structure we support. This allows us to

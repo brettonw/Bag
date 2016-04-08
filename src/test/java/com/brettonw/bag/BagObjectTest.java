@@ -84,14 +84,15 @@ public class BagObjectTest {
         AppTest.report (reconString, testString, "BagObject simple reconstitution");
 
         // test an escaped string
-        /*
-        String escapedString = "a longer string with a \\\"quote from shakespeare\\\" in it";
-        testObject.put ("escaped", escapedString);
-        AppTest.report (testObject.getString ("escaped"), escapedString, "BagObject simple test escaped string");
-        testString = testObject.toString ();
-        recon = BagObject.fromString (testString);
-        AppTest.report (recon.getString ("escaped"), escapedString, "BagObject simple test escaped string from reconstituted bagobject");
-        */
+        boolean testEscapedStrings = true;
+        if (testEscapedStrings) {
+            String escapedString = "a longer string with a \\\"quote from shakespeare\\\" in \\\"it\\\"";
+            testObject.put ("escaped", escapedString);
+            AppTest.report (testObject.getString ("escaped"), escapedString, "BagObject simple test escaped string");
+            testString = testObject.toString ();
+            recon = BagObject.fromString (testString);
+            AppTest.report (recon.getString ("escaped"), escapedString, "BagObject simple test escaped string from reconstituted bagobject");
+        }
 
         // try to put a bare POJO into a bagObject
         BagObject   bareBagObject = new BagObject ().put ("barecheck", new TestClassA (2, false, 123.456, "pdq"));
