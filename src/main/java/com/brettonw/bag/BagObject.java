@@ -238,6 +238,17 @@ public class BagObject {
     }
 
     /**
+     * Return whether or not the requested key is present in the BagObject.
+     *
+     * @param key A string value used to index an element.
+     * @return A boolean value, true if the key is present in the underlying store. Note that null
+     * values are not stored (design decision), so this equivalent to checking for null.
+     */
+    public boolean has (String key) {
+        return (binarySearch (key) >= 0);
+    }
+
+    /**
      * Returns an array of the keys contained in the underlying map.
      *
      * @return The keys in the underlying map as an array of Strings.

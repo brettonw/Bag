@@ -125,6 +125,8 @@ public class BagObjectTest {
         String jsonString = " { Married:\"true\",   \"Children\": [] ,       \"First Name\": \"Bretton\" , \"Last Name\" : \"Wade\" , \"Weight\":\"220.5\", Size:8 }";
         bagObject = BagObject.fromString (jsonString);
         AppTest.report (bagObject.getString ("Last Name"), "Wade", "BagObject - reconstitute from a hand-crafted string should pass");
+        AppTest.report (bagObject.has ("Married"), true, "BagObject - check that a tag is present");
+        AppTest.report (bagObject.has ("Junk"), false, "BagObject - check that a tag is not present");
         AppTest.report (bagObject.getBoolean ("Married"), true, "BagObject - reconstitute from a hand-crafted string with bare names should pass");
         AppTest.report (bagObject.getInteger ("Size"), 8, "BagObject - reconstitute from a hand-crafted string with bare values should pass");
         AppTest.report (bagObject.getBagArray ("Children").getCount (), 0, "BagObject - reconstitute from a hand-crafted string with empty array should be size 0");
