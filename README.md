@@ -20,7 +20,7 @@ transformations on the stored data.
 complex values to be shared in a text-based data interchange format without the formality of
 declaring classes or establishing schemas.
 
- * Bag can consume a superset of valid JSON files, and Bag text output files are valid JSON. The
+* Bag can consume a superset of valid JSON files, and Bag text output files are valid JSON. The
 text format is generated using the "toString" and "fromString" operators, but the parsing is
 slightly simplified compared to a JSON file.
 
