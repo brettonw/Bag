@@ -121,9 +121,12 @@ public class BagObjectTest {
         AppTest.report (recon.getString ("Joseph"), null, "BagObject simple bad key request (should be null)");
 
         // test a reconstruction from a hand-authored JSON string
-        String jsonString = " {   \"Children\": \"\" ,       \"First Name\": \"Bretton\" , \"Last Name\" : \"Wade\" , \"Married\":\"true\", \"Weight\":\"220.5\"}";
+        String jsonString = " { Married:\"true\",   \"Children\": [] ,       \"First Name\": \"Bretton\" , \"Last Name\" : \"Wade\" , \"Weight\":\"220.5\", Size:8 }";
         bagObject = BagObject.fromString (jsonString);
         AppTest.report (bagObject.getString ("Last Name"), "Wade", "BagObject - reconstitute from a hand-crafted string should pass");
+        AppTest.report (bagObject.getBoolean ("Married"), true, "BagObject - reconstitute from a hand-crafted string with bare names should pass");
+        AppTest.report (bagObject.getInteger ("Size"), 8, "BagObject - reconstitute from a hand-crafted string with bare values should pass");
+        AppTest.report (bagObject.getBagArray ("Children").getCount (), 0, "BagObject - reconstitute from a hand-crafted string with empty array should be size 0");
 
         // test a reconstruction from a bogus string
         String bogusString = "{\"Children\":\"\",\"First Name\":\"Bretton\",\"\"Wade\",\"Married\":\"true\",\"Weight\":\"220.5\"}";

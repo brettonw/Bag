@@ -1,3 +1,4 @@
 - Following release instructions at http://central.sonatype.org/pages/apache-maven.html
 
-- Coherent plan for handling strings with quotes in them
+- Coherent plan for handling strings with quotes in them (go with JSON standard?)
+

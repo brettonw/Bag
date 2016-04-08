@@ -1,10 +1,9 @@
 package com.brettonw.bag;
 
 // The BagParser is loosely modeled after a JSON parser grammar from the site (http://www.json.org).
-// The main difference is that we only expect to parse a string generated from a ToString call on a
-// BagObject or BagArray, so we ignore differences between value types (all of them will be strings
-// internally), don't handle extraneous whitespace, and assume the input is a well formed string
-// representation of a BagObject or BagArray
+// The main difference is that we ignore differences between value types (all of them will be
+// strings internally), and assume the input is a well formed string representation of a BagObject
+// or BagArray in JSON-ish format
 
 class BagParser {
     private int index;
@@ -47,7 +46,14 @@ class BagParser {
 
     private boolean ReadElements(BagArray bagArray) {
         // <Elements> ::= <Value> | <Value> , <Elements>
-        bagArray.add (ReadValue());
+        Object value = ReadValue();
+        if (value != null) {
+            // special case for "null"
+            if ((value instanceof String) && (((String) value).equalsIgnoreCase ("null"))) {
+                value = null;
+            }
+            bagArray.add (value);
+        }
         //noinspection PointlessBooleanExpression
         return (Expect(',') && ReadElements(bagArray)) || true;
     }
@@ -64,7 +70,10 @@ class BagParser {
         if ((key.length () > 0) && Expect(':')) {
             Object value = ReadValue();
             if (value != null) {
-                bagObject.put (key, value);
+                // special case for "null"
+                if (!((value instanceof String) && (((String) value).equalsIgnoreCase ("null")))) {
+                    bagObject.put (key, value);
+                }
                 return true;
             }
         }
@@ -73,7 +82,12 @@ class BagParser {
         return false;
     }
 
+    private boolean isAllowedBareValue (char c) {
+        return (Character.isLetterOrDigit (c)) || (".+=_$".indexOf (c) >= 0);
+    }
+
     private String ReadString() {
+        // " chars " | <chars>
         String result = null;
         if (Expect('"')) {
             int start = index;
@@ -82,6 +96,20 @@ class BagParser {
                 c = input.charAt (index++);
             }
             result = input.substring (start, index - 1);
+        } else {
+            // technically, we're being sloppy allowing bare values where quoted strings are
+            // expected, but it's part of the simplified structure we support. This allows us to
+            // read valid JSON files without handling every single case.
+            int start = index;
+            char c = input.charAt (index);
+            while (isAllowedBareValue (c)) {
+                c = input.charAt (++index);
+            }
+
+            // capture the result if we actually consumed some characters
+            if (index > start) {
+                result = input.substring (start, index);
+            }
         }
         return result;
     }
@@ -92,16 +120,17 @@ class BagParser {
 
         Object value = null;
         switch (input.charAt (index)) {
-            case '"':
-                value = ReadString();
-                break;
-
             case '{':
                 value = ReadBagObject();
                 break;
 
             case '[':
                 value = ReadBagArray();
+                break;
+
+            case '"':
+            default:
+                value = ReadString();
                 break;
         }
         return value;
