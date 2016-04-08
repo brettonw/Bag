@@ -99,16 +99,13 @@ public class BagObject {
         if (object != null) {
             int index = binarySearch (key);
             if (index >= 0) {
-                Pair pair = container[index];
-                pair.setValue (object);
-                //log.debug ("Replace - Key (" + key + "), Count (" + count + "), Index (" + index + ")");
+                container[index].setValue (object);
             } else {
                 // the binary search returns a funky encoding of the index where the new value
                 // should go when it's not there, so we have to decode that number (-index - 1)
                 index = -(index + 1);
                 grow (index);
                 container[index] = new Pair (key, object);
-                //log.debug ("Add - Key (" + key + "), Count (" + count + "), Index (" + index + ")");
             }
         }
         return this;

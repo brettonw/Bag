@@ -85,10 +85,8 @@ public enum Serializer { ;
             field.setAccessible (true);
 
             // get the name and type, and get the value to encode
-            String name = field.getName ();
-            log.info ("Add " + name + " as " + field.getType ().getName ());
             try {
-                value.put (name, toBagObject (field.get (object)));
+                value.put (field.getName (), toBagObject (field.get (object)));
             } catch (IllegalAccessException exception) {
                 // this shouldn't happen, per the comments above, and is untestable for purpose of
                 // measuring coverage
@@ -193,7 +191,7 @@ public enum Serializer { ;
             field.setAccessible (true);
 
             // get the name and type, and set the value from the encode value
-            //log.info ("Add " + name + " as " + field.getType ().getName ());
+            //log.trace ("Add " + field.getName () + " as " + field.getType ().getName ());
             field.set (target, fromBagObject (value.getBagObject (field.getName ())));
         }
         return target;
