@@ -10,60 +10,60 @@ class BagParser {
     private int index;
     private final String input;
 
-    public BagParser(String input)
-    {
+    public BagParser(String input) {
         this.input = input;
         index = 0;
     }
 
-    public BagArray ReadBagArray()
-    {
+    public BagArray ReadBagArray() {
         // <Array> :: [ ] | [ <Elements> ]
         BagArray bagArray = new BagArray();
         return (Expect('[') && ReadElements(bagArray) && Expect(']')) ? bagArray : null;
     }
 
-    public BagObject ReadBagObject()
-    {
+    public BagObject ReadBagObject() {
         // <Object> ::= { } | { <Members> }
         BagObject bagObject = new BagObject();
         return (Expect('{') && ReadMembers(bagObject) && Expect('}')) ? bagObject : null;
     }
 
-    private boolean Expect(char c)
-    {
-        if (input.charAt (index) == c)
-        {
+    private void consumeWhiteSpace () {
+        // consume white space (space, carriage return, tab, etc.
+        while (Character.isWhitespace (input.charAt (index))) {
+            ++index;
+        }
+    }
+
+    private boolean Expect(char c) {
+        consumeWhiteSpace ();
+
+        // the next character should be the one we expect
+        if (input.charAt (index) == c) {
             ++index;
             return true;
         }
         return false;
     }
 
-    private boolean ReadElements(BagArray bagArray)
-    {
+    private boolean ReadElements(BagArray bagArray) {
         // <Elements> ::= <Value> | <Value> , <Elements>
         bagArray.add (ReadValue());
         //noinspection PointlessBooleanExpression
         return (Expect(',') && ReadElements(bagArray)) || true;
     }
 
-    private boolean ReadMembers(BagObject bagObject)
-    {
+    private boolean ReadMembers(BagObject bagObject) {
         // <Members> ::= <Pair> | <Pair> , <Members>
         //noinspection ConstantConditions,PointlessBooleanExpression
         return ReadPair(bagObject) && ((Expect(',') && ReadMembers(bagObject)) || true);
     }
 
-    private boolean ReadPair(BagObject bagObject)
-    {
+    private boolean ReadPair(BagObject bagObject) {
         // <Pair> ::= <String> : <Value>
         String key = ReadString();
-        if ((key.length () > 0) && Expect(':'))
-        {
+        if ((key.length () > 0) && Expect(':')) {
             Object value = ReadValue();
-            if (value != null)
-            {
+            if (value != null) {
                 bagObject.put (key, value);
                 return true;
             }
@@ -73,30 +73,25 @@ class BagParser {
         return false;
     }
 
-    private String ReadString()
-    {
-        // read a string that allows quoted strings internally
+    private String ReadString() {
         String result = null;
-        if (Expect('"'))
-        {
-            StringBuilder stringBuilder = new StringBuilder();
+        if (Expect('"')) {
+            int start = index;
             char c = input.charAt (index++);
-            while (c != '"')
-            {
-                stringBuilder.append (c);
+            while (c != '"') {
                 c = input.charAt (index++);
             }
-            result = stringBuilder.toString ();
+            result = input.substring (start, index - 1);
         }
         return result;
     }
 
-    private Object ReadValue()
-    {
+    private Object ReadValue() {
         // <Value> ::= <String> | <Object> | <Array>
+        consumeWhiteSpace ();
+
         Object value = null;
-        switch (input.charAt (index))
-        {
+        switch (input.charAt (index)) {
             case '"':
                 value = ReadString();
                 break;

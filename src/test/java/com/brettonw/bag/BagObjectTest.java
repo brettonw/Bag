@@ -120,6 +120,11 @@ public class BagObjectTest {
         AppTest.report (recon.getBoolean ("DOB"), null, "BagObject simple bad type request (should be null)");
         AppTest.report (recon.getString ("Joseph"), null, "BagObject simple bad key request (should be null)");
 
+        // test a reconstruction from a hand-authored JSON string
+        String jsonString = " {   \"Children\": \"\" ,       \"First Name\": \"Bretton\" , \"Last Name\" : \"Wade\" , \"Married\":\"true\", \"Weight\":\"220.5\"}";
+        bagObject = BagObject.fromString (jsonString);
+        AppTest.report (bagObject.getString ("Last Name"), "Wade", "BagObject - reconstitute from a hand-crafted string should pass");
+
         // test a reconstruction from a bogus string
         String bogusString = "{\"Children\":\"\",\"First Name\":\"Bretton\",\"\"Wade\",\"Married\":\"true\",\"Weight\":\"220.5\"}";
         BagObject bogusBagObject = BagObject.fromString (bogusString);
