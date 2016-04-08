@@ -11,10 +11,6 @@
  * Type assignment is performed lazily on extraction, and presumes the user knows what they are
  * expecting to get.
  * <p>
- * Strings are stored directly, and the parser is not smart about strings with quotes in them. We
- * could change this behavior, but the bottom line is we don't want the Bag classes to do any kind
- * of transformations on the stored data.
- * <p>
  * These classes are primarily intended for messaging, events, and other applications that require
  * complex values to be shared in a text-based data interchange format without the formality of
  * declaring classes or establishing schemas.
