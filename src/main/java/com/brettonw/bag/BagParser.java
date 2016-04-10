@@ -23,7 +23,7 @@ class BagParser {
     public BagObject ReadBagObject() {
         // <Object> ::= { } | { <Members> }
         BagObject bagObject = new BagObject();
-        return (Expect('{') && ReadMembers(bagObject) && Expect('}')) ? bagObject : null;
+        return (Expect('{') && ReadMembers(bagObject, true) && Expect('}')) ? bagObject : null;
     }
 
     private void consumeWhiteSpace () {
@@ -58,16 +58,15 @@ class BagParser {
         return (Expect(',') && ReadElements(bagArray)) || true;
     }
 
-    private boolean ReadMembers(BagObject bagObject) {
+    private boolean ReadMembers(BagObject bagObject, boolean first) {
         // <Members> ::= <Pair> | <Pair> , <Members>
-        //noinspection ConstantConditions,PointlessBooleanExpression
-        return ReadPair(bagObject) && ((Expect(',') && ReadMembers(bagObject)) || true);
+        return ReadPair (bagObject) ? (Expect (',') ? ReadMembers (bagObject, false) : true) : first;
     }
 
     private boolean ReadPair(BagObject bagObject) {
         // <Pair> ::= <String> : <Value>
         String key = ReadString();
-        if ((key.length () > 0) && Expect(':')) {
+        if ((key != null) && (key.length () > 0) && Expect(':')) {
             Object value = ReadValue();
             if (value != null) {
                 // special case for "null"

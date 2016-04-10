@@ -121,6 +121,12 @@ public class BagObjectTest {
         AppTest.report (recon.getBoolean ("DOB"), null, "BagObject simple bad type request (should be null)");
         AppTest.report (recon.getString ("Joseph"), null, "BagObject simple bad key request (should be null)");
 
+        // test reconstruction of an empty object
+        bagObject = new BagObject ();
+        testString = bagObject.toString ();
+        BagObject reconBagObject = BagObject.fromString (testString);
+        AppTest.report (reconBagObject.toString (), testString, "BagObject - reconstitute an empty object");
+
         // test a reconstruction from a hand-authored JSON string
         String jsonString = " { Married:\"true\",   \"Children\": [] ,       \"First Name\": \"Bretton\" , \"Last Name\" : \"Wade\" , \"Weight\":\"220.5\", Size:8 }";
         bagObject = BagObject.fromString (jsonString);
