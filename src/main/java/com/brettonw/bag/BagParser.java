@@ -5,9 +5,14 @@ package com.brettonw.bag;
 // strings internally), and assume the input is a well formed string representation of a BagObject
 // or BagArray in JSON-ish format
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.*;
 
 class BagParser {
+    private static final Logger log = LogManager.getLogger (BagParser.class);
+
     private int index;
     private final String input;
 
@@ -78,6 +83,7 @@ class BagParser {
                 value = null;
             }
             bagArray.add (value);
+            //log.info ((value != null) ? value.toString () : "null");
         }
         //noinspection PointlessBooleanExpression
         return (Expect(',') && ReadElements(bagArray)) || true;
@@ -107,7 +113,7 @@ class BagParser {
     }
 
     private boolean isAllowedBareValue (char c) {
-        return (Character.isLetterOrDigit (c)) || (".+=_$".indexOf (c) >= 0);
+        return (Character.isLetterOrDigit (c)) || (".+-_$".indexOf (c) >= 0);
     }
 
     private String ReadString() {
