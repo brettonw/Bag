@@ -3,7 +3,7 @@
 
     <groupId>com.brettonw</groupId>
     <artifactId>bag</artifactId>
-    <version>1.0.9-SNAPSHOT</version>
+    <version>1.0.9</version>
     <packaging>jar</packaging>
 
     <name>Bag</name>
@@ -29,7 +29,7 @@
         <connection>scm:git:git@github.com:brettonw/bag.git</connection>
         <developerConnection>scm:git:git@github.com:brettonw/bag.git</developerConnection>
         <url>git@github.com:brettonw/bag.git</url>
-      <tag>HEAD</tag>
+      <tag>bag-1.0.9</tag>
   </scm>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
