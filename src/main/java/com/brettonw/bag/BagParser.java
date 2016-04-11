@@ -5,22 +5,47 @@ package com.brettonw.bag;
 // strings internally), and assume the input is a well formed string representation of a BagObject
 // or BagArray in JSON-ish format
 
+import java.io.*;
+
 class BagParser {
     private int index;
     private final String input;
 
-    public BagParser(String input) {
+    private String readInputStream (InputStream inputStream) throws IOException {
+        InputStreamReader   inputStreamReader = new InputStreamReader (inputStream);
+        BufferedReader bufferedReader = new BufferedReader (inputStreamReader);
+        StringBuilder stringBuilder = new StringBuilder ();
+        String line;
+        while ((line = bufferedReader.readLine ()) != null) {
+            stringBuilder.append (line);
+        }
+        bufferedReader.close ();
+        return stringBuilder.toString ();
+    }
+
+    BagParser(String input) {
         this.input = input;
         index = 0;
     }
 
-    public BagArray ReadBagArray() {
+    public BagParser(InputStream inputStream) throws IOException {
+        input = readInputStream (inputStream);
+        index = 0;
+    }
+
+    public BagParser(File file) throws IOException {
+        InputStream inputStream = new FileInputStream (file);
+        input = readInputStream (inputStream);
+        index = 0;
+    }
+
+    BagArray ReadBagArray() {
         // <Array> :: [ ] | [ <Elements> ]
         BagArray bagArray = new BagArray();
         return (Expect('[') && ReadElements(bagArray) && Expect(']')) ? bagArray : null;
     }
 
-    public BagObject ReadBagObject() {
+    BagObject ReadBagObject() {
         // <Object> ::= { } | { <Members> }
         BagObject bagObject = new BagObject();
         return (Expect('{') && ReadMembers(bagObject, true) && Expect('}')) ? bagObject : null;

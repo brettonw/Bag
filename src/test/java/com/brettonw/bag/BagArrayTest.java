@@ -3,7 +3,9 @@ package com.brettonw.bag;
 import com.brettonw.AppTest;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import java.io.InputStream;
+
+import static org.junit.Assert.assertEquals;
 
 public class BagArrayTest {
     @Test
@@ -85,5 +87,13 @@ public class BagArrayTest {
         testArray = BagArray.fromString (reconString);
         AppTest.report (testArray.toString (), reconString, "BagArray reconstitute with an array containing an array");
 
+        // regression test
+        try {
+            InputStream inputStream = this.getClass ().getResourceAsStream ("UCS_Satellite_Database_2-1-14.json");
+            bagArray = BagArray.fromStream (inputStream);
+            AppTest.report (bagArray != null, true, "BagArray - Regression Test 1");
+        } catch (Exception exception) {
+            //AppTest.report (false, true, "BagArray - Regression Test 1 - Exception failure");
+        }
     }
 }

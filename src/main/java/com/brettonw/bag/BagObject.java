@@ -3,6 +3,9 @@ package com.brettonw.bag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 
 /**
@@ -289,6 +292,28 @@ public class BagObject {
     public static BagObject fromString (String input) {
         // parse the string out... it is assumed to be a well formed BagObject serialization
         BagParser parser = new BagParser (input);
+        return parser.ReadBagObject ();
+    }
+
+    /**
+     * Returns a BagObject extracted from a JSON representation.
+     *
+     * @param  inputStream An InputStream containing a JSON encoding of a BagObject.
+     * @return A new BagObject containing the elements encoded in the input.
+     */
+    public static BagObject fromString (InputStream inputStream) throws IOException {
+        BagParser parser = new BagParser (inputStream);
+        return parser.ReadBagObject ();
+    }
+
+    /**
+     * Returns a BagObject extracted from a JSON representation.
+     *
+     * @param  file A File containing a JSON encoding of a BagObject.
+     * @return A new BagObject containing the elements encoded in the input.
+     */
+    public static BagObject fromString (File file) throws IOException {
+        BagParser parser = new BagParser (file);
         return parser.ReadBagObject ();
     }
 

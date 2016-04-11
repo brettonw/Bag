@@ -3,6 +3,10 @@ package com.brettonw.bag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+
 /**
  * A collection of text-based values stored in a zero-based indexed array.
  * <p>
@@ -285,7 +289,7 @@ public class BagArray {
     }
 
     /**
-     * Returns a BagArray extracted from a JSON representation.
+     * Returns a BagArray extracted from a JSON representation in a string.
      *
      * @param  input A String containing a JSON encoding of a BagArray.
      * @return A new BagArray containing the elements encoded in the input.
@@ -293,6 +297,30 @@ public class BagArray {
     public static BagArray fromString (String input) {
         // parse the string out... it is assumed to be a well formed BagArray serialization
         BagParser parser = new BagParser (input);
+        return parser.ReadBagArray ();
+    }
+
+    /**
+     * Returns a BagArray extracted from a JSON representation in an input stream.
+     *
+     * @param  inputStream An input stream containing a JSON encoding of a BagArray.
+     * @return A new BagArray containing the elements encoded in the input.
+     */
+    public static BagArray fromStream (InputStream inputStream) throws IOException {
+        // parse the string out... it is assumed to be a well formed BagArray serialization
+        BagParser parser = new BagParser (inputStream);
+        return parser.ReadBagArray ();
+    }
+
+    /**
+     * Returns a BagArray extracted from a JSON representation in a file.
+     *
+     * @param  file A file containing a JSON encoding of a BagArray.
+     * @return A new BagArray containing the elements encoded in the input.
+     */
+    public static BagArray fromFile (File file) throws IOException {
+        // parse the string out... it is assumed to be a well formed BagArray serialization
+        BagParser parser = new BagParser (file);
         return parser.ReadBagArray ();
     }
 }
