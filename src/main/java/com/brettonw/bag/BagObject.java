@@ -301,7 +301,7 @@ public class BagObject {
      * @param  inputStream An InputStream containing a JSON encoding of a BagObject.
      * @return A new BagObject containing the elements encoded in the input.
      */
-    public static BagObject fromString (InputStream inputStream) throws IOException {
+    public static BagObject fromStream (InputStream inputStream) throws IOException {
         BagParser parser = new BagParser (inputStream);
         return parser.ReadBagObject ();
     }
@@ -312,7 +312,7 @@ public class BagObject {
      * @param  file A File containing a JSON encoding of a BagObject.
      * @return A new BagObject containing the elements encoded in the input.
      */
-    public static BagObject fromString (File file) throws IOException {
+    public static BagObject fromFile (File file) throws IOException {
         BagParser parser = new BagParser (file);
         return parser.ReadBagObject ();
     }
