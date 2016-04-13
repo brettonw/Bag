@@ -141,5 +141,21 @@ public class BagObjectTest {
         String bogusString = "{\"Children\":\"\",\"First Name\":\"Bretton\",\"\"Wade\",\"Married\":\"true\",\"Weight\":\"220.5\"}";
         BagObject bogusBagObject = BagObject.fromString (bogusString);
         AppTest.report (bogusBagObject, null, "BagObject - reconstitute from a bogus string should fail");
+
+        // test v1.1 features (add, path-based bag-of-bags...)
+        {
+            // hierarchical values
+            BagObject.setPathSeparator (".");
+            bagObject = new BagObject ().putPath ("com.brettonw.bag.name", "test");
+            AppTest.report (bagObject.hasPath ("com.brettonw.test"), false, "BagObject - test that an incorrect path returns false");
+            AppTest.report (bagObject.hasPath ("com.brettonw.bag.name.xxx"), false, "BagObject - test that a longer incorrect path returns false");
+            AppTest.report (bagObject.hasPath ("com.brettonw.bag.name"), true, "BagObject - test that a correct path returns true");
+            AppTest.report (bagObject.getBagObjectAtPath ("com.brettonw.bag").getString ("name"), "test", "BagObject - test that a hierarchical fetch yields the correct result");
+            AppTest.report (bagObject.getBagObjectAtPath ("com.bretton.bag"), null, "BagObject - test that an incorrect hierarchical fetch yields null");
+
+            // add
+            bagObject.add ("testArray", 5).add (6).add (7).add (null).add (9);
+            AppTest.report (bagObject.getBagArray ("testArray").getInteger (2), 7, "BagObject - test array get");
+        }
     }
 }

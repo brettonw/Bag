@@ -4,6 +4,7 @@ import com.brettonw.AppTest;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.FileInputStream;
 
 import static org.junit.Assert.assertEquals;
 
@@ -92,6 +93,8 @@ public class BagArrayTest {
             File testFile = new File ("data", "UCS_Satellite_Database_2-1-14.json");
             bagArray = BagArray.fromFile (testFile);
             AppTest.report (bagArray != null, true, "BagArray - Regression Test 1");
+            bagArray = BagArray.fromStream (new FileInputStream (testFile));
+            AppTest.report (bagArray != null, true, "BagArray - Regression Test 2");
         } catch (Exception exception) {
             AppTest.report (false, true, "BagArray - Regression Test 1 - Exception failure");
         }

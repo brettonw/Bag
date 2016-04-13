@@ -13,6 +13,7 @@ import java.util.Arrays;
  */
 public class BagObject {
     private static final Logger log = LogManager.getLogger (BagObject.class);
+    private static String pathSeparator = "/";
 
     private static final int START_SIZE = 1;
     private static final int DOUBLING_CAP = 16;
@@ -37,6 +38,10 @@ public class BagObject {
     public BagObject (int size) {
         count = 0;
         container = new Pair[size];
+    }
+
+    public static void setPathSeparator (String pathSeparator) {
+        BagObject.pathSeparator = pathSeparator;
     }
 
     /**
@@ -132,29 +137,29 @@ public class BagObject {
      *
      * @param key A string value used to index the element.
      * @param object The element to store.
-     * @return The BagObject, so that operations can be chained together.
+     * @return The BagArray, so that operations can be chained together.
      */
-    public BagObject append (String key, Object object) {
+    public BagArray add (String key, Object object) {
         Pair pair = getOrAddPair (key);
         BagArray bagArray = (BagArray) pair.getValue ();
         if (bagArray == null) {
             pair.setValue (bagArray = new BagArray ());
         }
         bagArray.add (BagHelper.objectify (object));
-        return this;
+        return bagArray;
     }
 
     /**
-     * Add an object to a hierarchical "bag of bags", indexed using a path with "/" as separator
-     * keys. Using a binary search of the underlying store, finds where the BagObject mapped to the
-     * first component of the path should be. If the BagObject does not already exist, it is
+     * Add an object to a hierarchical "bag of bags", indexed using a path with a separator for
+     * child keys. Using a binary search of the underlying store, finds where the BagObject mapped
+     * to the first component of the path should be. If the BagObject does not already exist, it is
      * created, and the underlying store is shifted to make a space for it. The shift might cause
      * the underlying store to be resized if there is insufficient room.
      * <p>
      * Note that, as per the normal "put" operations, null values for the element are NOT stored
      * at the leaf of the tree denoted by "path", as returning null from getObject would
      * be indistinguishable from a call to getObject with an unknown key. However, the intervening
-     * branches will be stored if they don't already exist.
+     * branches WILL be stored if they don't already exist.
      *
      * @param path A string value used to index the element, using "/" as separators, for example:
      *             "com/brettonw/bag/key".
@@ -162,7 +167,7 @@ public class BagObject {
      * @return The BagObject, so that operations can be chained together.
      */
     public BagObject putPath (String path, Object object) {
-        String split[] = path.split ("/", 2);
+        String split[] = path.split ("\\" + pathSeparator, 2);
         if (split.length == 1) {
             return put (split[0], object);
         } else {
@@ -171,7 +176,8 @@ public class BagObject {
             if (bagObject == null) {
                 pair.setValue (bagObject = new BagObject ());
             }
-            return bagObject.putPath (split[1], object);
+            bagObject.putPath (split[1], object);
+            return this;
         }
     }
 
@@ -282,8 +288,14 @@ public class BagObject {
         return null;
     }
 
+    /**
+     * Retrieve a mapped element at the given path in a hierarchical "bag-of-bags" arrangement.
+     *
+     * @param path A string value used to index an element, using "/" as separators.
+     * @return The element as a BagObject, or null if the element is not found.
+     */
     public BagObject getBagObjectAtPath (String path) {
-        String split[] = path.split ("/", 2);
+        String split[] = path.split ("\\" + pathSeparator, 2);
         BagObject bagObject = getBagObject (split[0]);
         if (bagObject != null) {
             return (split.length == 1) ? bagObject : bagObject.getBagObjectAtPath (split[1]);
@@ -326,9 +338,14 @@ public class BagObject {
      * values are not stored (design decision), so this equivalent to checking for null.
      */
     public boolean hasPath (String path) {
-        String split[] = path.split ("/", 2);
+        String split[] = path.split ("\\" + pathSeparator, 2);
         int index = binarySearch (split[0]);
-        return (index >= 0) && ((split.length == 1) || ((BagObject) container[index].getValue ()).hasPath (split[1]));
+        try {
+            return (index >= 0) && ((split.length == 1) || ((BagObject) container[index].getValue ()).hasPath (split[1]));
+        } catch (ClassCastException classCastException) {
+            // if a requested value is not a BagObject - this should be an exceptional case
+            return false;
+        }
     }
 
     /**
