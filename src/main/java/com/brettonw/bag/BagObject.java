@@ -66,6 +66,21 @@ public class BagObject {
         return Arrays.binarySearch (container, 0, count, term);
     }
 
+    private Pair getOrAddPair (String key) {
+        // conduct a binary search for where the pair should be
+        int index = binarySearch (key);
+        if (index < 0) {
+            // the binary search returns a funky encoding of the index where the new value
+            // should go when it's not there, so we have to decode that number (-index - 1)
+            index = -(index + 1);
+
+            // make sure there is room in the underlying container, then store a new (empty) Pair
+            grow (index);
+            container[index] = new Pair (key);
+        }
+        return container[index];
+    }
+
     /**
      * Using a binary search of the underlying store, finds where the element mapped to the key
      * would be, and returns it.
@@ -83,10 +98,11 @@ public class BagObject {
     }
 
     /**
-     * Using a binary search of the underlying store, finds where the element mapped to the key
-     * should be, and stores it. If the element already exists, it is replaced with the new one. If
-     * the element does not already exist, the underlying store is shifted to make a space for it.
-     * The shift might cause the underlying store to be resized if there is insufficient room.
+     * Store an object at the requested key. Using a binary search of the underlying store, finds
+     * where the element mapped to the key should be. If the element already exists, it is replaced
+     * with the new one. If the element does not already exist, the underlying store is shifted to
+     * make a space for it. The shift might cause the underlying store to be resized if there is
+     * insufficient room.
      * <p>
      * Note that null values for the element are NOT stored, as returning null from getObject would
      * be indistinguishable from a call to getObject with an unknown key.
@@ -100,18 +116,63 @@ public class BagObject {
         // that is indistinguishable on the get from fetching a non-existent key
         object = BagHelper.objectify (object);
         if (object != null) {
-            int index = binarySearch (key);
-            if (index >= 0) {
-                container[index].setValue (object);
-            } else {
-                // the binary search returns a funky encoding of the index where the new value
-                // should go when it's not there, so we have to decode that number (-index - 1)
-                index = -(index + 1);
-                grow (index);
-                container[index] = new Pair (key, object);
-            }
+            Pair pair = getOrAddPair (key);
+            pair.setValue (object);
         }
         return this;
+    }
+
+    /**
+     * Add an object to a BagArray stored at the requested key. Using a binary search of the
+     * underlying store, finds where the BagArray mapped to the key should be. If the BagArray does
+     * not already exist, it is created, and the underlying store is shifted to make a space for it.
+     * The shift might cause the underlying store to be resized if there is insufficient room.
+     * <p>
+     * Note that null values for the BagArray ARE stored per the design decision for arrays.
+     *
+     * @param key A string value used to index the element.
+     * @param object The element to store.
+     * @return The BagObject, so that operations can be chained together.
+     */
+    public BagObject append (String key, Object object) {
+        Pair pair = getOrAddPair (key);
+        BagArray bagArray = (BagArray) pair.getValue ();
+        if (bagArray == null) {
+            pair.setValue (bagArray = new BagArray ());
+        }
+        bagArray.add (BagHelper.objectify (object));
+        return this;
+    }
+
+    /**
+     * Add an object to a hierarchical "bag of bags", indexed using a path with "/" as separator
+     * keys. Using a binary search of the underlying store, finds where the BagObject mapped to the
+     * first component of the path should be. If the BagObject does not already exist, it is
+     * created, and the underlying store is shifted to make a space for it. The shift might cause
+     * the underlying store to be resized if there is insufficient room.
+     * <p>
+     * Note that, as per the normal "put" operations, null values for the element are NOT stored
+     * at the leaf of the tree denoted by "path", as returning null from getObject would
+     * be indistinguishable from a call to getObject with an unknown key. However, the intervening
+     * branches will be stored if they don't already exist.
+     *
+     * @param path A string value used to index the element, using "/" as separators, for example:
+     *             "com/brettonw/bag/key".
+     * @param object The element to store.
+     * @return The BagObject, so that operations can be chained together.
+     */
+    public BagObject putPath (String path, Object object) {
+        String split[] = path.split ("/", 2);
+        if (split.length == 1) {
+            return put (split[0], object);
+        } else {
+            Pair pair = getOrAddPair (split[0]);
+            BagObject bagObject = (BagObject) pair.getValue ();
+            if (bagObject == null) {
+                pair.setValue (bagObject = new BagObject ());
+            }
+            return bagObject.putPath (split[1], object);
+        }
     }
 
     /**
@@ -221,6 +282,15 @@ public class BagObject {
         return null;
     }
 
+    public BagObject getBagObjectAtPath (String path) {
+        String split[] = path.split ("/", 2);
+        BagObject bagObject = getBagObject (split[0]);
+        if (bagObject != null) {
+            return (split.length == 1) ? bagObject : bagObject.getBagObjectAtPath (split[1]);
+        }
+        return null;
+    }
+
     /**
      * Retrieve a mapped element and return it as a BagArray.
      *
@@ -246,6 +316,19 @@ public class BagObject {
      */
     public boolean has (String key) {
         return (binarySearch (key) >= 0);
+    }
+
+    /**
+     * Return whether or not the requested path is present in a hierarchical "bag of bags".
+     *
+     * @param path A string value used to index an element, using "/" as separators.
+     * @return A boolean value, true if the key is present in the underlying store. Note that null
+     * values are not stored (design decision), so this equivalent to checking for null.
+     */
+    public boolean hasPath (String path) {
+        String split[] = path.split ("/", 2);
+        int index = binarySearch (split[0]);
+        return (index >= 0) && ((split.length == 1) || ((BagObject) container[index].getValue ()).hasPath (split[1]));
     }
 
     /**

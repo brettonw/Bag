@@ -5,13 +5,13 @@ class Pair implements Comparable<Pair> {
     private final String key;
     private Object value;
 
+    public Pair (String key) {
+        this.key = key;
+    }
+
     public Pair (String key, Object value) {
         this.key = key;
         this.value = value;
-    }
-
-    public Pair (String key) {
-        this.key = key;
     }
 
     public String getKey() {
