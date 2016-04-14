@@ -40,6 +40,13 @@ public class BagObject {
         container = new Pair[size];
     }
 
+    /**
+     * Set the path separator. BagObject uses this value to split paths in the hierarchical bag-of-
+     * bags methods. This value defaults to "/"
+     *
+     * @param pathSeparator A string value that is used to separate key values in a path descriptor,
+     *                      such as "com/brettonw/bag", or "com.brettonw.bag".
+     */
     public static void setPathSeparator (String pathSeparator) {
         BagObject.pathSeparator = pathSeparator;
     }
