@@ -13,7 +13,6 @@ enum BagHelper { ;
     }
 
     public static String quote (String input) {
-        // XXX should this escape quote marks in the string?
         return enclose (input, "\"");
     }
 
@@ -59,7 +58,6 @@ enum BagHelper { ;
 
                 default:
                     // no other type should be stored in the bag classes
-                    // XXX throw an exception?
                     log.error ("Unhandled type: " + className);
                     break;
             }
