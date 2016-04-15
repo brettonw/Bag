@@ -6,6 +6,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
 import static org.junit.Assert.*;
 
 public class BagObjectTest {
@@ -145,17 +149,31 @@ public class BagObjectTest {
         // test v1.1 features (add, path-based bag-of-bags...)
         {
             // hierarchical values
-            BagObject.setPathSeparator (".");
-            bagObject = new BagObject ().putPath ("com.brettonw.bag.name", "test");
-            AppTest.report (bagObject.hasPath ("com.brettonw.test"), false, "BagObject - test that an incorrect path returns false");
-            AppTest.report (bagObject.hasPath ("com.brettonw.bag.name.xxx"), false, "BagObject - test that a longer incorrect path returns false");
-            AppTest.report (bagObject.hasPath ("com.brettonw.bag.name"), true, "BagObject - test that a correct path returns true");
-            AppTest.report (bagObject.getBagObjectAtPath ("com.brettonw.bag").getString ("name"), "test", "BagObject - test that a hierarchical fetch yields the correct result");
-            AppTest.report (bagObject.getBagObjectAtPath ("com.bretton.bag"), null, "BagObject - test that an incorrect hierarchical fetch yields null");
+            bagObject = new BagObject ().put ("com/brettonw/bag/name", "test");
+            AppTest.report (bagObject.has ("com/brettonw/test"), false, "BagObject - test that an incorrect path returns false");
+            AppTest.report (bagObject.has ("com/brettonw/bag/name/xxx"), false, "BagObject - test that a longer incorrect path returns false");
+            AppTest.report (bagObject.has ("com/brettonw/bag/name"), true, "BagObject - test that a correct path returns true");
+            AppTest.report (bagObject.getString ("com/brettonw/bag/name"), "test", "BagObject - test that a hierarchical fetch yields the correct result");
+            AppTest.report (bagObject.getBagObject ("com/bretton/bag"), null, "BagObject - test that an incorrect hierarchical fetch yields null");
+            bagObject.remove ("com/brettonw/bag");
+            AppTest.report (bagObject.has ("com/brettonw/bag/name"), false, "BagObject - test that a path is correctly removed");
 
             // add
             bagObject.add ("testArray", 5).add (6).add (7).add (null).add (9);
             AppTest.report (bagObject.getBagArray ("testArray").getInteger (2), 7, "BagObject - test array get");
         }
+
+        // file and stream tests
+        try {
+            File testFile = new File ("data", "bagObject.json");
+            bagObject = BagObject.fromFile (testFile);
+            bagObject = BagObject.fromStream (new FileInputStream (testFile));
+            AppTest.report (bagObject.getString ("glossary/title"), "example glossary", "BagObject - basic test that load from stream succeeds");
+            AppTest.report (bagObject.getString ("glossary/GlossDiv/GlossList/GlossEntry/ID"), "SGML", "BagObject - complex test that load from stream succeeds");
+
+        } catch (IOException exception) {
+            AppTest.report (false, true, exception.getMessage ());
+        }
+
     }
 }
