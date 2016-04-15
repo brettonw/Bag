@@ -99,9 +99,14 @@ public class BagObject {
      * @return The indexed element (if found), or null
      */
     public Object getObject (String key) {
+        // separate the key into path components, the "local" key value is the first component, so
+        // use that to conduct the search. We are only interested in values that indicate the search
+        // found the requested key
         String path[] = key.split (PATH_SEPARATOR, 2);
         int index = binarySearch (path[0]);
         if (index >= 0) {
+            // grab the found element... if the path was only one element long, this is the element
+            // we were looking for, otherwise recur on the found element as another BagObject
             Pair pair = container[index];
             Object found = pair.getValue ();
             return (path.length == 1) ? found : ((BagObject) found).getObject (path[1]);
@@ -130,14 +135,21 @@ public class BagObject {
      * @return The BagObject, so that operations can be chained together.
      */
     public BagObject put (String key, Object object) {
+        // convert the element to internal storage format, and don't bother with the rest if that's
+        // a null value (per the docs above)
         object = BagHelper.objectify (object);
         if (object != null) {
+            // separate the key into path components, the "local" key value is the first component,
+            // so use that to conduct the search. If there is an element there, we want to get it,
+            // otherwise we want to create it.
             String path[] = key.split (PATH_SEPARATOR, 2);
+            Pair pair = getOrAddPair (path[0]);
             if (path.length == 1) {
-                Pair pair = getOrAddPair (path[0]);
+                // this was the only key in the path, so it's the end of the line, store the value
                 pair.setValue (object);
             } else {
-                Pair pair = getOrAddPair (path[0]);
+                // this is not the leaf key, so we set the pair value to be a new BagObject if
+                // necessary, then traverse via recursion,
                 BagObject bagObject = (BagObject) pair.getValue ();
                 if (bagObject == null) {
                     pair.setValue (bagObject = new BagObject ());
@@ -149,12 +161,19 @@ public class BagObject {
     }
 
     /**
-     * Add an object to a BagArray stored at the requested key. Using a binary search of the
-     * underlying store, finds where the BagArray mapped to the key should be. If the BagArray does
-     * not already exist, it is created, and the underlying store is shifted to make a space for it.
-     * The shift might cause the underlying store to be resized if there is insufficient room.
+     * Add an object to a BagArray stored at the requested key. If the key does not already exist,
+     * a non-null value will be stored as a bare value, just as if "put" had been called. If it does
+     * exist, and is not already an array or the stored value is null, then a new array will be
+     * created to store any existing values and the requested element.
      * <p>
-     * Note that null values for the BagArray ARE stored per the design decision for arrays.
+     * Using a binary search of the underlying store, finds where the first component of the path
+     * should be. If it does not already exist, it is created (recursively in the case of a path),
+     * and the underlying store is shifted to make a space for it. The shift might cause the
+     * underlying store to be resized if there is insufficient room.
+     * <p>
+     * Note that null values for the BagArray ARE stored per the design decision for arrays, but
+     * bare values of null are not recorded, so initial calls to "add" with null values will be
+     * discarded.
      *
      * @param key A string value used to index the element, using "/" as separators, for example:
      *             "com/brettonw/bag/key".
@@ -162,14 +181,46 @@ public class BagObject {
      * @return The BagObject, so that operations can be chained together.
      */
     public BagObject add (String key, Object object) {
+        // separate the key into path components, the "local" key value is the first component,
+        // so use that to conduct the search. If there is an element there, we want to get it,
+        // otherwise we want to create it.
         String path[] = key.split (PATH_SEPARATOR, 2);
         Pair pair = getOrAddPair (path[0]);
         if (path.length == 1) {
-            BagArray bagArray = (BagArray) pair.getValue ();
-            if (bagArray == null) {
-                pair.setValue (bagArray = new BagArray ());
+            // this is the end of the line, so we want to store the requested object
+            BagArray bagArray;
+            Object found = pair.getValue ();
+            if ((object = BagHelper.objectify (object)) == null) {
+                if (found == null) {
+                    // 1) object is null, key does not exist - create array
+                    pair.setValue (bagArray = new BagArray ());
+                } else if (found instanceof BagArray) {
+                    // 2) object is null, key exists (is array)
+                    bagArray = (BagArray) found;
+                } else {
+                    // 3) object is null, key exists (is not array) - create array, store existing value
+                    pair.setValue (bagArray = new BagArray (2));
+                    bagArray.add (found);
+                }
+
+                // and store the null value in the array
+                bagArray.add (null);
+            } else {
+                if (found == null) {
+                    // 4) object is not null, key does not exist - store as bare value
+                    pair.setValue (object);
+                } else {
+                    if (found instanceof BagArray) {
+                        // 5) object is not null, key exists (is array) - add new value to array
+                        bagArray = (BagArray) found;
+                    } else {
+                        // 6) object is not null, key exists (is not array) - create array, store existing value, store new value
+                        pair.setValue (bagArray = new BagArray (2));
+                        bagArray.add (found);
+                    }
+                    bagArray.add (object);
+                }
             }
-            bagArray.add (BagHelper.objectify (object));
         } else {
             BagObject bagObject = (BagObject) pair.getValue ();
             if (bagObject == null) {

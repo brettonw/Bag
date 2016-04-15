@@ -159,8 +159,16 @@ public class BagObjectTest {
             AppTest.report (bagObject.has ("com/brettonw/bag/name"), false, "BagObject - test that a path is correctly removed");
 
             // add
-            bagObject.add ("com/bretton/testArray", 5).getBagArray ("com/bretton/testArray").add (6).add (7).add (null).add (9);
+            bagObject.add ("com/bretton/testArray", 5).add ("com/bretton/testArray", 6).add ("com/bretton/testArray", 7).add ("com/bretton/testArray", null).add ("com/bretton/testArray", 9);
             AppTest.report (bagObject.getBagArray ("com/bretton/testArray").getInteger (2), 7, "BagObject - test array get");
+
+            bagObject = new BagObject ().add ("null", null);
+            AppTest.report (bagObject.getBagArray ("null").getCount (), 1, "BagObject - test case 1, add null to non existent key");
+
+            bagObject = new BagObject ().add ("null", 5).add ("null", null);
+            AppTest.report (bagObject.getBagArray ("null").getCount (), 2, "BagObject - test case 3, add null to non array key");
+
+
         }
 
         // file and stream tests

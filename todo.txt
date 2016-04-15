@@ -3,3 +3,6 @@
 
 - add xml serialization
 - rethink "toString", etc. as "toJSON"?
+- consider eliminating object creation in binary search
+- change BagObject so that "add" implicitly changes the underlying type to an array if it's not
+  already an array, and stores the original value in the new array

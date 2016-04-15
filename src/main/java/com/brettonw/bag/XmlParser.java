@@ -1,38 +1,31 @@
 package com.brettonw.bag;
 
-// The JsonParser is loosely modeled after a JSON parser grammar from the site (http://www.json.org).
-// The main difference is that we ignore differences between value types (all of them will be
-// strings internally), and assume the input is a well formed string representation of a BagObject
-// or BagArray in JSON-ish format
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 
-class JsonParser extends Parser {
-    private static final Logger log = LogManager.getLogger (JsonParser.class);
+class XmlParser extends Parser {
+    private static final Logger log = LogManager.getLogger (XmlParser.class);
 
-    JsonParser (String input) {
+    XmlParser (String input) {
         super (input);
     }
 
-    JsonParser (InputStream inputStream) throws IOException {
+    XmlParser (InputStream inputStream) throws IOException {
         super (inputStream);
     }
 
-    JsonParser (File file) throws IOException {
+    XmlParser (File file) throws IOException {
         super (file);
     }
 
-    @Override
     BagArray ReadBagArray() {
         // <Array> :: [ ] | [ <Elements> ]
         BagArray bagArray = new BagArray();
         return (Expect('[') && ReadElements(bagArray) && Expect(']')) ? bagArray : null;
     }
 
-    @Override
     BagObject ReadBagObject() {
         // <Object> ::= { } | { <Members> }
         BagObject bagObject = new BagObject();
