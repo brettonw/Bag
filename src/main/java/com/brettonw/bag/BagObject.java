@@ -376,7 +376,7 @@ public class BagObject {
      */
     public static BagObject fromString (String input) {
         // parse the string out... it is assumed to be a well formed BagObject serialization
-        BagParser parser = new BagParser (input);
+        JsonParser parser = new JsonParser (input);
         return parser.ReadBagObject ();
     }
 
@@ -387,7 +387,7 @@ public class BagObject {
      * @return A new BagObject containing the elements encoded in the input.
      */
     public static BagObject fromStream (InputStream inputStream) throws IOException {
-        BagParser parser = new BagParser (inputStream);
+        JsonParser parser = new JsonParser (inputStream);
         return parser.ReadBagObject ();
     }
 
@@ -398,7 +398,7 @@ public class BagObject {
      * @return A new BagObject containing the elements encoded in the input.
      */
     public static BagObject fromFile (File file) throws IOException {
-        BagParser parser = new BagParser (file);
+        JsonParser parser = new JsonParser (file);
         return parser.ReadBagObject ();
     }
 

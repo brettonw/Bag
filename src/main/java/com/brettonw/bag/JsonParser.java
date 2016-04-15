@@ -1,6 +1,6 @@
 package com.brettonw.bag;
 
-// The BagParser is loosely modeled after a JSON parser grammar from the site (http://www.json.org).
+// The JsonParser is loosely modeled after a JSON parser grammar from the site (http://www.json.org).
 // The main difference is that we ignore differences between value types (all of them will be
 // strings internally), and assume the input is a well formed string representation of a BagObject
 // or BagArray in JSON-ish format
@@ -10,8 +10,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 
-class BagParser {
-    private static final Logger log = LogManager.getLogger (BagParser.class);
+class JsonParser {
+    private static final Logger log = LogManager.getLogger (JsonParser.class);
 
     private int index;
     private final String input;
@@ -28,17 +28,17 @@ class BagParser {
         return stringBuilder.toString ();
     }
 
-    BagParser(String input) {
+    JsonParser (String input) {
         this.input = input;
         index = 0;
     }
 
-    public BagParser(InputStream inputStream) throws IOException {
+    public JsonParser (InputStream inputStream) throws IOException {
         input = readInputStream (inputStream);
         index = 0;
     }
 
-    public BagParser(File file) throws IOException {
+    public JsonParser (File file) throws IOException {
         InputStream inputStream = new FileInputStream (file);
         input = readInputStream (inputStream);
         index = 0;
