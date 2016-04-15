@@ -305,6 +305,7 @@ public class BagArray {
      *
      * @param  inputStream An input stream containing a JSON encoding of a BagArray.
      * @return A new BagArray containing the elements encoded in the input.
+     * @throws IOException if the stream input can not be read
      */
     public static BagArray fromStream (InputStream inputStream) throws IOException {
         // parse the string out... it is assumed to be a well formed BagArray serialization
@@ -317,6 +318,7 @@ public class BagArray {
      *
      * @param  file A file containing a JSON encoding of a BagArray.
      * @return A new BagArray containing the elements encoded in the input.
+     * @throws IOException if the file input can not be read
      */
     public static BagArray fromFile (File file) throws IOException {
         // parse the string out... it is assumed to be a well formed BagArray serialization

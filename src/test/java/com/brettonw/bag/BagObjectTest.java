@@ -19,8 +19,8 @@ public class BagObjectTest {
     public void test() {
         BagObject bagObject = new BagObject ();
         bagObject.put ("name", "bretton wade");
-        bagObject.put ("phone", "410.710.7918");
-        bagObject.put ("address", "610 Cathedral St Apt 3");
+        bagObject.put ("phone", "410.791.7108");
+        bagObject.put ("address", "410 Charles St");
         bagObject.put ("city", "baltimore");
         bagObject.put ("state", "mx"); // note the typo that gets replaced...
         bagObject.put ("zip", "21201");

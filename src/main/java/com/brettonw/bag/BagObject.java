@@ -89,7 +89,9 @@ public class BagObject {
     }
 
     /**
-     * Return an object stored at the requested key value.
+     * Return an object stored at the requested key value. The key may be a simple name, or it may
+     * be a path (with keys separated by "/") to create a hierarchical "bag-of-bags" that is indexed
+     * recursively.
      * <p>
      * Using a binary search of the underlying store, finds where the first component of the path
      * should be and returns it.
@@ -161,19 +163,19 @@ public class BagObject {
     }
 
     /**
-     * Add an object to a BagArray stored at the requested key. If the key does not already exist,
-     * a non-null value will be stored as a bare value, just as if "put" had been called. If it does
-     * exist, and is not already an array or the stored value is null, then a new array will be
-     * created to store any existing values and the requested element.
+     * Add an object to a BagArray stored at the requested key. The key may be a simple name, or it may be a path
+     * (with keys separated by "/") to create a hierarchical "bag-of-bags" that is indexed
+     * recursively. If the key does not already exist a non-null value will be stored as a bare
+     * value, just as if "put" had been called. If it does exist, and is not already an array or the
+     * stored value is null, then a new array will be created to store any existing values and the
+     * requested element.
      * <p>
      * Using a binary search of the underlying store, finds where the first component of the path
      * should be. If it does not already exist, it is created (recursively in the case of a path),
      * and the underlying store is shifted to make a space for it. The shift might cause the
      * underlying store to be resized if there is insufficient room.
      * <p>
-     * Note that null values for the BagArray ARE stored per the design decision for arrays, but
-     * bare values of null are not recorded, so initial calls to "add" with null values will be
-     * discarded.
+     * Note that null values for the BagArray ARE stored per the design decision for arrays.
      *
      * @param key A string value used to index the element, using "/" as separators, for example:
      *             "com/brettonw/bag/key".
@@ -222,6 +224,8 @@ public class BagObject {
                 }
             }
         } else {
+            // this is not the leaf key, so we set the pair value to be a new BagObject if
+            // necessary, then traverse via recursion,
             BagObject bagObject = (BagObject) pair.getValue ();
             if (bagObject == null) {
                 pair.setValue (bagObject = new BagObject ());
@@ -232,6 +236,10 @@ public class BagObject {
     }
 
     /**
+     * Remove an object stored at teh requested key. The key may be a simple name, or it may be a
+     * path (with keys separated by "/") to create a hierarchical "bag-of-bags" that is indexed
+     * recursively.
+     * <p>
      * Using a binary search of the underlying store, finds where the element mapped to the key
      * should be, and removes it. If the element doesn't exist, nothing happens. If
      * the element is removed, the underlying store is shifted to close the space where it was.
@@ -436,6 +444,7 @@ public class BagObject {
      *
      * @param  inputStream An InputStream containing a JSON encoding of a BagObject.
      * @return A new BagObject containing the elements encoded in the input.
+     * @throws IOException if the stream input can not be read
      */
     public static BagObject fromStream (InputStream inputStream) throws IOException {
         JsonParser parser = new JsonParser (inputStream);
@@ -447,6 +456,7 @@ public class BagObject {
      *
      * @param  file A File containing a JSON encoding of a BagObject.
      * @return A new BagObject containing the elements encoded in the input.
+     * @throws IOException if the file can not be read
      */
     public static BagObject fromFile (File file) throws IOException {
         JsonParser parser = new JsonParser (file);
