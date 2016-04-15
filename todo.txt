@@ -1,4 +1,5 @@
 - Following release instructions at http://central.sonatype.org/pages/apache-maven.html
     * mvn release:clean release:prepare && mvn release:perform
 
-
+- add xml serialization
+- rethink "toString", etc. as "toJSON"?

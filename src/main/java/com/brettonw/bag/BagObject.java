@@ -23,14 +23,14 @@ public class BagObject {
 
 
     /**
-     * Create a new BagObject with a default underlying storage size, and default path separator.
+     * Create a new BagObject with a default underlying storage size.
      */
     public BagObject () {
         init (DEFAULT_CONTAINER_SIZE);
     }
 
     /**
-     * Create a new BagObject with hint for the underlying storage size, and default path separator.
+     * Create a new BagObject with hint for the underlying storage size.
      *
      * @param size The expected number of elements in the BagObject, treated as a hint to optimize
      *             memory allocation. If additional elements are stored, the BagObject will revert
@@ -89,10 +89,13 @@ public class BagObject {
     }
 
     /**
-     * Using a binary search of the underlying store, finds where the element mapped to the key
-     * would be, and returns it.
+     * Return an object stored at the requested key value.
+     * <p>
+     * Using a binary search of the underlying store, finds where the first component of the path
+     * should be and returns it.
      *
-     * @param key A string value used to index the element.
+     * @param key A string value used to index the element, using "/" as separators, for example:
+     *             "com/brettonw/bag/key".
      * @return The indexed element (if found), or null
      */
     public Object getObject (String key) {
@@ -107,36 +110,14 @@ public class BagObject {
     }
 
     /**
-     * Add an object to a BagArray stored at the requested key. Using a binary search of the
-     * underlying store, finds where the BagArray mapped to the key should be. If the BagArray does
-     * not already exist, it is created, and the underlying store is shifted to make a space for it.
-     * The shift might cause the underlying store to be resized if there is insufficient room.
-     * <p>
-     * Note that null values for the BagArray ARE stored per the design decision for arrays.
-     *
-     * @param key A string value used to index the element.
-     * @param object The element to store.
-     * @return The BagArray, so that operations can be chained together.
-     */
-    public BagArray add (String key, Object object) {
-        Pair pair = getOrAddPair (key);
-        BagArray bagArray = (BagArray) pair.getValue ();
-        if (bagArray == null) {
-            pair.setValue (bagArray = new BagArray ());
-        }
-        bagArray.add (BagHelper.objectify (object));
-        return bagArray;
-    }
-
-    /**
      * Store an object at the requested key value. The key may be a simple name, or it may be a path
      * (with keys separated by "/") to create a hierarchical "bag-of-bags" that is indexed
      * recursively.
      * <p>
-     * Using a binary search of the underlying store, finds where the BagObject mapped
-     * to the first component of the path should be. If the BagObject does not already exist, it is
-     * created, and the underlying store is shifted to make a space for it. The shift might cause
-     * the underlying store to be resized if there is insufficient room.
+     * Using a binary search of the underlying store, finds where the first component of the path
+     * should be. If it does not already exist, it is created (recursively in the case of a path),
+     * and the underlying store is shifted to make a space for it. The shift might cause the
+     * underlying store to be resized if there is insufficient room.
      * <p>
      * Note that null values for the element are NOT stored at the leaf of the tree denoted by
      * a path, as returning null from getObject would be indistinguishable from a call to getObject
@@ -168,12 +149,45 @@ public class BagObject {
     }
 
     /**
+     * Add an object to a BagArray stored at the requested key. Using a binary search of the
+     * underlying store, finds where the BagArray mapped to the key should be. If the BagArray does
+     * not already exist, it is created, and the underlying store is shifted to make a space for it.
+     * The shift might cause the underlying store to be resized if there is insufficient room.
+     * <p>
+     * Note that null values for the BagArray ARE stored per the design decision for arrays.
+     *
+     * @param key A string value used to index the element, using "/" as separators, for example:
+     *             "com/brettonw/bag/key".
+     * @param object The element to store.
+     * @return The BagObject, so that operations can be chained together.
+     */
+    public BagObject add (String key, Object object) {
+        String path[] = key.split (PATH_SEPARATOR, 2);
+        Pair pair = getOrAddPair (path[0]);
+        if (path.length == 1) {
+            BagArray bagArray = (BagArray) pair.getValue ();
+            if (bagArray == null) {
+                pair.setValue (bagArray = new BagArray ());
+            }
+            bagArray.add (BagHelper.objectify (object));
+        } else {
+            BagObject bagObject = (BagObject) pair.getValue ();
+            if (bagObject == null) {
+                pair.setValue (bagObject = new BagObject ());
+            }
+            bagObject.add (path[1], object);
+        }
+        return this;
+    }
+
+    /**
      * Using a binary search of the underlying store, finds where the element mapped to the key
      * should be, and removes it. If the element doesn't exist, nothing happens. If
      * the element is removed, the underlying store is shifted to close the space where it was.
      * removing elements will never cause the underlying store to shrink.
      *
-     * @param key A string value used to index the element.
+     * @param key A string value used to index the element, using "/" as separators, for example:
+     *             "com/brettonw/bag/key".
      * @return The BagObject, so that operations can be chained together.
      */
     public BagObject remove (String key) {
@@ -300,7 +314,8 @@ public class BagObject {
      * Return whether or not the requested key or path is present in the BagObject or hierarchical
      * "bag-of-bags"
      *
-     * @param key A string value used to index an element
+     * @param key A string value used to index the element, using "/" as separators, for example:
+     *             "com/brettonw/bag/key".
      * @return A boolean value, true if the key is present in the underlying store. Note that null
      * values are not stored (design decision), so this equivalent to checking for null.
      */
@@ -318,7 +333,8 @@ public class BagObject {
     }
 
     /**
-     * Returns an array of the keys contained in the underlying container.
+     * Returns an array of the keys contained in the underlying container. it does not enumerate the
+     * container and all of its children.
      *
      * @return The keys in the underlying map as an array of Strings.
      */
