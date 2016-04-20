@@ -28,7 +28,7 @@ public class BagArrayTest {
 
         // convert that bag to a string
         String bagArrayAsString = bagArray.toString ();
-        BagArray reconBagArray = BagArray.fromString (bagArrayAsString);
+        BagArray reconBagArray = BagArray.fromJsonString (bagArrayAsString);
         AppTest.report (reconBagArray.toString (), bagArrayAsString, "BagArray - simple round trip with null values");
 
         // a more complicated array test
@@ -54,7 +54,7 @@ public class BagArrayTest {
         String testString = testArray.toString();
         AppTest.report(testString, testString, "BagArray simple toString exercise (" + testString + ")");
 
-        BagArray reconArray = BagArray.fromString(testString);
+        BagArray reconArray = BagArray.fromJsonString(testString);
         String reconString = reconArray.toString();
         AppTest.report(reconString, testString, "BagArray simple reconstitution");
 
@@ -67,7 +67,7 @@ public class BagArrayTest {
         testString = reconArray.toString();
         AppTest.report(testString, testString, "BagArray complex toString exercise (" + testString + ")");
 
-        reconArray = BagArray.fromString(testString);
+        reconArray = BagArray.fromJsonString(testString);
         reconString = reconArray.toString();
         AppTest.report(reconString, testString, "BagArray complex reconstitution");
 
@@ -85,7 +85,7 @@ public class BagArrayTest {
         AppTest.report (reconArray.getBagArray (1), childArray, "BagArray store and retrieve a BagArray");
         AppTest.report (reconArray.getBagObject (1), null, "BagArray simple invalid type extraction as BagObject");
         reconString = reconArray.toString ();
-        testArray = BagArray.fromString (reconString);
+        testArray = BagArray.fromJsonString (reconString);
         AppTest.report (testArray.toString (), reconString, "BagArray reconstitute with an array containing an array");
 
         // regression test

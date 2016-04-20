@@ -82,7 +82,7 @@ public class SerializerTest {
         // test the version handler
         {
             String serializedString = "{\"type\":\"java.lang.String\",\"v\":\"0.9\",\"value\":\"pdq\"}";
-            BagObject serializedStringBagObject = BagObject.fromString (serializedString);
+            BagObject serializedStringBagObject = BagObject.fromJsonString (serializedString);
             String deserializedString = (String) Serializer.fromBagObject (serializedStringBagObject);
             AppTest.report (deserializedString, null, "Serializer test reconstituting a string with a bad version");
         }
@@ -90,7 +90,7 @@ public class SerializerTest {
         // test deserialization from modified source
         {
             String serializedString = "{\"type\":\"java.lang.Sring\",\"v\":\"1.0\",\"value\":\"pdq\"}";
-            BagObject serializedStringBagObject = BagObject.fromString (serializedString);
+            BagObject serializedStringBagObject = BagObject.fromJsonString (serializedString);
             String deserializedString = (String) Serializer.fromBagObject (serializedStringBagObject);
             AppTest.report (deserializedString, null, "Serializer test reconstituting a modified source");
         }
@@ -188,7 +188,7 @@ public class SerializerTest {
         // test a bogus array string
         {
             String bogusArrayString = "{\"type\":\"[java.lang.Integer;\",\"v\":\"1.0\",\"value\":[{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"0\"},{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"1\"},{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"2\"},{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"3\"},{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"4\"},{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"5\"},{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"6\"},{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"7\"},{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"8\"},{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"9\"}]}";
-            BagObject bogusArray = BagObject.fromString (bogusArrayString);
+            BagObject bogusArray = BagObject.fromJsonString (bogusArrayString);
             Object result = Serializer.fromBagObject (bogusArray);
             AppTest.report (result, null, "Serializer - test bogus array string");
         }

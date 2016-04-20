@@ -16,7 +16,7 @@ public class Bag {
     }
 
     public Bag (String string) {
-        container = BagObject.fromString (string);
+        container = BagObject.fromJsonString (string);
     }
 
     public Bag (InputStream stream) throws IOException {

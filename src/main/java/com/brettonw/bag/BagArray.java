@@ -14,7 +14,7 @@ import java.io.InputStream;
  * work with dynamic storage of very large numbers of elements (more than 1,000s). It will work,
  * but we have not chosen to focus on this as a potential use-case.
  */
-public class BagArray {
+public class BagArray extends Base {
     private static final Logger log = LogManager.getLogger (BagArray.class);
 
     private static final int START_SIZE = 1;
@@ -108,7 +108,7 @@ public class BagArray {
     public BagArray insert (int index, Object object) {
         grow (index);
         // note that arrays can store null objects, unlike bags
-        container[index] = BagHelper.objectify (object);
+        container[index] = objectify (object);
         return this;
     }
 
@@ -139,7 +139,7 @@ public class BagArray {
      */
     public BagArray replace (int index, Object object) {
         // note that arrays can store null objects, unlike bags
-        container[index] = BagHelper.objectify (object);
+        container[index] = objectify (object);
         return this;
     }
 
@@ -273,19 +273,32 @@ public class BagArray {
      *
      * @return A String containing the JSON representation of the underlying store.
      */
-    @Override
-    public String toString () {
+    public String toJsonString () {
         StringBuilder result = new StringBuilder ();
         boolean first = true;
         for (int i = 0; i < count; ++i) {
             result.append (first ? "" : ",");
             first = false;
-            String string = BagHelper.stringify (container[i]);
+            String string = getJsonString (container[i]);
             if (string != null) {
                 result.append (string);
             }
         }
-        return BagHelper.enclose (result.toString (), "[]");
+        return enclose (result.toString (), SQUARE_BRACKETS);
+    }
+
+    /**
+     * Returns the BagArray represented as XML.
+     *
+     * @return A String containing the XML representation of the underlying store.
+     */
+    public String toXmlString (String name) {
+        StringBuilder result = new StringBuilder ();
+        for (int i = 0; i < count; ++i) {
+            String string = getXmlString (name, container[i]);
+            result.append (string);
+        }
+        return result.toString ();
     }
 
     /**
@@ -294,7 +307,7 @@ public class BagArray {
      * @param  input A String containing a JSON encoding of a BagArray.
      * @return A new BagArray containing the elements encoded in the input.
      */
-    public static BagArray fromString (String input) {
+    public static BagArray fromJsonString (String input) {
         // parse the string out... it is assumed to be a well formed BagArray serialization
         JsonParser parser = new JsonParser (input);
         return parser.ReadBagArray ();

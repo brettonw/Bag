@@ -61,7 +61,7 @@ public class BagObjectTest {
         String testString = testObject.toString ();
         AppTest.report (testString, testString, "BagObject simple ToString exercise (" + testString + ")");
 
-        BagObject recon = BagObject.fromString (testString);
+        BagObject recon = BagObject.fromJsonString (testString);
         assertNotNull (recon);
         String reconString = recon.toString ();
         AppTest.report (reconString, testString, "BagObject simple reconstitution");
@@ -82,7 +82,7 @@ public class BagObjectTest {
         testString = testObject.toString ();
         AppTest.report (testString, testString, "BagObject simple ToString exercise (" + testString + ")");
 
-        recon = BagObject.fromString (testString);
+        recon = BagObject.fromJsonString (testString);
         assertNotNull (recon);
         reconString = recon.toString ();
         AppTest.report (reconString, testString, "BagObject simple reconstitution");
@@ -94,7 +94,7 @@ public class BagObjectTest {
             testObject.put ("escaped", escapedString);
             AppTest.report (testObject.getString ("escaped"), escapedString, "BagObject simple test escaped string");
             testString = testObject.toString ();
-            recon = BagObject.fromString (testString);
+            recon = BagObject.fromJsonString (testString);
             AppTest.report (recon.getString ("escaped"), escapedString, "BagObject simple test escaped string from reconstituted bagobject");
         }
 
@@ -114,7 +114,7 @@ public class BagObjectTest {
         testString = testObject.toString ();
         AppTest.report (testString, testString, "BagObject complex ToString exercise (" + testString + ")");
 
-        recon = BagObject.fromString (testString);
+        recon = BagObject.fromJsonString (testString);
         reconString = recon.toString ();
         AppTest.report (reconString, testString, "BagObject complex reconsititution");
 
@@ -128,12 +128,12 @@ public class BagObjectTest {
         // test reconstruction of an empty object
         bagObject = new BagObject ();
         testString = bagObject.toString ();
-        BagObject reconBagObject = BagObject.fromString (testString);
+        BagObject reconBagObject = BagObject.fromJsonString (testString);
         AppTest.report (reconBagObject.toString (), testString, "BagObject - reconstitute an empty object");
 
         // test a reconstruction from a hand-authored JSON string
         String jsonString = " { Married:\"true\",   \"Children\": [] ,       \"First Name\": \"Bretton\" , \"Last Name\" : \"Wade\" , \"Weight\":\"220.5\", Size:8 }";
-        bagObject = BagObject.fromString (jsonString);
+        bagObject = BagObject.fromJsonString (jsonString);
         AppTest.report (bagObject.getString ("Last Name"), "Wade", "BagObject - reconstitute from a hand-crafted string should pass");
         AppTest.report (bagObject.has ("Married"), true, "BagObject - check that a tag is present");
         AppTest.report (bagObject.has ("Junk"), false, "BagObject - check that a tag is not present");
@@ -143,7 +143,7 @@ public class BagObjectTest {
 
         // test a reconstruction from a bogus string
         String bogusString = "{\"Children\":\"\",\"First Name\":\"Bretton\",\"\"Wade\",\"Married\":\"true\",\"Weight\":\"220.5\"}";
-        BagObject bogusBagObject = BagObject.fromString (bogusString);
+        BagObject bogusBagObject = BagObject.fromJsonString (bogusString);
         AppTest.report (bogusBagObject, null, "BagObject - reconstitute from a bogus string should fail");
 
         // test v1.1 features (add, path-based bag-of-bags...)
@@ -181,6 +181,19 @@ public class BagObjectTest {
 
         } catch (IOException exception) {
             AppTest.report (false, true, exception.getMessage ());
+        }
+
+        // xml string tests
+        {
+            bagObject = new BagObject ();
+            bagObject.put ("name", "bretton wade");
+            bagObject.put ("phone", "410.791.7108");
+            bagObject.put ("address", "410 Charles St");
+            bagObject.put ("city", "baltimore");
+            bagObject.put ("zip", "21201");
+            bagObject.put ("state", "md");
+            String xmlString = bagObject.toXmlString ("xml");
+            AppTest.report (xmlString, xmlString, xmlString);
         }
 
     }

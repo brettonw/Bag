@@ -11,7 +11,7 @@ import java.util.Arrays;
 /**
  * A collection of text-based values store in key/value pairs (maintained in a sorted array).
  */
-public class BagObject {
+public class BagObject extends Base {
     private static final Logger log = LogManager.getLogger (BagObject.class);
 
     private static final int DEFAULT_CONTAINER_SIZE = 1;
@@ -139,7 +139,7 @@ public class BagObject {
     public BagObject put (String key, Object object) {
         // convert the element to internal storage format, and don't bother with the rest if that's
         // a null value (per the docs above)
-        object = BagHelper.objectify (object);
+        object = objectify (object);
         if (object != null) {
             // separate the key into path components, the "local" key value is the first component,
             // so use that to conduct the search. If there is an element there, we want to get it,
@@ -192,7 +192,7 @@ public class BagObject {
             // this is the end of the line, so we want to store the requested object
             BagArray bagArray;
             Object found = pair.getValue ();
-            if ((object = BagHelper.objectify (object)) == null) {
+            if ((object = objectify (object)) == null) {
                 if (found == null) {
                     // 1) object is null, key does not exist - create array
                     pair.setValue (bagArray = new BagArray ());
@@ -410,8 +410,7 @@ public class BagObject {
      *
      * @return A String containing the JSON representation of the underlying store.
      */
-    @Override
-    public String toString () {
+    public String toJsonString () {
         StringBuilder result = new StringBuilder ();
         boolean isFirst = true;
         for (int i = 0; i < count; ++i) {
@@ -420,11 +419,25 @@ public class BagObject {
 
             Pair pair = container[i];
             result
-                    .append (BagHelper.quote (pair.getKey ()))
+                    .append (quote (pair.getKey ()))
                     .append (":")
-                    .append (BagHelper.stringify (pair.getValue ()));
+                    .append (getJsonString (pair.getValue ()));
         }
-        return BagHelper.enclose (result.toString (), "{}");
+        return enclose (result.toString (), CURLY_BRACKETS);
+    }
+    /**
+     * Returns the BagObject represented as XML.
+     *
+     * @param  name A String giving the name of the unit for enclosure.
+     * @return A String containing the XML representation of the underlying store.
+     */
+    public String toXmlString (String name) {
+        StringBuilder result = new StringBuilder ();
+        for (int i = 0; i < count; ++i) {
+            Pair pair = container[i];
+            result.append (getXmlString (pair.getKey (), pair.getValue ()));
+        }
+        return encloseXml (name, result.toString ());
     }
 
     /**
@@ -433,7 +446,7 @@ public class BagObject {
      * @param  input A String containing a JSON encoding of a BagObject.
      * @return A new BagObject containing the elements encoded in the input.
      */
-    public static BagObject fromString (String input) {
+    public static BagObject fromJsonString (String input) {
         // parse the string out... it is assumed to be a well formed BagObject serialization
         JsonParser parser = new JsonParser (input);
         return parser.ReadBagObject ();
