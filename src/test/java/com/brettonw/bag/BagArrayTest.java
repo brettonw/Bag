@@ -113,4 +113,18 @@ public class BagArrayTest {
             AppTest.report (false, true, "BagArray - Regression Test 1 - Exception failure");
         }
     }
+
+    @Test
+    public void testXml() {
+        BagObject bagObject = new BagObject ().put ("array",
+            new BagArray ()
+                .add (5)
+                .add ("hello")
+                .add (null)
+                .add ("world")
+                .add (735.6));
+        String xml = bagObject.toXmlString ("xml");
+        String expect = "<xml><array>5</array><array>hello</array><array></array><array>world</array><array>735.6</array></xml>";
+        AppTest.report (xml, expect, "BagArray - test XML");
+    }
 }
