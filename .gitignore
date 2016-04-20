@@ -10,3 +10,4 @@ buildNumber.properties
 .idea
 *.log
 .DS_Store
+*.iml
