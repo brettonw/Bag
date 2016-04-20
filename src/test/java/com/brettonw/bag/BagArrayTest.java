@@ -10,13 +10,13 @@ import static org.junit.Assert.assertEquals;
 
 public class BagArrayTest {
     @Test
-    public void test() {
+    public void testBagArray() {
         // a first basic test
         BagArray bagArray = new BagArray ()
-            .add ("abdefg")
-            .add (123456)
-            .add (123.456)
-            .add (true);
+                .add ("abdefg")
+                .add (123456)
+                .add (123.456)
+                .add (true);
         bagArray.insert (1, 234567);
         bagArray.replace (2, 345678);
 
@@ -30,7 +30,10 @@ public class BagArrayTest {
         String bagArrayAsString = bagArray.toString ();
         BagArray reconBagArray = BagArray.fromJsonString (bagArrayAsString);
         AppTest.report (reconBagArray.toString (), bagArrayAsString, "BagArray - simple round trip with null values");
+    }
 
+    @Test
+    public void testComplicated() {
         // a more complicated array test
         BagArray testArray = new BagArray();
         testArray.add("Bretton");
@@ -57,23 +60,32 @@ public class BagArrayTest {
         BagArray reconArray = BagArray.fromJsonString(testString);
         String reconString = reconArray.toString();
         AppTest.report(reconString, testString, "BagArray simple reconstitution");
+    }
+
+    @Test
+    public void testArrayWithChildren() {
+        BagArray testArray = new BagArray();
+        testArray.add("Bretton");
+        testArray.add("Wade");
+        testArray.add(220.5);
+        testArray.add(true);
+        testArray.add(42);
 
         BagObject dateObject = new BagObject ();
         dateObject.put ("Year", 2015);
         dateObject.put ("Month", 11);
         dateObject.put ("Day", 18);
 
-        reconArray.insert(1, dateObject);
-        testString = reconArray.toString();
+        testArray.insert(1, dateObject);
+        String testString = testArray.toString();
         AppTest.report(testString, testString, "BagArray complex toString exercise (" + testString + ")");
 
-        reconArray = BagArray.fromJsonString(testString);
-        reconString = reconArray.toString();
+        BagArray reconArray = BagArray.fromJsonString(testString);
+        String reconString = reconArray.toString();
         AppTest.report(reconString, testString, "BagArray complex reconstitution");
 
         AppTest.report(reconArray.getString(2), "Wade", "BagArray simple string extraction after insert");
         AppTest.report(reconArray.getBagObject(1).getInteger ("Year"), 2015, "BagArray complex bag/int extraction");
-        //AppTest.report (false, "Test Failure");
 
         // a couple of invalid retrievals
         AppTest.report (reconArray.getString (1), null, "BagArray simple invalid type extraction as String");
@@ -87,11 +99,13 @@ public class BagArrayTest {
         reconString = reconArray.toString ();
         testArray = BagArray.fromJsonString (reconString);
         AppTest.report (testArray.toString (), reconString, "BagArray reconstitute with an array containing an array");
+    }
 
-        // regression test
+    @Test
+    public void testRegressionCase() {
         try {
             File testFile = new File ("data", "UCS_Satellite_Database_2-1-14.json");
-            bagArray = BagArray.fromFile (testFile);
+            BagArray bagArray = BagArray.fromFile (testFile);
             AppTest.report (bagArray != null, true, "BagArray - Regression Test 1");
             bagArray = BagArray.fromStream (new FileInputStream (testFile));
             AppTest.report (bagArray != null, true, "BagArray - Regression Test 2");
