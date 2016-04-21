@@ -105,37 +105,7 @@ public class BagObject extends Base {
         // key not found, return an encoded version of where the key SHOULD be
         return -(low + 1);
     }
-/*
-    public static int binarySearch(Object[] a, int fromIndex, int toIndex,
-                                   Object key) {
-        rangeCheck(a.length, fromIndex, toIndex);
-        return binarySearch0(a, fromIndex, toIndex, key);
-    }
-
-    // Like public version, but without range checks.
-    private static int binarySearch0(Object[] a, int fromIndex, int toIndex,
-                                     Object key) {
-        int low = fromIndex;
-        int high = toIndex - 1;
-
-        while (low <= high) {
-            int mid = (low + high) >>> 1;
-            @SuppressWarnings("rawtypes")
-            Comparable midVal = (Comparable)a[mid];
-            @SuppressWarnings("unchecked")
-            int cmp = midVal.compareTo(key);
-
-            if (cmp < 0)
-                low = mid + 1;
-            else if (cmp > 0)
-                high = mid - 1;
-            else
-                return mid; // key found
-        }
-        return -(low + 1);  // key not found.
-    }
-
- */
+    
     private Pair getOrAddPair (String key) {
         // conduct a binary search for where the pair should be
         int index = binarySearch (key);
