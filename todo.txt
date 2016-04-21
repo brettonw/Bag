@@ -6,4 +6,3 @@
 - consider eliminating object creation in binary search
 - document the Bag type - along with the hierarchical indexing support
 - add a Database type, based on a bagarray, complete with sort, search, filter, etc.
-- split serializer tests into smaller pieces
