@@ -77,8 +77,6 @@ class JsonParser extends Parser {
 
     private boolean ReadMembers(BagObject bagObject) {
         // <Members> ::= <Pair> | <Pair> , <Members>
-        //return ReadPair (bagObject) ? (Expect (',') ? ReadMembers (bagObject, false) : true) : first;
-
         boolean loop;
         boolean result = true;
         boolean first = true;
