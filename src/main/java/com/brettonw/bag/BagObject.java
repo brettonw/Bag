@@ -6,7 +6,6 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 
 /**
  * A collection of text-based values store in key/value pairs (maintained in a sorted array).
@@ -17,6 +16,16 @@ public class BagObject extends Base {
     private static final int DEFAULT_CONTAINER_SIZE = 1;
     private static final int DOUBLING_CAP = 16;
     private static final String PATH_SEPARATOR = "/";
+
+    private class Pair {
+        final String key;
+        Object value;
+
+        Pair (String key) {
+            this.key = key;
+        }
+    }
+
 
     private Pair[] container;
     private int count;
@@ -68,11 +77,65 @@ public class BagObject extends Base {
     }
 
     private int binarySearch (String key) {
-        // XXX it would be nice if this didn't need to create a new object to conduct this search
-        Pair term = new Pair (key);
-        return Arrays.binarySearch (container, 0, count, term);
+        // starting conditions mapped to either end of the internal store
+        int low = 0;
+        int high = count - 1;
+
+        // loop as long as the bounds have not crossed
+        while (low <= high) {
+            // compute the midpoint, and compare the search term against the key stored there, this
+            // uses the unsigned right shift in lieu of division by 2
+            int mid = (low + high) >>> 1;
+            int cmp = container[mid].key.compareTo (key);
+
+            // check the result of the comparison
+            if (cmp < 0) {
+                // the current midpoint is below the target value, set 'low' to one past it so the
+                // next loop will look only at the part of the array above the midpoint
+                low = mid + 1;
+            } else if (cmp > 0) {
+                // the current midpoint is above the target value, set 'high' to one below it so the
+                // next loop will look only at the part of the array below the midpoint
+                high = mid - 1;
+            } else {
+                // "Found it!" she says in a sing-song voice
+                return mid;
+            }
+        }
+        // key not found, return an encoded version of where the key SHOULD be
+        return -(low + 1);
+    }
+/*
+    public static int binarySearch(Object[] a, int fromIndex, int toIndex,
+                                   Object key) {
+        rangeCheck(a.length, fromIndex, toIndex);
+        return binarySearch0(a, fromIndex, toIndex, key);
     }
 
+    // Like public version, but without range checks.
+    private static int binarySearch0(Object[] a, int fromIndex, int toIndex,
+                                     Object key) {
+        int low = fromIndex;
+        int high = toIndex - 1;
+
+        while (low <= high) {
+            int mid = (low + high) >>> 1;
+            @SuppressWarnings("rawtypes")
+            Comparable midVal = (Comparable)a[mid];
+            @SuppressWarnings("unchecked")
+            int cmp = midVal.compareTo(key);
+
+            if (cmp < 0)
+                low = mid + 1;
+            else if (cmp > 0)
+                high = mid - 1;
+            else
+                return mid; // key found
+        }
+        return -(low + 1);  // key not found.
+    }
+
+ */
     private Pair getOrAddPair (String key) {
         // conduct a binary search for where the pair should be
         int index = binarySearch (key);
@@ -110,7 +173,7 @@ public class BagObject extends Base {
             // grab the found element... if the path was only one element long, this is the element
             // we were looking for, otherwise recur on the found element as another BagObject
             Pair pair = container[index];
-            Object found = pair.getValue ();
+            Object found = pair.value;
             return (path.length == 1) ? found : ((BagObject) found).getObject (path[1]);
         }
         return null;
@@ -148,13 +211,13 @@ public class BagObject extends Base {
             Pair pair = getOrAddPair (path[0]);
             if (path.length == 1) {
                 // this was the only key in the path, so it's the end of the line, store the value
-                pair.setValue (object);
+                pair.value = object;
             } else {
                 // this is not the leaf key, so we set the pair value to be a new BagObject if
                 // necessary, then traverse via recursion,
-                BagObject bagObject = (BagObject) pair.getValue ();
+                BagObject bagObject = (BagObject) pair.value;
                 if (bagObject == null) {
-                    pair.setValue (bagObject = new BagObject ());
+                    pair.value = (bagObject = new BagObject ());
                 }
                 bagObject.put (path[1], object);
             }
@@ -191,17 +254,17 @@ public class BagObject extends Base {
         if (path.length == 1) {
             // this is the end of the line, so we want to store the requested object
             BagArray bagArray;
-            Object found = pair.getValue ();
+            Object found = pair.value;
             if ((object = objectify (object)) == null) {
                 if (found == null) {
                     // 1) object is null, key does not exist - create array
-                    pair.setValue (bagArray = new BagArray ());
+                    pair.value = (bagArray = new BagArray ());
                 } else if (found instanceof BagArray) {
                     // 2) object is null, key exists (is array)
                     bagArray = (BagArray) found;
                 } else {
                     // 3) object is null, key exists (is not array) - create array, store existing value
-                    pair.setValue (bagArray = new BagArray (2));
+                    pair.value = (bagArray = new BagArray (2));
                     bagArray.add (found);
                 }
 
@@ -210,14 +273,14 @@ public class BagObject extends Base {
             } else {
                 if (found == null) {
                     // 4) object is not null, key does not exist - store as bare value
-                    pair.setValue (object);
+                    pair.value = object;
                 } else {
                     if (found instanceof BagArray) {
                         // 5) object is not null, key exists (is array) - add new value to array
                         bagArray = (BagArray) found;
                     } else {
                         // 6) object is not null, key exists (is not array) - create array, store existing value, store new value
-                        pair.setValue (bagArray = new BagArray (2));
+                        pair.value = (bagArray = new BagArray (2));
                         bagArray.add (found);
                     }
                     bagArray.add (object);
@@ -226,9 +289,9 @@ public class BagObject extends Base {
         } else {
             // this is not the leaf key, so we set the pair value to be a new BagObject if
             // necessary, then traverse via recursion,
-            BagObject bagObject = (BagObject) pair.getValue ();
+            BagObject bagObject = (BagObject) pair.value;
             if (bagObject == null) {
-                pair.setValue (bagObject = new BagObject ());
+                pair.value = (bagObject = new BagObject ());
             }
             bagObject.add (path[1], object);
         }
@@ -258,7 +321,7 @@ public class BagObject extends Base {
                 System.arraycopy (container, gapIndex, container, index, count - gapIndex);
                 --count;
             } else {
-                BagObject found = (BagObject) container[index].getValue ();
+                BagObject found = (BagObject) container[index].value;
                 found.remove (path[1]);
             }
         }
@@ -384,7 +447,7 @@ public class BagObject extends Base {
         try {
             return (index >= 0) &&
                     ((path.length == 1) ||
-                            ((BagObject) container[index].getValue ()).has (path[1]));
+                            ((BagObject) container[index].value).has (path[1]));
         } catch (ClassCastException classCastException) {
             // if a requested value is not a BagObject - this should be an exceptional case
             return false;
@@ -400,7 +463,7 @@ public class BagObject extends Base {
     public String[] keys () {
         String keys[] = new String[count];
         for (int i = 0; i < count; ++i) {
-            keys[i] = container[i].getKey ();
+            keys[i] = container[i].key;
         }
         return keys;
     }
@@ -419,9 +482,9 @@ public class BagObject extends Base {
 
             Pair pair = container[i];
             result
-                    .append (quote (pair.getKey ()))
+                    .append (quote (pair.key))
                     .append (":")
-                    .append (getJsonString (pair.getValue ()));
+                    .append (getJsonString (pair.value));
         }
         return enclose (result.toString (), CURLY_BRACKETS);
     }
@@ -435,7 +498,7 @@ public class BagObject extends Base {
         StringBuilder result = new StringBuilder ();
         for (int i = 0; i < count; ++i) {
             Pair pair = container[i];
-            result.append (getXmlString (pair.getKey (), pair.getValue ()));
+            result.append (getXmlString (pair.key, pair.value));
         }
         return encloseXml (name, result.toString ());
     }

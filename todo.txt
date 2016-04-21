@@ -3,6 +3,5 @@
 
 - some thinking about xml and arrays...
 - add xml deserialization
-- consider eliminating object creation in binary search
 - document the Bag type - along with the hierarchical indexing support
 - add a Database type, based on a bagarray, complete with sort, search, filter, etc.
