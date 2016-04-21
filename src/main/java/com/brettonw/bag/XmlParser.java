@@ -3,7 +3,9 @@ package com.brettonw.bag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 class XmlParser extends Parser {
     private static final Logger log = LogManager.getLogger (XmlParser.class);
