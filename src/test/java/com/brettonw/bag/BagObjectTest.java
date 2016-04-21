@@ -230,4 +230,14 @@ public class BagObjectTest {
         String expect = "<xml><address>410 Charles St</address><city>baltimore</city><name>bretton wade</name><phone>410.791.7108</phone><state>md</state><zip>21201</zip></xml>";
         AppTest.report (xmlString, expect, "BagObject - test XML");
     }
+
+    @Test
+    public void testJohnF() {
+        try {
+            File testFile = new File ("data", "JohnF.json");
+            BagObject bagObject = BagObject.fromFile (testFile);
+        } catch (IOException exception) {
+            AppTest.report (false, true, exception.getMessage ());
+        }
+    }
 }

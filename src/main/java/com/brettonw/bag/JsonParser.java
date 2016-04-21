@@ -38,7 +38,7 @@ class JsonParser extends Parser {
     BagObject ReadBagObject() {
         // <Object> ::= { } | { <Members> }
         BagObject bagObject = new BagObject();
-        return (Expect('{') && ReadMembers(bagObject, true) && Expect('}')) ? bagObject : null;
+        return (Expect('{') && ReadMembers(bagObject) && Expect('}')) ? bagObject : null;
     }
 
     private void consumeWhiteSpace () {
@@ -61,22 +61,39 @@ class JsonParser extends Parser {
 
     private boolean ReadElements(BagArray bagArray) {
         // <Elements> ::= <Value> | <Value> , <Elements>
-        Object value = ReadValue();
-        if (value != null) {
-            // special case for "null"
-            if ((value instanceof String) && (((String) value).equalsIgnoreCase ("null"))) {
-                value = null;
+        do {
+            Object value = ReadValue ();
+            if (value != null) {
+                // special case for "null"
+                if ((value instanceof String) && (((String) value).equalsIgnoreCase ("null"))) {
+                    value = null;
+                }
+                bagArray.add (value);
+                //log.info ((value != null) ? value.toString () : "null");
             }
-            bagArray.add (value);
-            //log.info ((value != null) ? value.toString () : "null");
-        }
-        //noinspection PointlessBooleanExpression
-        return (Expect(',') && ReadElements(bagArray)) || true;
+        } while (Expect (','));
+        return true;
     }
 
-    private boolean ReadMembers(BagObject bagObject, boolean first) {
+    private boolean ReadMembers(BagObject bagObject) {
         // <Members> ::= <Pair> | <Pair> , <Members>
-        return ReadPair (bagObject) ? (Expect (',') ? ReadMembers (bagObject, false) : true) : first;
+        //return ReadPair (bagObject) ? (Expect (',') ? ReadMembers (bagObject, false) : true) : first;
+
+        boolean loop;
+        boolean result = true;
+        boolean first = true;
+        do {
+            loop = false;
+            if (ReadPair (bagObject)) {
+                if (Expect (',')) {
+                    loop = true;
+                    first = false;
+                }
+            } else {
+                result = first;
+            }
+        } while (loop);
+        return result;
     }
 
     private boolean ReadPair(BagObject bagObject) {
