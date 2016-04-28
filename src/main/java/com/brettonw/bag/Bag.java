@@ -27,6 +27,15 @@ public class Bag {
         container = BagObject.fromFile (file);
     }
 
+    public Bag (BagObject container) {
+        this.container = container;
+    }
+
+    public Bag (Bag bag) {
+        // note, not a deep copy
+        container = bag.container;
+    }
+
     public Bag put (String key, Object object) {
         container.put (key, Serializer.toBagObject (object));
         return this;

@@ -11,6 +11,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 class JsonParser extends Parser {
     private static final Logger log = LogManager.getLogger (JsonParser.class);
@@ -57,7 +58,7 @@ class JsonParser extends Parser {
         boolean result = true;
         if (storeValue (bagArray)) {
             while (expect (',')) {
-                result = require (storeValue (bagArray), "Valid Value");
+                result = require (storeValue (bagArray), "Valid value");
             }
         }
         return result;
@@ -75,7 +76,7 @@ class JsonParser extends Parser {
         boolean result = true;
         if (readPair (bagObject)) {
             while (expect (',')) {
-                result = require (readPair (bagObject), "Valid Pair");
+                result = require (readPair (bagObject), "Valid pair");
             }
         }
         return result;
@@ -102,35 +103,54 @@ class JsonParser extends Parser {
         // <Pair> ::= <String> : <Value>
         String key = readString ();
         if ((key != null) && (key.length () > 0) && require (':')) {
-            return require (storeValue (bagObject, key), "Valid Value");
+            return require (storeValue (bagObject, key), "Valid value");
         }
         return false;
     }
 
-    private boolean isAllowedBareValue (char c) {
-        return (Character.isLetterOrDigit (c)) || (".+-_$".indexOf (c) >= 0);
+    private static final char bareValueStopChars[] = sortString (" \t\n:{}[]\",");
+    private static final char quotedStringStopChars[] = sortString ("\n\"");
+
+    private static char[] sortString (String string) {
+        char chars[] = string.toCharArray ();
+        Arrays.sort (chars);
+        return chars;
+    }
+
+    private boolean notIn (char stopChars[], char c) {
+        int i = 0;
+        int end = stopChars.length;
+        char stopChar = 0;
+        while ((i < end) && (c > (stopChar = stopChars[i]))) {
+            ++i;
+        }
+        return stopChar != c;
+    }
+
+    private int consumeUntilStop (char stopChars[]) {
+        int start = index;
+        char c;
+        //while (check () && (Arrays.binarySearch (stopChars, c = input.charAt (index)) < 0)) {
+        while (check () && notIn (stopChars, (c = input.charAt (index)))) {
+            // using the escape mechanism is like a free pass for the next character, but we
+            // don't do any transformation on the substring, just return it as written
+            index += (c == '\\') ? 2 : 1;
+        }
+        return start;
     }
 
     private String readString () {
         // " chars " | <chars>
         String result = null;
-        char c;
         if (expect('"')) {
-            int start = index;
-            while (check () && ((c = input.charAt(index)) != '"')) {
-                // using the escape mechanism is like a free pass for the next character, but we
-                // don't do any transformation on the substring, just return it as written
-                index += (c == '\\') ? 2 : 1;
-            }
+            // digest the string, and be sure to eat the end quote
+            int start = consumeUntilStop (quotedStringStopChars);
             result = input.substring (start, index++);
         } else {
             // technically, we're being sloppy allowing bare values where quoted strings are
             // expected, but it's part of the simplified structure we support. This allows us to
             // read valid JSON files without handling every single case.
-            int start = index;
-            while (check () && isAllowedBareValue (c = input.charAt (index))) {
-                ++index;
-            }
+            int start = consumeUntilStop (bareValueStopChars);;
 
             // capture the result if we actually consumed some characters
             if (index > start) {

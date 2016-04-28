@@ -55,17 +55,18 @@ abstract class Parser {
 
     protected void consumeWhiteSpace () {
         // consume white space (space, carriage return, tab, etc.
-        char c;
-        while (check() && Character.isWhitespace (c = input.charAt (index))) {
-            ++index;
-            switch (c) {
+        while (check ()) {
+            switch (input.charAt (index)) {
+                case '\t': case ' ':
+                    ++index;
+                    break;
                 case '\n':
-                case '\r':
+                    ++index;
                     ++lineNumber;
                     lastLineIndex = index;
                     break;
                 default:
-                    break;
+                    return;
             }
         }
     }
@@ -87,7 +88,7 @@ abstract class Parser {
 
     protected boolean require (boolean condition, String explanation) {
         if (! condition) {
-            onParseError ("REQUIRED: " + explanation);
+            onParseError (explanation + " REQUIRED");
         }
         return condition;
     }
