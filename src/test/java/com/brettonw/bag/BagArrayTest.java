@@ -117,14 +117,20 @@ public class BagArrayTest {
     @Test
     public void testXml() {
         BagObject bagObject = new BagObject ().put ("array",
-            new BagArray ()
-                .add (5)
-                .add ("hello")
-                .add (null)
-                .add ("world")
-                .add (735.6));
+                new BagArray ()
+                        .add (5)
+                        .add ("hello")
+                        .add (null)
+                        .add ("world")
+                        .add (735.6));
         String xml = bagObject.toXmlString ("xml");
         String expect = "<xml><array>5</array><array>hello</array><array></array><array>world</array><array>735.6</array></xml>";
         AppTest.report (xml, expect, "BagArray - test XML");
+    }
+
+    @Test
+    public void testEmptyArrayStrings() {
+        BagArray bagArray = BagArray.fromJsonString ("[]");
+        AppTest.report (bagArray != null, true, "BagArray - test empty shell");
     }
 }

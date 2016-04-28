@@ -34,14 +34,12 @@ class JsonParser extends Parser {
         return (expect('[') && readElements (bagArray) && require(']')) ? bagArray : null;
     }
 
-    @Override
-    BagObject readBagObject () {
-        // <Object> ::= { } | { <Members> }
-        BagObject bagObject = new BagObject();
-        return (expect('{') && readMembers (bagObject) && require('}')) ? bagObject : null;
-    }
-
     private boolean storeValue (BagArray bagArray) {
+        // the goal here is to try to read a "value" from the input stream, and store it into the
+        // BagArray. BagArrays can store null values, so we have a special handling case to make
+        // sure we properly convert "null" string to null value - as distinguished from a failed
+        // read, which returns null value to start.the method returns true if a valid value was
+        // fetched from the stream (in which case it was added to the BagArray)
         Object value = readValue ();
         if (value != null) {
             // special case for "null"
@@ -65,6 +63,13 @@ class JsonParser extends Parser {
         return result;
     }
 
+    @Override
+    BagObject readBagObject () {
+        // <Object> ::= { } | { <Members> }
+        BagObject bagObject = new BagObject();
+        return (expect('{') && readMembers (bagObject) && require('}')) ? bagObject : null;
+    }
+
     private boolean readMembers (BagObject bagObject) {
         // <Members> ::= <Pair> | <Pair> , <Members>
         boolean result = true;
@@ -77,6 +82,11 @@ class JsonParser extends Parser {
     }
 
     private boolean storeValue (BagObject bagObject, String key) {
+        // the goal here is to try to read a "value" from the input stream, and store it into the
+        // BagObject. BagObject can NOT store null values, so we have a special handling case to
+        // make sure we properly convert "null" string to null value - as distinguished from a failed
+        // read, which returns null value to start. the method returns true if a valid value was
+        // fetched from the stream, regardless of whether a null value was stored in the BagObject.
         Object value = readValue ();
         if (value != null) {
             // special case for "null"
