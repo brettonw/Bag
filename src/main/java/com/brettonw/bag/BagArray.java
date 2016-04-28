@@ -310,7 +310,7 @@ public class BagArray extends Base {
     public static BagArray fromJsonString (String input) {
         // parse the string out... it is assumed to be a well formed BagArray serialization
         JsonParser parser = new JsonParser (input);
-        return parser.ReadBagArray ();
+        return parser.readBagArray ();
     }
 
     /**
@@ -323,7 +323,7 @@ public class BagArray extends Base {
     public static BagArray fromStream (InputStream inputStream) throws IOException {
         // parse the string out... it is assumed to be a well formed BagArray serialization
         JsonParser parser = new JsonParser (inputStream);
-        return parser.ReadBagArray ();
+        return parser.readBagArray ();
     }
 
     /**
@@ -336,6 +336,6 @@ public class BagArray extends Base {
     public static BagArray fromFile (File file) throws IOException {
         // parse the string out... it is assumed to be a well formed BagArray serialization
         JsonParser parser = new JsonParser (file);
-        return parser.ReadBagArray ();
+        return parser.readBagArray ();
     }
 }

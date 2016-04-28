@@ -5,3 +5,4 @@
 - add xml deserialization
 - document the Bag type - along with the hierarchical indexing support
 - add a Database type, based on a bagarray, complete with sort, search, filter, etc.
+- add some error handling and reporting in the parser, so that users can know why they got null back

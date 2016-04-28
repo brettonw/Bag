@@ -28,87 +28,72 @@ class JsonParser extends Parser {
     }
 
     @Override
-    BagArray ReadBagArray() {
+    BagArray readBagArray () {
         // <Array> :: [ ] | [ <Elements> ]
         BagArray bagArray = new BagArray();
-        return (Expect('[') && ReadElements(bagArray) && Expect(']')) ? bagArray : null;
+        return (expect('[') && readElements (bagArray) && require(']')) ? bagArray : null;
     }
 
     @Override
-    BagObject ReadBagObject() {
+    BagObject readBagObject () {
         // <Object> ::= { } | { <Members> }
         BagObject bagObject = new BagObject();
-        return (Expect('{') && ReadMembers(bagObject) && Expect('}')) ? bagObject : null;
+        return (expect('{') && readMembers (bagObject) && require('}')) ? bagObject : null;
     }
 
-    private void consumeWhiteSpace () {
-        // consume white space (space, carriage return, tab, etc.
-        while (Character.isWhitespace (input.charAt (index))) {
-            ++index;
-        }
-    }
-
-    private boolean Expect(char c) {
-        consumeWhiteSpace ();
-
-        // the next character should be the one we expect
-        if (input.charAt (index) == c) {
-            ++index;
+    private boolean storeValue (BagArray bagArray) {
+        Object value = readValue ();
+        if (value != null) {
+            // special case for "null"
+            if ((value instanceof String) && (((String) value).equalsIgnoreCase ("null"))) {
+                value = null;
+            }
+            bagArray.add (value);
             return true;
         }
         return false;
     }
 
-    private boolean ReadElements(BagArray bagArray) {
+    private boolean readElements (BagArray bagArray) {
         // <Elements> ::= <Value> | <Value> , <Elements>
-        do {
-            Object value = ReadValue ();
-            if (value != null) {
-                // special case for "null"
-                if ((value instanceof String) && (((String) value).equalsIgnoreCase ("null"))) {
-                    value = null;
-                }
-                bagArray.add (value);
-                //log.info ((value != null) ? value.toString () : "null");
-            }
-        } while (Expect (','));
-        return true;
-    }
-
-    private boolean ReadMembers(BagObject bagObject) {
-        // <Members> ::= <Pair> | <Pair> , <Members>
-        boolean loop;
         boolean result = true;
-        boolean first = true;
-        do {
-            loop = false;
-            if (ReadPair (bagObject)) {
-                if (Expect (',')) {
-                    loop = true;
-                    first = false;
-                }
-            } else {
-                result = first;
+        if (storeValue (bagArray)) {
+            while (expect (',')) {
+                result = require (storeValue (bagArray), "Valid Value");
             }
-        } while (loop);
+        }
         return result;
     }
 
-    private boolean ReadPair(BagObject bagObject) {
-        // <Pair> ::= <String> : <Value>
-        String key = ReadString();
-        if ((key != null) && (key.length () > 0) && Expect(':')) {
-            Object value = ReadValue();
-            if (value != null) {
-                // special case for "null"
-                if (!((value instanceof String) && (((String) value).equalsIgnoreCase ("null")))) {
-                    bagObject.put (key, value);
-                }
-                return true;
+    private boolean readMembers (BagObject bagObject) {
+        // <Members> ::= <Pair> | <Pair> , <Members>
+        boolean result = true;
+        if (readPair (bagObject)) {
+            while (expect (',')) {
+                result = require (readPair (bagObject), "Valid Pair");
             }
         }
+        return result;
+    }
 
-        // this will only happen if we are reconstructing from invalid source
+    private boolean storeValue (BagObject bagObject, String key) {
+        Object value = readValue ();
+        if (value != null) {
+            // special case for "null"
+            if (!((value instanceof String) && (((String) value).equalsIgnoreCase ("null")))) {
+                bagObject.put (key, value);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private boolean readPair (BagObject bagObject) {
+        // <Pair> ::= <String> : <Value>
+        String key = readString ();
+        if ((key != null) && (key.length () > 0) && require (':')) {
+            return require (storeValue (bagObject, key), "Valid Value");
+        }
         return false;
     }
 
@@ -116,19 +101,16 @@ class JsonParser extends Parser {
         return (Character.isLetterOrDigit (c)) || (".+-_$".indexOf (c) >= 0);
     }
 
-    private String ReadString() {
+    private String readString () {
         // " chars " | <chars>
         String result = null;
-        if (Expect('"')) {
+        char c;
+        if (expect('"')) {
             int start = index;
-            char c = input.charAt(index);
-            while (c != '"') {
+            while (check () && ((c = input.charAt(index)) != '"')) {
                 // using the escape mechanism is like a free pass for the next character, but we
                 // don't do any transformation on the substring, just return it as written
-                if (c == '\\') {
-                    ++index;
-                }
-                c = input.charAt(++index);
+                index += (c == '\\') ? 2 : 1;
             }
             result = input.substring (start, index++);
         } else {
@@ -136,9 +118,8 @@ class JsonParser extends Parser {
             // expected, but it's part of the simplified structure we support. This allows us to
             // read valid JSON files without handling every single case.
             int start = index;
-            char c = input.charAt (index);
-            while (isAllowedBareValue (c)) {
-                c = input.charAt (++index);
+            while (check () && isAllowedBareValue (c = input.charAt (index))) {
+                ++index;
             }
 
             // capture the result if we actually consumed some characters
@@ -149,24 +130,26 @@ class JsonParser extends Parser {
         return result;
     }
 
-    private Object ReadValue() {
+    private Object readValue () {
         // <Value> ::= <String> | <Object> | <Array>
         consumeWhiteSpace ();
 
         Object value = null;
-        switch (input.charAt (index)) {
-            case '{':
-                value = ReadBagObject();
-                break;
+        if (check ()) {
+            switch (input.charAt (index)) {
+                case '{':
+                    value = readBagObject ();
+                    break;
 
-            case '[':
-                value = ReadBagArray();
-                break;
+                case '[':
+                    value = readBagArray ();
+                    break;
 
-            case '"':
-            default:
-                value = ReadString();
-                break;
+                case '"':
+                default:
+                    value = readString ();
+                    break;
+            }
         }
         return value;
     }

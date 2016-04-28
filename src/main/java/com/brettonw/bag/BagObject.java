@@ -105,7 +105,7 @@ public class BagObject extends Base {
         // key not found, return an encoded version of where the key SHOULD be
         return -(low + 1);
     }
-    
+
     private Pair getOrAddPair (String key) {
         // conduct a binary search for where the pair should be
         int index = binarySearch (key);
@@ -269,7 +269,7 @@ public class BagObject extends Base {
     }
 
     /**
-     * Remove an object stored at teh requested key. The key may be a simple name, or it may be a
+     * Remove an object stored at the requested key. The key may be a simple name, or it may be a
      * path (with keys separated by "/") to create a hierarchical "bag-of-bags" that is indexed
      * recursively.
      * <p>
@@ -482,7 +482,7 @@ public class BagObject extends Base {
     public static BagObject fromJsonString (String input) {
         // parse the string out... it is assumed to be a well formed BagObject serialization
         JsonParser parser = new JsonParser (input);
-        return parser.ReadBagObject ();
+        return parser.readBagObject ();
     }
 
     /**
@@ -494,7 +494,7 @@ public class BagObject extends Base {
      */
     public static BagObject fromStream (InputStream inputStream) throws IOException {
         JsonParser parser = new JsonParser (inputStream);
-        return parser.ReadBagObject ();
+        return parser.readBagObject ();
     }
 
     /**
@@ -506,7 +506,7 @@ public class BagObject extends Base {
      */
     public static BagObject fromFile (File file) throws IOException {
         JsonParser parser = new JsonParser (file);
-        return parser.ReadBagObject ();
+        return parser.readBagObject ();
     }
 
 }

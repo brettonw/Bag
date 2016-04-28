@@ -240,4 +240,18 @@ public class BagObjectTest {
             AppTest.report (false, true, exception.getMessage ());
         }
     }
+
+    @Test
+    public void testBadFiles() {
+        try {
+            BagObject bagObject = BagObject.fromFile (new File ("data", "badFile.json"));
+            AppTest.report (bagObject, null, "BagObject - Test that a bad file returns null (check error message in log)");
+            bagObject = BagObject.fromFile (new File ("data", "badFile2.json"));
+            AppTest.report (bagObject, null, "BagObject - Test that a bad file returns null 2 (check error message in log)");
+            bagObject = BagObject.fromFile (new File ("data", "badFile3.json"));
+            AppTest.report (bagObject, null, "BagObject - Test that a bad file returns null 3 (check error message in log)");
+        } catch (IOException exception) {
+            AppTest.report (false, true, exception.getMessage ());
+        }
+    }
 }
