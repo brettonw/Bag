@@ -113,7 +113,7 @@ public class BagArray extends Base {
     }
 
     /**
-     * Adds the element at the ed of the underlying array store. The underlying store might be
+     * Adds the element at the end of the underlying array store. The underlying store might be
      * resized if there is insufficient room.
      * <p>
      * Note that null values for the element ARE stored, as the underlying store is not a sparse

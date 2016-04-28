@@ -15,22 +15,22 @@ abstract class Base {
     private static final String ANGLE_CLOSE_BRACKETS[] = { "</", ">" };
 
 
-    protected String enclose (String input, String bracket[]) {
+    String enclose (String input, String bracket[]) {
         String bracket0 = bracket[0];
         String bracket1 = (bracket.length > 1) ? bracket[1] : bracket0;
         return bracket0 + input + bracket1;
     }
 
-    protected String quote (String input) {
+    String quote (String input) {
         return enclose (input, QUOTES);
     }
 
-    protected String encloseXml (String name, String input) {
+    String encloseXml (String name, String input) {
         String brackets[] = { enclose (name, ANGLE_BRACKETS), enclose (name, ANGLE_CLOSE_BRACKETS) };
         return enclose (input, brackets);
     }
 
-    protected String getJsonString (Object object) {
+    String getJsonString (Object object) {
         if (object != null) {
             switch (object.getClass ().getName ()) {
                 case "java.lang.String":
@@ -51,7 +51,7 @@ abstract class Base {
         return "null";
     }
 
-    protected String getXmlString (String name, Object object) {
+    String getXmlString (String name, Object object) {
         if (object != null) {
             switch (object.getClass ().getName ()) {
                 case "java.lang.String":
@@ -73,7 +73,7 @@ abstract class Base {
 
 
 
-    protected Object objectify (Object value) {
+    Object objectify (Object value) {
         if (value != null) {
             String className = value.getClass ().getName ();
             switch (className) {
