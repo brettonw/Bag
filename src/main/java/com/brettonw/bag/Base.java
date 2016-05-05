@@ -75,8 +75,9 @@ abstract class Base {
 
     Object objectify (Object value) {
         if (value != null) {
-            String className = value.getClass ().getName ();
-            switch (className) {
+            Class type = value.getClass ();
+            String typeName = type.getName ();
+            switch (typeName) {
                 case "java.lang.String":
                     // is this the right place to do a transformation that converts quotes to some
                     // escape character?
@@ -94,8 +95,8 @@ abstract class Base {
 
                 default:
                     // no other type should be stored in the bag classes
-                    log.error ("Unhandled type: " + className);
-                    break;
+                    //log.error ("Unhandled type: " + typeName);
+                    throw new UnsupportedTypeException (type);
             }
         }
         return null;

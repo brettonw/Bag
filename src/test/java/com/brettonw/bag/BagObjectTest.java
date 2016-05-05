@@ -41,16 +41,6 @@ public class BagObjectTest {
         // test a couple of exception cases
         AppTest.report(bagObject.getBagObject ("state"), null, "BagObject simple retrieve incorrect element type as BagObject");
         AppTest.report(bagObject.getBagArray ("state"), null, "BagObject simple retrieve incorrect element type as BagArray");
-
-        // and try to store something we shouldn't
-        class pojo {
-            private int a; private int b;
-            public pojo (int _a, int _b) { a = _a; b = _b; }
-            int getA () { return a; }
-            int getB () { return b; }
-        }
-        bagObject.put ("pojo", new pojo (1, 2));
-        AppTest.report (bagObject.getObject ("pojo"), null, "BagObject simple store an invalid object");
     }
 
     @Test
@@ -110,8 +100,12 @@ public class BagObjectTest {
     @Test
     public void testBarePojo() {
         // try to put a bare POJO into a bagObject
-        BagObject   bareBagObject = new BagObject ().put ("barecheck", new TestClassA (2, false, 123.456, "pdq"));
-        AppTest.report (bareBagObject.getObject ("barecheck"), null, "BagObject - test bare POJO rejection");
+        try {
+            BagObject bareBagObject = new BagObject ().put ("barecheck", new TestClassA (2, false, 123.456, "pdq"));
+            AppTest.report (false, true, "BagObject - test bare POJO rejection");
+        } catch (UnsupportedTypeException exception) {
+            AppTest.report (true, true, "BagObject - test bare POJO rejection");
+        }
     }
 
     @Test
