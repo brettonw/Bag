@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Modifier;
 import java.util.*;
 
 /**
@@ -74,23 +75,30 @@ public final class Serializer { ;
     }
 
     private static BagObject serializeJavaObjectType (BagObject bagObject, Object object, Class type) {
+        // this bag object will hold the value(s) of the fields
         BagObject value = new BagObject ();
+
+        // gather all of the fields declared, public, private, static, etc., then loop over them all
         Set<Field> fieldSet = new HashSet<> (Arrays.asList (type.getFields ()));
         fieldSet.addAll (Arrays.asList (type.getDeclaredFields ()));
         for (Field field : fieldSet) {
-            // force accessibility for serialization - this is an issue with the reflection API
-            // that we want to step around because serialization is assumed to be the primary
-            // goal, as opposed to viewing a way to workaround an API that needs to be over-
-            // ridden. This should prevent the IllegalAccessException from ever happening.
-            field.setAccessible (true);
+            // check if the field is static, we don't want to serialize any static values, as this
+            // leads to recursion
+            if (! Modifier.isStatic (field.getModifiers ())) {
+                // force accessibility for serialization - this is an issue with the reflection API
+                // that we want to step around because serialization is assumed to be the primary
+                // goal, as opposed to viewing a way to workaround an API that needs to be over-
+                // ridden. This should prevent the IllegalAccessException from ever happening.
+                field.setAccessible (true);
 
-            // get the name and type, and get the value to encode
-            try {
-                value.put (field.getName (), toBagObject (field.get (object)));
-            } catch (IllegalAccessException exception) {
-                // this shouldn't happen, per the comments above, and is untestable for purpose of
-                // measuring coverage
-                log.error (exception);
+                // get the name and type, and get the value to encode
+                try {
+                    value.put (field.getName (), toBagObject (field.get (object)));
+                } catch (IllegalAccessException exception) {
+                    // this shouldn't happen, per the comments above, and is untestable for purpose
+                    // of measuring coverage
+                    log.error (exception);
+                }
             }
         }
         return bagObject.put (VALUE_KEY, value);

@@ -7,6 +7,8 @@ public class TestClassA {
     public String abc;
     public TestClassB sub;
 
+    public static TestClassA standard = new TestClassA (5, false, 6.0, "7");
+
     public TestClassA () {}
 
     public TestClassA (int x, boolean y, double z, String abc) {
