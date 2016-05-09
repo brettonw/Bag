@@ -102,7 +102,7 @@ public class BagObjectTest {
         // try to put a bare POJO into a bagObject
         try {
             BagObject bareBagObject = new BagObject ().put ("barecheck", new TestClassA (2, false, 123.456, "pdq"));
-            AppTest.report (false, true, "BagObject - test bare POJO rejection");
+            AppTest.report (bareBagObject != null, false, "BagObject - test bare POJO rejection");
         } catch (UnsupportedTypeException exception) {
             AppTest.report (true, true, "BagObject - test bare POJO rejection");
         }
@@ -202,6 +202,7 @@ public class BagObjectTest {
         try {
             File testFile = new File ("data", "bagObject.json");
             BagObject bagObject = BagObject.fromFile (testFile);
+            AppTest.report (bagObject != null, true, "BagObject - verify a successful load from a file");
             bagObject = BagObject.fromStream (new FileInputStream (testFile));
             AppTest.report (bagObject.getString ("glossary/title"), "example glossary", "BagObject - basic test that load from stream succeeds");
             AppTest.report (bagObject.getString ("glossary/GlossDiv/GlossList/GlossEntry/ID"), "SGML", "BagObject - complex test that load from stream succeeds");
@@ -230,6 +231,7 @@ public class BagObjectTest {
         try {
             File testFile = new File ("data", "JohnF.json");
             BagObject bagObject = BagObject.fromFile (testFile);
+            AppTest.report (bagObject != null, true, "BagObject - test regression case on complex file successfully loaded");
         } catch (IOException exception) {
             AppTest.report (false, true, exception.getMessage ());
         }

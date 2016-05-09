@@ -1,11 +1,6 @@
 package com.brettonw.bag;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 abstract class Base {
-    private static final Logger log = LogManager.getLogger (Base.class);
-
     // data and functions for exporting as strings
     static final String SQUARE_BRACKETS[] = { "[", "]" };
     static final String CURLY_BRACKETS[] = { "{", "}" };

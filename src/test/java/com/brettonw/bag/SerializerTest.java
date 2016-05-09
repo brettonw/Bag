@@ -17,6 +17,11 @@ public class SerializerTest {
     private static final Logger log = LogManager.getLogger (SerializerTest.class);
 
     @Test
+    public void test() {
+        new Serializer ();
+    }
+
+    @Test
     public void testBareType() {
         // serialize a bare type
         int x = 24;

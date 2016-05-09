@@ -5,17 +5,12 @@ package com.brettonw.bag;
 // strings internally), and assume the input is a well formed string representation of a BagObject
 // or BagArray in JSON-ish format
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
 class JsonParser extends Parser {
-    private static final Logger log = LogManager.getLogger (JsonParser.class);
-
     JsonParser (String input) {
         super (input);
     }
@@ -102,10 +97,8 @@ class JsonParser extends Parser {
     private boolean readPair (BagObject bagObject) {
         // <Pair> ::= <String> : <Value>
         String key = readString ();
-        if ((key != null) && (key.length () > 0) && require (':')) {
-            return require (storeValue (bagObject, key), "Valid value");
-        }
-        return false;
+        return (key != null) && (key.length () > 0) &&
+                require (':') && require (storeValue (bagObject, key), "Valid value");
     }
 
     private static final char bareValueStopChars[] = sortString (" \t\n:{}[]\",");
@@ -150,7 +143,7 @@ class JsonParser extends Parser {
             // technically, we're being sloppy allowing bare values where quoted strings are
             // expected, but it's part of the simplified structure we support. This allows us to
             // read valid JSON files without handling every single case.
-            int start = consumeUntilStop (bareValueStopChars);;
+            int start = consumeUntilStop (bareValueStopChars);
 
             // capture the result if we actually consumed some characters
             if (index > start) {

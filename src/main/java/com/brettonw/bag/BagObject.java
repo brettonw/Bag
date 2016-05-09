@@ -16,7 +16,7 @@ public class BagObject extends Base {
 
     private static final int DEFAULT_CONTAINER_SIZE = 1;
     private static final int DOUBLING_CAP = 16;
-    private static final String PATH_SEPARATOR = "/";
+    static final String PATH_SEPARATOR = "/";
 
     private class Pair {
         final String key;
@@ -138,7 +138,7 @@ public class BagObject extends Base {
         // separate the key into path components, the "local" key value is the first component, so
         // use that to conduct the search. We are only interested in values that indicate the search
         // found the requested key
-        String path[] = key.split (PATH_SEPARATOR, 2);
+        String path[] = Key.split (key);
         int index = binarySearch (path[0]);
         if (index >= 0) {
             // grab the found element... if the path was only one element long, this is the element
@@ -178,7 +178,7 @@ public class BagObject extends Base {
             // separate the key into path components, the "local" key value is the first component,
             // so use that to conduct the search. If there is an element there, we want to get it,
             // otherwise we want to create it.
-            String path[] = key.split (PATH_SEPARATOR, 2);
+            String path[] = Key.split (key);
             Pair pair = getOrAddPair (path[0]);
             if (path.length == 1) {
                 // this was the only key in the path, so it's the end of the line, store the value
@@ -220,7 +220,7 @@ public class BagObject extends Base {
         // separate the key into path components, the "local" key value is the first component,
         // so use that to conduct the search. If there is an element there, we want to get it,
         // otherwise we want to create it.
-        String path[] = key.split (PATH_SEPARATOR, 2);
+        String path[] = Key.split (key);
         Pair pair = getOrAddPair (path[0]);
         if (path.length == 1) {
             // this is the end of the line, so we want to store the requested object
@@ -284,7 +284,7 @@ public class BagObject extends Base {
      * @return The BagObject, so that operations can be chained together.
      */
     public BagObject remove (String key) {
-        String path[] = key.split (PATH_SEPARATOR, 2);
+        String path[] = Key.split (key);
         int index = binarySearch (path[0]);
         if (index >= 0) {
             if (path.length == 1) {
@@ -520,7 +520,7 @@ public class BagObject extends Base {
      * values are not stored (design decision), so this equivalent to checking for null.
      */
     public boolean has (String key) {
-        String path[] = key.split (PATH_SEPARATOR, 2);
+        String path[] = Key.split (key);
         int index = binarySearch (path[0]);
         try {
             return (index >= 0) &&

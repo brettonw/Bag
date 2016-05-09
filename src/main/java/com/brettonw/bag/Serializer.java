@@ -15,7 +15,9 @@ import java.util.*;
  * arrays, and array or map-based containers of one of the previously mentioned types. It explicitly
  * supports BagObject and BagArray as well.
  */
-public final class Serializer { ;
+public final class Serializer {
+    Serializer () {}
+
     private static final Logger log = LogManager.getLogger (Serializer.class);
 
     private static final String TYPE_KEY = "type";
