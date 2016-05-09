@@ -2,6 +2,7 @@ package com.brettonw.bag;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.apache.logging.log4j.util.Supplier;
 
 import java.io.File;
 import java.io.IOException;
@@ -315,6 +316,18 @@ public class BagObject extends Base {
     }
 
     /**
+     * Retrieve a mapped element and return it as a String.
+     *
+     * @param key A string value used to index the element.
+     * @param notFound A String value to return if the key was not found
+     * @return The element as a string, or notFound if the element is not found.
+     */
+    public String getString (String key, String notFound) {
+        String value = getString (key);
+        return (value != null) ? value : notFound;
+    }
+
+    /**
      * Retrieve a mapped element and return it as a Boolean.
      *
      * @param key A string value used to index the element.
@@ -326,15 +339,38 @@ public class BagObject extends Base {
     }
 
     /**
+     * Retrieve a mapped element and return it as a Boolean.
+     *
+     * @param key A string value used to index the element.
+     * @param notFound A Boolean value to return if the key was not found
+     * @return The element as a Boolean, or notFound if the element is not found.
+     */
+    public Boolean getBoolean (String key, Boolean notFound) {
+        Boolean value = getBoolean (key);
+        return (value != null) ? value : notFound;
+    }
+
+    /**
      * Retrieve a mapped element and return it as a Long.
      *
      * @param key A string value used to index the element.
      * @return The element as a Long, or null if the element is not found.
      */
-    @SuppressWarnings ("WeakerAccess")
     public Long getLong (String key) {
         String string = getString (key);
         return (string != null) ? Long.parseLong (string) : null;
+    }
+
+    /**
+     * Retrieve a mapped element and return it as a Long.
+     *
+     * @param key A string value used to index the element.
+     * @param notFound A Long value to return if the key was not found
+     * @return The element as a Long, or notFound if the element is not found.
+     */
+    public Long getLong (String key, Long notFound) {
+        Long value = getLong (key);
+        return (value != null) ? value : notFound;
     }
 
     /**
@@ -349,6 +385,18 @@ public class BagObject extends Base {
     }
 
     /**
+     * Retrieve a mapped element and return it as an Integer.
+     *
+     * @param key A string value used to index the element.
+     * @param notFound An Integer value to return if the key was not found
+     * @return The element as an Integer, or notFound if the element is not found.
+     */
+    public Integer getInteger (String key, Integer notFound) {
+        Long value = getLong (key);
+        return (value != null) ? value.intValue () : notFound;
+    }
+
+    /**
      * Retrieve a mapped element and return it as a Double.
      *
      * @param key A string value used to index the element.
@@ -360,6 +408,18 @@ public class BagObject extends Base {
     }
 
     /**
+     * Retrieve a mapped element and return it as a Double.
+     *
+     * @param key A string value used to index the element.
+     * @param notFound A Double value to return if the key was not found
+     * @return The element as a Double, or notFound if the element is not found.
+     */
+    public Double getDouble (String key, Double notFound) {
+        Double value = getDouble (key);
+        return (value != null) ? value : notFound;
+    }
+
+    /**
      * Retrieve a mapped element and return it as a Float.
      *
      * @param key A string value used to index the element.
@@ -368,6 +428,18 @@ public class BagObject extends Base {
     public Float getFloat (String key) {
         Double value = getDouble (key);
         return (value != null) ? value.floatValue () : null;
+    }
+
+    /**
+     * Retrieve a mapped element and return it as a Float.
+     *
+     * @param key A string value used to index the element.
+     * @param notFound A Float value to return if the key was not found
+     * @return The element as a Float, or notFound if the element is not found.
+     */
+    public Float getFloat (String key, Float notFound) {
+        Double value = getDouble (key);
+        return (value != null) ? value.floatValue () : notFound;
     }
 
     /**
@@ -387,6 +459,30 @@ public class BagObject extends Base {
     }
 
     /**
+     * Retrieve a mapped element and return it as a BagObject.
+     *
+     * @param key A string value used to index the element.
+     * @param notFound A BagObject to return if the key was not found
+     * @return The element as a BagObject, or notFound if the element is not found.
+     */
+    public BagObject getBagObject (String key, BagObject notFound) {
+        BagObject value = getBagObject (key);
+        return (value != null) ? value : notFound;
+    }
+
+    /**
+     * Retrieve a mapped element and return it as a BagObject.
+     *
+     * @param key A string value used to index the element.
+     * @param supplier A function to create a new object if the requested key was not found
+     * @return The element as a BagObject, or supplier.get () if the element is not found.
+     */
+    public BagObject getBagObject (String key, Supplier<BagObject> supplier) {
+        BagObject value = getBagObject (key);
+        return (value != null) ? value : supplier.get ();
+    }
+
+    /**
      * Retrieve a mapped element and return it as a BagArray.
      *
      * @param key A string value used to index the element.
@@ -400,6 +496,18 @@ public class BagObject extends Base {
             log.warn ("Cannot cast value type (" + object.getClass ().getName () + ") to BagArray for key (" + key + ")");
         }
         return null;
+    }
+
+    /**
+     * Retrieve a mapped element and return it as a BagArray.
+     *
+     * @param key A string value used to index the element.
+     * @param notFound A BagArray to return if the key was not found
+     * @return The element as a BagArray, or notFound if the element is not found.
+     */
+    public BagArray getBagArray (String key, BagArray notFound) {
+        BagArray value = getBagArray (key);
+        return (value != null) ? value : notFound;
     }
 
     /**
@@ -483,6 +591,16 @@ public class BagObject extends Base {
         // parse the string out... it is assumed to be a well formed BagObject serialization
         JsonParser parser = new JsonParser (input);
         return parser.readBagObject ();
+    }
+
+    /**
+     * Creates a deep copy of a BagObject
+     * @param bagObject A BagObject you want to copy
+     * @return a deep copy of the requested BagObject
+     */
+    public static BagObject clone (BagObject bagObject) {
+        // a quick and easy way to make a deep copy of a BagObject
+        return BagObject.fromJsonString (bagObject.toJsonString ());
     }
 
     /**

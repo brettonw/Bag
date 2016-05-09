@@ -5,6 +5,6 @@
 - add xml deserialization
 - document the Bag type - along with the hierarchical indexing support
 - add a Database type, based on a bagarray, complete with sort, search, filter, etc.
-- consider BagObject.objectify invoking the Serializer when it encounters an unsupported type, or
-  throw an exception in that case rather than fail silently - with instructions to tell the user
-  they should use the Serializer if this is what they intended (maybe add 'addAsType' method?)
+- add a "simpleSerializer" that takes BagObjects, and uses name conversion to map POJO field names
+  to install values, so a... createFromSimpleBagObject type of thing...
+- Helper functions that return a default value if the requested value is not present
