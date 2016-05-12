@@ -238,6 +238,17 @@ public class BagObjectTest {
     }
 
     @Test
+    public void testJohnF2() {
+        try {
+            File testFile = new File ("data", "JohnF2.json");
+            BagObject bagObject = BagObject.fromFile (testFile);
+            AppTest.report (bagObject != null, true, "BagObject - test regression case on complex file 2 successfully loaded");
+        } catch (IOException exception) {
+            AppTest.report (false, true, exception.getMessage ());
+        }
+    }
+
+    @Test
     public void testBadFiles() {
         try {
             BagObject bagObject = BagObject.fromFile (new File ("data", "badFile.json"));

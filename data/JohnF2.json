@@ -1,0 +1,18 @@
+{
+  "stn_opts": {
+    "KOC_RC16A": [
+      {
+        "name": "ra_noise_as",
+        "value": "1.5",
+        "type": "double",
+        "description": "Right Ascension Telescope Observation Noise [arcseconds]"
+      },
+      {
+        "name": "dec_noise_as",
+        "value": "1.5",
+        "type": "double",
+        "description": "Declination Telescope Observation Noise [arcseconds]"
+      }
+    ]
+  }
+}
