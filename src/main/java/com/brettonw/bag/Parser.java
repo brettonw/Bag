@@ -57,9 +57,11 @@ abstract class Parser {
         // consume white space (space, carriage return, tab, etc.
         while (check ()) {
             switch (input.charAt (index)) {
-                case '\t': case ' ':
+                // tab, space, nbsp
+                case '\t': case ' ': case 160:
                     ++index;
                     break;
+                // carriage return - the file reader converts all returns to \n
                 case '\n':
                     ++index;
                     ++lineNumber;

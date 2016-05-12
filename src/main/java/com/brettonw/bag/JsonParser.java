@@ -101,8 +101,8 @@ class JsonParser extends Parser {
                 require (':') && require (storeValue (bagObject, key), "Valid value");
     }
 
-    private static final char bareValueStopChars[] = sortString (" \t\n:{}[]\",");
-    private static final char quotedStringStopChars[] = sortString ("\n\"");
+    private static final char BARE_VALUE_STOP_CHARS[] = sortString (" \u00a0\t\n:{}[]\",");
+    private static final char QUOTED_STRING_STOP_CHARS[] = sortString ("\n\"");
 
     private static char[] sortString (String string) {
         char chars[] = string.toCharArray ();
@@ -137,13 +137,13 @@ class JsonParser extends Parser {
         String result = null;
         if (expect('"')) {
             // digest the string, and be sure to eat the end quote
-            int start = consumeUntilStop (quotedStringStopChars);
+            int start = consumeUntilStop (QUOTED_STRING_STOP_CHARS);
             result = input.substring (start, index++);
         } else {
             // technically, we're being sloppy allowing bare values where quoted strings are
             // expected, but it's part of the simplified structure we support. This allows us to
             // read valid JSON files without handling every single case.
-            int start = consumeUntilStop (bareValueStopChars);
+            int start = consumeUntilStop (BARE_VALUE_STOP_CHARS);
 
             // capture the result if we actually consumed some characters
             if (index > start) {
