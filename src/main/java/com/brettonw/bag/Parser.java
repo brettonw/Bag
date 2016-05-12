@@ -16,9 +16,8 @@ abstract class Parser {
     protected int lastLineIndex;
     protected boolean error;
 
-    private String readInputStream (InputStream inputStream) throws IOException {
-        InputStreamReader inputStreamReader = new InputStreamReader (inputStream);
-        BufferedReader bufferedReader = new BufferedReader (inputStreamReader);
+    private static String readInput (Reader input) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader (input);
         StringBuilder stringBuilder = new StringBuilder ();
         String line;
         while ((line = bufferedReader.readLine ()) != null) {
@@ -36,17 +35,19 @@ abstract class Parser {
         lastLineIndex = 0;
     }
 
-    Parser (String input) {
-        init (input);
+    Parser (String input) throws IOException {
+        Reader inputReader = new StringReader (input);
+        init (readInput (inputReader));
     }
 
     Parser (InputStream inputStream) throws IOException {
-        init (readInputStream (inputStream));
+        Reader inputReader = new InputStreamReader (inputStream);
+        init (readInput (inputReader));
     }
 
     Parser (File file) throws IOException {
-        InputStream inputStream = new FileInputStream (file);
-        init (readInputStream (inputStream));
+        Reader inputReader = new FileReader (file);
+        init (readInput (inputReader));
     }
 
     protected boolean check () {
@@ -58,7 +59,7 @@ abstract class Parser {
         while (check ()) {
             switch (input.charAt (index)) {
                 // tab, space, nbsp
-                case '\t': case ' ': case 160:
+                case '\t': case ' ': case '\u00a0':
                     ++index;
                     break;
                 // carriage return - the file reader converts all returns to \n

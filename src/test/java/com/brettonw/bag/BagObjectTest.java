@@ -45,56 +45,68 @@ public class BagObjectTest {
 
     @Test
     public void testSimpleStringSerialization() {
-        // first round, a simple string serialization example
-        BagObject testObject = new BagObject();
-        testObject.put("First Name", "Bretton");
+        try {
+            // first round, a simple string serialization example
+            BagObject testObject = new BagObject ();
+            testObject.put ("First Name", "Bretton");
 
-        AppTest.report (testObject.getString ("First Name"), "Bretton", "BagObject simple string extraction");
+            AppTest.report (testObject.getString ("First Name"), "Bretton", "BagObject simple string extraction");
 
-        String testString = testObject.toString ();
-        AppTest.report (testString, testString, "BagObject simple ToString exercise (" + testString + ")");
+            String testString = testObject.toString ();
+            AppTest.report (testString, testString, "BagObject simple ToString exercise (" + testString + ")");
 
-        BagObject recon = BagObject.fromJsonString (testString);
-        assertNotNull (recon);
-        String reconString = recon.toString ();
-        AppTest.report (reconString, testString, "BagObject simple reconstitution");
+            BagObject recon = BagObject.fromJsonString (testString);
+            assertNotNull (recon);
+            String reconString = recon.toString ();
+            AppTest.report (reconString, testString, "BagObject simple reconstitution");
+        } catch (IOException exception) {
+            AppTest.report (false, true, "An excption is a failure case");
+        }
     }
 
     @Test
     public void testComplexStringSerialization() {
-        // second round, a bit more sophisticated
-        BagObject testObject = new BagObject();
-        testObject.put("First Name", "Bretton");
-        testObject.put("Last Name", "Wade");
-        testObject.put("Weight", 220.5);
-        testObject.put("Married", true);
-        testObject.put("Children", "");
+        try {
+            // second round, a bit more sophisticated
+            BagObject testObject = new BagObject();
+            testObject.put("First Name", "Bretton");
+            testObject.put("Last Name", "Wade");
+            testObject.put("Weight", 220.5);
+            testObject.put("Married", true);
+            testObject.put("Children", "");
 
-        AppTest.report (testObject.getString ("First Name"), "Bretton", "BagObject simple string extraction");
-        AppTest.report (testObject.getString ("Last Name"), "Wade", "BagObject simple string extraction");
-        AppTest.report (testObject.getBoolean ("Married"), true, "BagObject simple bool extraction");
-        AppTest.report (testObject.getDouble ("Weight"), 220.5, "BagObject simple double extraction");
-        AppTest.report (testObject.getFloat ("Weight"), 220.5f, "BagObject simple float extraction");
-        AppTest.report (testObject.getString ("Children"), "", "BagObject simple empty extraction");
+            AppTest.report (testObject.getString ("First Name"), "Bretton", "BagObject simple string extraction");
+            AppTest.report (testObject.getString ("Last Name"), "Wade", "BagObject simple string extraction");
+            AppTest.report (testObject.getBoolean ("Married"), true, "BagObject simple bool extraction");
+            AppTest.report (testObject.getDouble ("Weight"), 220.5, "BagObject simple double extraction");
+            AppTest.report (testObject.getFloat ("Weight"), 220.5f, "BagObject simple float extraction");
+            AppTest.report (testObject.getString ("Children"), "", "BagObject simple empty extraction");
 
-        String testString = testObject.toString ();
-        AppTest.report (testString, testString, "BagObject simple ToString exercise (" + testString + ")");
+            String testString = testObject.toString ();
+            AppTest.report (testString, testString, "BagObject simple ToString exercise (" + testString + ")");
 
-        BagObject recon = BagObject.fromJsonString (testString);
-        assertNotNull (recon);
-        String reconString = recon.toString ();
-        AppTest.report (reconString, testString, "BagObject simple reconstitution");
+            BagObject recon = BagObject.fromJsonString (testString);
+            assertNotNull (recon);
+            String reconString = recon.toString ();
+            AppTest.report (reconString, testString, "BagObject simple reconstitution");
+        } catch (IOException exception) {
+            AppTest.report (false, true, "An excption is a failure case");
+        }
     }
 
     @Test
     public void testEscapedStrings() {
-        // test an escaped string
-        String escapedString = "a longer string with a \\\"quote from shakespeare\\\" in \\\"it\\\"";
-        BagObject testObject = new BagObject ().put ("escaped", escapedString);
-        AppTest.report (testObject.getString ("escaped"), escapedString, "BagObject simple test escaped string");
-        String testString = testObject.toString ();
-        BagObject recon = BagObject.fromJsonString (testString);
-        AppTest.report (recon.getString ("escaped"), escapedString, "BagObject simple test escaped string from reconstituted bagobject");
+        try {
+            // test an escaped string
+            String escapedString = "a longer string with a \\\"quote from shakespeare\\\" in \\\"it\\\"";
+            BagObject testObject = new BagObject ().put ("escaped", escapedString);
+            AppTest.report (testObject.getString ("escaped"), escapedString, "BagObject simple test escaped string");
+            String testString = testObject.toString ();
+            BagObject recon = BagObject.fromJsonString (testString);
+            AppTest.report (recon.getString ("escaped"), escapedString, "BagObject simple test escaped string from reconstituted bagobject");
+        } catch (IOException exception) {
+            AppTest.report (false, true, "An excption is a failure case");
+        }
     }
 
     @Test
@@ -110,64 +122,81 @@ public class BagObjectTest {
 
     @Test
     public void testSubObject() {
-        // on with the show
-        BagObject dateObject = new BagObject ()
-                .put ("Year", 2015)
-                .put ("Month", 11)
-                .put ("Day", 18);
+        try {
+            // on with the show
+            BagObject dateObject = new BagObject ()
+                    .put ("Year", 2015)
+                    .put ("Month", 11)
+                    .put ("Day", 18);
 
-        AppTest.report (dateObject.getInteger ("Month"), 11, "BagObject simple int extraction");
+            AppTest.report (dateObject.getInteger ("Month"), 11, "BagObject simple int extraction");
 
-        BagObject testObject = new BagObject()
-                .put("First Name", "Bretton")
-                .put("Last Name", "Wade")
-                .put("Weight", 220.5)
-                .put("Married", true)
-                .put("Children", "")
-                .put ("DOB", dateObject);
-        String testString = testObject.toString ();
-        AppTest.report (testString, testString, "BagObject complex ToString exercise (" + testString + ")");
+            BagObject testObject = new BagObject()
+                    .put("First Name", "Bretton")
+                    .put("Last Name", "Wade")
+                    .put("Weight", 220.5)
+                    .put("Married", true)
+                    .put("Children", "")
+                    .put ("DOB", dateObject);
+            String testString = testObject.toString ();
+            AppTest.report (testString, testString, "BagObject complex ToString exercise (" + testString + ")");
 
-        BagObject recon = BagObject.fromJsonString (testString);
-        String reconString = recon.toString ();
-        AppTest.report (reconString, testString, "BagObject complex reconsititution");
+            BagObject recon = BagObject.fromJsonString (testString);
+            String reconString = recon.toString ();
+            AppTest.report (reconString, testString, "BagObject complex reconsititution");
 
-        AppTest.report (recon.getBoolean ("Married"), true, "BagObject complex bag/bool extraction");
-        AppTest.report (recon.getDouble ("Weight"), 220.5, "BagObject complex bag/double extraction");
-        AppTest.report (recon.getBagObject ("DOB").getInteger ("Year"), 2015, "BagObject complex bag/int extraction");
+            AppTest.report (recon.getBoolean ("Married"), true, "BagObject complex bag/bool extraction");
+            AppTest.report (recon.getDouble ("Weight"), 220.5, "BagObject complex bag/double extraction");
+            AppTest.report (recon.getBagObject ("DOB").getInteger ("Year"), 2015, "BagObject complex bag/int extraction");
 
-        AppTest.report (recon.getBoolean ("DOB"), null, "BagObject simple bad type request (should be null)");
-        AppTest.report (recon.getString ("Joseph"), null, "BagObject simple bad key request (should be null)");
+            AppTest.report (recon.getBoolean ("DOB"), null, "BagObject simple bad type request (should be null)");
+            AppTest.report (recon.getString ("Joseph"), null, "BagObject simple bad key request (should be null)");
+        } catch (IOException exception) {
+            AppTest.report (false, true, "An excption is a failure case");
+        }
     }
 
     @Test
     public void testEmptyObject() {
-        // test reconstruction of an empty object
-        BagObject bagObject = new BagObject ();
-        String testString = bagObject.toString ();
-        BagObject reconBagObject = BagObject.fromJsonString (testString);
-        AppTest.report (reconBagObject.toString (), testString, "BagObject - reconstitute an empty object");
+        try {
+            // test reconstruction of an empty object
+            BagObject bagObject = new BagObject ();
+            String testString = bagObject.toString ();
+            BagObject reconBagObject = BagObject.fromJsonString (testString);
+            AppTest.report (reconBagObject.toString (), testString, "BagObject - reconstitute an empty object");
+        } catch (IOException exception) {
+            AppTest.report (false, true, "An excption is a failure case");
+        }
     }
 
     @Test
     public void testHandAuthoredJson() {
-        // test a reconstruction from a hand-authored JSON string
-        String jsonString = " { Married:\"true\",   \"Children\": [] ,       \"First Name\": \"Bretton\" , \"Last Name\" : \"Wade\" , \"Weight\":\"220.5\", Size:8 }";
-        BagObject bagObject = BagObject.fromJsonString (jsonString);
-        AppTest.report (bagObject.getString ("Last Name"), "Wade", "BagObject - reconstitute from a hand-crafted string should pass");
-        AppTest.report (bagObject.has ("Married"), true, "BagObject - check that a tag is present");
-        AppTest.report (bagObject.has ("Junk"), false, "BagObject - check that a tag is not present");
-        AppTest.report (bagObject.getBoolean ("Married"), true, "BagObject - reconstitute from a hand-crafted string with bare names should pass");
-        AppTest.report (bagObject.getInteger ("Size"), 8, "BagObject - reconstitute from a hand-crafted string with bare values should pass");
-        AppTest.report (bagObject.getBagArray ("Children").getCount (), 0, "BagObject - reconstitute from a hand-crafted string with empty array should be size 0");
+        try {
+            // test a reconstruction from a hand-authored JSON string
+            String jsonString = " { Married:\"true\",   \"Children\": [] ,       \"First Name\": \"Bretton\" , \"Last Name\" : \"Wade\" , \"Weight\":\"220.5\", Size:8 }";
+            BagObject bagObject = BagObject.fromJsonString (jsonString);
+            AppTest.report (bagObject.getString ("Last Name"), "Wade", "BagObject - reconstitute from a hand-crafted string should pass");
+            AppTest.report (bagObject.has ("Married"), true, "BagObject - check that a tag is present");
+            AppTest.report (bagObject.has ("Junk"), false, "BagObject - check that a tag is not present");
+            AppTest.report (bagObject.getBoolean ("Married"), true, "BagObject - reconstitute from a hand-crafted string with bare names should pass");
+            AppTest.report (bagObject.getInteger ("Size"), 8, "BagObject - reconstitute from a hand-crafted string with bare values should pass");
+            AppTest.report (bagObject.getBagArray ("Children").getCount (), 0, "BagObject - reconstitute from a hand-crafted string with empty array should be size 0");
+        } catch (IOException exception) {
+            AppTest.report (false, true, "An excption is a failure case");
+        }
+
     }
 
     @Test
     public void testBogusJson() {
-        // test a reconstruction from a bogus string
-        String bogusString = "{\"Children\":\"\",\"First Name\":\"Bretton\",\"\"Wade\",\"Married\":\"true\",\"Weight\":\"220.5\"}";
-        BagObject bogusBagObject = BagObject.fromJsonString (bogusString);
-        AppTest.report (bogusBagObject, null, "BagObject - reconstitute from a bogus string should fail");
+        try {
+            // test a reconstruction from a bogus string
+            String bogusString = "{\"Children\":\"\",\"First Name\":\"Bretton\",\"\"Wade\",\"Married\":\"true\",\"Weight\":\"220.5\"}";
+            BagObject bogusBagObject = BagObject.fromJsonString (bogusString);
+            AppTest.report (bogusBagObject, null, "BagObject - reconstitute from a bogus string should fail");
+        } catch (IOException exception) {
+            AppTest.report (false, true, "An excption is a failure case");
+        }
     }
 
     @Test
@@ -264,41 +293,45 @@ public class BagObjectTest {
 
     @Test
     public void testNotFound() {
-        BagObject bagObject = new BagObject ()
-                .put ("x", "y")
-                .put ("a", "b")
-                .put ("c", true)
-                .put ("d", 3.141592654)
-                .put ("e", 1234567L)
-                .put ("f", new BagObject ().put ("hello", "world"))
-                .put ("g", new BagArray ().add (123));
+        try {
+            BagObject bagObject = new BagObject ()
+                    .put ("x", "y")
+                    .put ("a", "b")
+                    .put ("c", true)
+                    .put ("d", 3.141592654)
+                    .put ("e", 1234567L)
+                    .put ("f", new BagObject ().put ("hello", "world"))
+                    .put ("g", new BagArray ().add (123));
 
-        // test the clone
-        bagObject = BagObject.clone (bagObject);
+            // test the clone
+            bagObject = BagObject.clone (bagObject);
 
-        AppTest.report (bagObject.getString ("x", "xxx"), "y", "BagObject - Test that 'notFound' method still correctly returns requested string value");
-        AppTest.report (bagObject.getString ("xxx", "yyy"), "yyy", "BagObject - Test that 'notFound' method correctly returns notFound string value");
+            AppTest.report (bagObject.getString ("x", "xxx"), "y", "BagObject - Test that 'notFound' method still correctly returns requested string value");
+            AppTest.report (bagObject.getString ("xxx", "yyy"), "yyy", "BagObject - Test that 'notFound' method correctly returns notFound string value");
 
-        AppTest.report (bagObject.getBoolean ("c", false), true, "BagObject - Test that 'notFound' method still correctly returns requested boolean value");
-        AppTest.report (bagObject.getBoolean ("ccc", true), true, "BagObject - Test that 'notFound' method correctly returns notFound boolean value");
+            AppTest.report (bagObject.getBoolean ("c", false), true, "BagObject - Test that 'notFound' method still correctly returns requested boolean value");
+            AppTest.report (bagObject.getBoolean ("ccc", true), true, "BagObject - Test that 'notFound' method correctly returns notFound boolean value");
 
-        AppTest.report (bagObject.getInteger ("e", 345), 1234567, "BagObject - Test that 'notFound' method still correctly returns requested integer value");
-        AppTest.report (bagObject.getInteger ("eee", 345), 345, "BagObject - Test that 'notFound' method correctly returns notFound integer value");
+            AppTest.report (bagObject.getInteger ("e", 345), 1234567, "BagObject - Test that 'notFound' method still correctly returns requested integer value");
+            AppTest.report (bagObject.getInteger ("eee", 345), 345, "BagObject - Test that 'notFound' method correctly returns notFound integer value");
 
-        AppTest.report (bagObject.getLong ("e", 345L), 1234567L, "BagObject - Test that 'notFound' method still correctly returns requested long value");
-        AppTest.report (bagObject.getLong ("eee", 345L), 345L, "BagObject - Test that 'notFound' method correctly returns notFound long value");
+            AppTest.report (bagObject.getLong ("e", 345L), 1234567L, "BagObject - Test that 'notFound' method still correctly returns requested long value");
+            AppTest.report (bagObject.getLong ("eee", 345L), 345L, "BagObject - Test that 'notFound' method correctly returns notFound long value");
 
-        AppTest.report (bagObject.getFloat ("d", 6.28f), 3.141592654f, "BagObject - Test that 'notFound' method still correctly returns requested float value");
-        AppTest.report (bagObject.getFloat ("ddd", 6.28f), 6.28f, "BagObject - Test that 'notFound' method correctly returns notFound float value");
+            AppTest.report (bagObject.getFloat ("d", 6.28f), 3.141592654f, "BagObject - Test that 'notFound' method still correctly returns requested float value");
+            AppTest.report (bagObject.getFloat ("ddd", 6.28f), 6.28f, "BagObject - Test that 'notFound' method correctly returns notFound float value");
 
-        AppTest.report (bagObject.getDouble ("d", 6.28), 3.141592654, "BagObject - Test that 'notFound' method still correctly returns requested double value");
-        AppTest.report (bagObject.getDouble ("ddd", 6.28), 6.28, "BagObject - Test that 'notFound' method correctly returns notFound double value");
+            AppTest.report (bagObject.getDouble ("d", 6.28), 3.141592654, "BagObject - Test that 'notFound' method still correctly returns requested double value");
+            AppTest.report (bagObject.getDouble ("ddd", 6.28), 6.28, "BagObject - Test that 'notFound' method correctly returns notFound double value");
 
-        AppTest.report (bagObject.getBagObject ("f", new BagObject ().put ("hello", "moto")).getString ("hello"), "world", "BagObject - test that 'notFound' method correctly returns found BagObject");
-        AppTest.report (bagObject.getBagObject ("fff", new BagObject ().put ("hello", "moto")).getString ("hello"), "moto", "BagObject - test that 'notFound' method correctly returns notFound BagObject");
-        AppTest.report (bagObject.getBagObject ("q", () -> new BagObject ().put ("q", "r")).getString ("q"), "r", "BagObject - test that closure creates a new object correctly");
+            AppTest.report (bagObject.getBagObject ("f", new BagObject ().put ("hello", "moto")).getString ("hello"), "world", "BagObject - test that 'notFound' method correctly returns found BagObject");
+            AppTest.report (bagObject.getBagObject ("fff", new BagObject ().put ("hello", "moto")).getString ("hello"), "moto", "BagObject - test that 'notFound' method correctly returns notFound BagObject");
+            AppTest.report (bagObject.getBagObject ("q", () -> new BagObject ().put ("q", "r")).getString ("q"), "r", "BagObject - test that closure creates a new object correctly");
 
-        AppTest.report (bagObject.getBagArray ("g", new BagArray ().add (345)).getInteger (0), 123, "BagObject - test that 'notFound' method correctly returns found BagArray");
-        AppTest.report (bagObject.getBagArray ("ggg", new BagArray ().add (345)).getInteger (0), 345, "BagObject - test that 'notFound' method correctly returns notFound BagArray");
+            AppTest.report (bagObject.getBagArray ("g", new BagArray ().add (345)).getInteger (0), 123, "BagObject - test that 'notFound' method correctly returns found BagArray");
+            AppTest.report (bagObject.getBagArray ("ggg", new BagArray ().add (345)).getInteger (0), 345, "BagObject - test that 'notFound' method correctly returns notFound BagArray");
+        } catch (IOException exception) {
+            AppTest.report (false, true, "An excption is a failure case");
+        }
     }
 }

@@ -10,7 +10,7 @@ import java.io.InputStream;
 class XmlParser extends Parser {
     private static final Logger log = LogManager.getLogger (XmlParser.class);
 
-    XmlParser (String input) {
+    XmlParser (String input) throws IOException {
         super (input);
     }
 

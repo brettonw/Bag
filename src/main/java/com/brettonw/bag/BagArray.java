@@ -307,7 +307,7 @@ public class BagArray extends Base {
      * @param  input A String containing a JSON encoding of a BagArray.
      * @return A new BagArray containing the elements encoded in the input.
      */
-    public static BagArray fromJsonString (String input) {
+    public static BagArray fromJsonString (String input) throws IOException {
         // parse the string out... it is assumed to be a well formed BagArray serialization
         JsonParser parser = new JsonParser (input);
         return parser.readBagArray ();

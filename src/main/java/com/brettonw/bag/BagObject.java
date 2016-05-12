@@ -587,7 +587,7 @@ public class BagObject extends Base {
      * @param  input A String containing a JSON encoding of a BagObject.
      * @return A new BagObject containing the elements encoded in the input.
      */
-    public static BagObject fromJsonString (String input) {
+    public static BagObject fromJsonString (String input) throws IOException {
         // parse the string out... it is assumed to be a well formed BagObject serialization
         JsonParser parser = new JsonParser (input);
         return parser.readBagObject ();
@@ -598,7 +598,7 @@ public class BagObject extends Base {
      * @param bagObject A BagObject you want to copy
      * @return a deep copy of the requested BagObject
      */
-    public static BagObject clone (BagObject bagObject) {
+    public static BagObject clone (BagObject bagObject) throws IOException {
         // a quick and easy way to make a deep copy of a BagObject
         return BagObject.fromJsonString (bagObject.toJsonString ());
     }

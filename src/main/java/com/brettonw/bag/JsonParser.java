@@ -11,7 +11,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 
 class JsonParser extends Parser {
-    JsonParser (String input) {
+    JsonParser (String input) throws IOException {
         super (input);
     }
 

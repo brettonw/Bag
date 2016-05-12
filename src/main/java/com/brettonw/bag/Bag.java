@@ -15,7 +15,7 @@ public class Bag {
         container = new BagObject (size);
     }
 
-    public Bag (String string) {
+    public Bag (String string) throws IOException {
         container = BagObject.fromJsonString (string);
     }
 
