@@ -26,6 +26,21 @@
  * the end user knows what they are expecting to get. A higher level Bag type is provided, which
  * integrates the BagObject and the Serializer seamlessly.
  * <p>
+ * <strong>Storing Strings</strong><br>
+ * Because the internal storage mechanism for primitive types is string based, and the preferred
+ * interchange is JSON, there is a challenge when storing strings that have quotes in them. The JSON
+ * standard supports escaped characters (\"), and so does the BagObject.
+ * <p>
+ * By design, we have chosen not to do any kind of transformation when storing strings, which means
+ * that attempting to store strings that have un-escaped quotes in them, and then serializing the
+ * object, will result in failure to parse on deserialization. It is left to the user to encode
+ * strings containing quotes in them in a manner that makes sense for their application.
+ * <p>
+ * In a special case, some users have reported failures when trying to store JSON strings into a
+ * BagObject. This is not a supported usage for the reasons outlined above. Users interested in
+ * storing JSON should consider simply storing the populated BagObject represented by the JSON ,
+ * string, or serializing the structure directly into the BagObject format.
+ * <p>
  * <strong>Hierarchical Indexing</strong><br>
  * Hierarchical indexing is an option when BagObjects are nested inside of other BagObjects. The key
  * is a single string, with the individual keys separated by '/' characters (like a file path, but
