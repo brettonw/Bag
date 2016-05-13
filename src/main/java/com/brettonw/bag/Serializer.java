@@ -3,10 +3,7 @@ package com.brettonw.bag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.lang.reflect.Array;
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Modifier;
+import java.lang.reflect.*;
 import java.util.*;
 
 /**
@@ -91,6 +88,7 @@ public final class Serializer {
                 // that we want to step around because serialization is assumed to be the primary
                 // goal, as opposed to viewing a way to workaround an API that needs to be over-
                 // ridden. This should prevent the IllegalAccessException from ever happening.
+                boolean accessible = field.isAccessible ();
                 field.setAccessible (true);
 
                 // get the name and type, and get the value to encode
@@ -101,6 +99,10 @@ public final class Serializer {
                     // purpose of measuring coverage
                     log.error (exception);
                 }
+
+                // restore the accessibility - not 100% sure this is necessary, better be safe than
+                // sorry, right?
+                field.setAccessible (accessible);
             }
         }
         return bagObject.put (VALUE_KEY, value);
@@ -185,24 +187,35 @@ public final class Serializer {
             type.getConstructor (String.class).newInstance (valueString);
     }
 
-    private static Object deserializeJavaObjectType (BagObject bagObject) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+    private static Object deserializeJavaObjectType (BagObject bagObject) throws ClassNotFoundException, IllegalAccessException, NoSuchMethodException, InstantiationException, InvocationTargetException {
+        // get the type and it's associated empty constructor. Even if the constructor is private,
+        // we force accessibility for serialization - this is an issue with the reflection API that
+        // we want to step around because serialization is assumed to be the primary goal, as
+        // opposed to viewing it as a way to workaround an API that needs to be over-ridden.
         Class type = ClassLoader.getSystemClassLoader ().loadClass (bagObject.getString (TYPE_KEY));
-        Object target = type.newInstance ();
+        Constructor constructor = type.getDeclaredConstructor();
+        boolean accessible = constructor.isAccessible ();
+        constructor.setAccessible(true);
+        Object target = constructor.newInstance ();
+        constructor.setAccessible(accessible);
 
         // traverse the fields via reflection to set the values, only the public values
         BagObject value = bagObject.getBagObject (VALUE_KEY);
         Set<Field> fieldSet = new HashSet<> (Arrays.asList (type.getFields ()));
         fieldSet.addAll (Arrays.asList (type.getDeclaredFields ()));
         for (Field field : fieldSet) {
-            // force accessibility for serialization - this is an issue with the reflection API
-            // that we want to step around because serialization is assumed to be the primary
-            // goal, as opposed to viewing a way to workaround an API that needs to be over-
-            // ridden. This should prevent the IllegalAccessException from ever happening.
+            // force accessibility for serialization, as above... this should prevent the
+            // IllegalAccessException from ever happening.
+            accessible = field.isAccessible ();
             field.setAccessible (true);
 
             // get the name and type, and set the value from the encode value
             //log.trace ("Add " + field.getName () + " as " + field.getType ().getName ());
             field.set (target, fromBagObject (value.getBagObject (field.getName ())));
+
+            // restore the accessibility - not 100% sure this is necessary, better be safe than
+            // sorry, right?
+            field.setAccessible (accessible);
         }
         return target;
     }

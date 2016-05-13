@@ -60,7 +60,7 @@ public class BagObjectTest {
             String reconString = recon.toString ();
             AppTest.report (reconString, testString, "BagObject simple reconstitution");
         } catch (IOException exception) {
-            AppTest.report (false, true, "An excption is a failure case");
+            AppTest.report (false, true, "An exception is a failure case");
         }
     }
 
@@ -90,7 +90,7 @@ public class BagObjectTest {
             String reconString = recon.toString ();
             AppTest.report (reconString, testString, "BagObject simple reconstitution");
         } catch (IOException exception) {
-            AppTest.report (false, true, "An excption is a failure case");
+            AppTest.report (false, true, "An exception is a failure case");
         }
     }
 
@@ -105,7 +105,7 @@ public class BagObjectTest {
             BagObject recon = BagObject.fromJsonString (testString);
             AppTest.report (recon.getString ("escaped"), escapedString, "BagObject simple test escaped string from reconstituted bagobject");
         } catch (IOException exception) {
-            AppTest.report (false, true, "An excption is a failure case");
+            AppTest.report (false, true, "An exception is a failure case");
         }
     }
 
@@ -152,7 +152,7 @@ public class BagObjectTest {
             AppTest.report (recon.getBoolean ("DOB"), null, "BagObject simple bad type request (should be null)");
             AppTest.report (recon.getString ("Joseph"), null, "BagObject simple bad key request (should be null)");
         } catch (IOException exception) {
-            AppTest.report (false, true, "An excption is a failure case");
+            AppTest.report (false, true, "An exception is a failure case");
         }
     }
 
@@ -165,7 +165,7 @@ public class BagObjectTest {
             BagObject reconBagObject = BagObject.fromJsonString (testString);
             AppTest.report (reconBagObject.toString (), testString, "BagObject - reconstitute an empty object");
         } catch (IOException exception) {
-            AppTest.report (false, true, "An excption is a failure case");
+            AppTest.report (false, true, "An exception is a failure case");
         }
     }
 
@@ -182,7 +182,7 @@ public class BagObjectTest {
             AppTest.report (bagObject.getInteger ("Size"), 8, "BagObject - reconstitute from a hand-crafted string with bare values should pass");
             AppTest.report (bagObject.getBagArray ("Children").getCount (), 0, "BagObject - reconstitute from a hand-crafted string with empty array should be size 0");
         } catch (IOException exception) {
-            AppTest.report (false, true, "An excption is a failure case");
+            AppTest.report (false, true, "An exception is a failure case");
         }
 
     }
@@ -195,7 +195,7 @@ public class BagObjectTest {
             BagObject bogusBagObject = BagObject.fromJsonString (bogusString);
             AppTest.report (bogusBagObject, null, "BagObject - reconstitute from a bogus string should fail");
         } catch (IOException exception) {
-            AppTest.report (false, true, "An excption is a failure case");
+            AppTest.report (false, true, "An exception is a failure case");
         }
     }
 
@@ -329,5 +329,8 @@ public class BagObjectTest {
 
         AppTest.report (bagObject.getBagArray ("g", new BagArray ().add (345)).getInteger (0), 123, "BagObject - test that 'notFound' method correctly returns found BagArray");
         AppTest.report (bagObject.getBagArray ("ggg", new BagArray ().add (345)).getInteger (0), 345, "BagObject - test that 'notFound' method correctly returns notFound BagArray");
+
+        bagObject = BagObject.copy (null);
+        assertEquals (bagObject, null);
     }
 }

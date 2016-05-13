@@ -33,7 +33,7 @@ public class BagArrayTest {
             BagArray reconBagArray = BagArray.fromJsonString (bagArrayAsString);
             AppTest.report (reconBagArray.toString (), bagArrayAsString, "BagArray - simple round trip with null values");
         } catch (IOException exception) {
-            AppTest.report (false, true, "An excption is a failure case");
+            AppTest.report (false, true, "An exception is a failure case");
         }
     }
 
@@ -67,7 +67,7 @@ public class BagArrayTest {
             String reconString = reconArray.toString ();
             AppTest.report (reconString, testString, "BagArray simple reconstitution");
         } catch (IOException exception) {
-            AppTest.report (false, true, "An excption is a failure case");
+            AppTest.report (false, true, "An exception is a failure case");
         }
     }
 
@@ -110,7 +110,7 @@ public class BagArrayTest {
             testArray = BagArray.fromJsonString (reconString);
             AppTest.report (testArray.toString (), reconString, "BagArray reconstitute with an array containing an array");
         } catch (IOException exception) {
-            AppTest.report (false, true, "An excption is a failure case");
+            AppTest.report (false, true, "An exception is a failure case");
         }
     }
 
@@ -147,7 +147,7 @@ public class BagArrayTest {
             BagArray bagArray = BagArray.fromJsonString ("[]");
             AppTest.report (bagArray != null, true, "BagArray - test empty shell");
         } catch (IOException exception) {
-            AppTest.report (false, true, "An excption is a failure case");
+            AppTest.report (false, true, "An exception is a failure case");
         }
     }
 }

@@ -8,6 +8,7 @@ import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -109,7 +110,7 @@ public class SerializerTest {
             String deserializedString = (String) Serializer.fromBagObject (serializedStringBagObject);
             AppTest.report (deserializedString, null, "Serializer test reconstituting a string with a bad version");
         } catch (IOException exception) {
-            AppTest.report (false, true, "An excption is a failure case");
+            AppTest.report (false, true, "An exception is a failure case");
         }
     }
 
@@ -121,7 +122,7 @@ public class SerializerTest {
             String deserializedString = (String) Serializer.fromBagObject (serializedStringBagObject);
             AppTest.report (deserializedString, null, "Serializer test reconstituting a modified source");
         } catch (IOException exception) {
-            AppTest.report (false, true, "An excption is a failure case");
+            AppTest.report (false, true, "An exception is a failure case");
         }
     }
 
@@ -225,7 +226,15 @@ public class SerializerTest {
             Object result = Serializer.fromBagObject (bogusArray);
             AppTest.report (result, null, "Serializer - test bogus array string");
         } catch (IOException exception) {
-            AppTest.report (false, true, "An excption is a failure case");
+            AppTest.report (false, true, "An exception is a failure case");
         }
+    }
+
+    @Test
+    public void testOffsetDateTime () {
+        // deal with a type that has a private default consructor
+        OffsetDateTime  odt = OffsetDateTime.now ();
+        BagObject bagObject = Serializer.toBagObject (odt);
+        OffsetDateTime  reconOdt = (OffsetDateTime) Serializer.fromBagObject (bagObject);
     }
 }

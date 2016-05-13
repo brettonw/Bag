@@ -606,7 +606,7 @@ public class BagObject extends Base {
             }
         } catch (IOException exception) {
             // NOTE this should never happen unless there is a bug in toJsonString we don't know
-            // about, and I can't generate a test case to cover it - so it reports is lack of
+            // about, and I can't generate a test case to cover it - so it reports as a lack of
             // coverage
             log.error (exception);
         }
