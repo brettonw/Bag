@@ -97,8 +97,8 @@ public final class Serializer {
                 try {
                     value.put (field.getName (), toBagObject (field.get (object)));
                 } catch (IllegalAccessException exception) {
-                    // this shouldn't happen, per the comments above, and is untestable for purpose
-                    // of measuring coverage
+                    // NOTE this shouldn't happen, per the comments above, and is untestable for
+                    // purpose of measuring coverage
                     log.error (exception);
                 }
             }

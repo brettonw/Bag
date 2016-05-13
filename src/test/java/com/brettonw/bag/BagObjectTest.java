@@ -302,8 +302,8 @@ public class BagObjectTest {
                 .put ("f", new BagObject ().put ("hello", "world"))
                 .put ("g", new BagArray ().add (123));
 
-        // test the clone
-        bagObject = BagObject.clone (bagObject);
+        // test the copy
+        bagObject = BagObject.copy (bagObject);
 
         AppTest.report (bagObject.getString ("x", "xxx"), "y", "BagObject - Test that 'notFound' method still correctly returns requested string value");
         AppTest.report (bagObject.getString ("xxx", "yyy"), "yyy", "BagObject - Test that 'notFound' method correctly returns notFound string value");
