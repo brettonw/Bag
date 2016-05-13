@@ -13,22 +13,18 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 
 public class SerializerTest {
     private static final Logger log = LogManager.getLogger (SerializerTest.class);
 
     @Test
-    public void test() {
-        new Serializer ();
-    }
-
-    @Test
     public void testBareType() {
         // serialize a bare type
         int x = 24;
         BagObject serializedX = Serializer.toBagObject (x);
-        int deserializedX = (int) Serializer.fromBagObject (serializedX);
+        int deserializedX = new Serializer<Integer> ().from (serializedX);
         AppTest.report (deserializedX, x, "Serializer - test bare type");
     }
 
@@ -39,7 +35,7 @@ public class SerializerTest {
         BagObject bagObject = Serializer.toBagObject (testClass);
         log.info (bagObject.toString ());
 
-        TestClassA reconClass = (TestClassA) Serializer.fromBagObject (bagObject);
+        TestClassA reconClass = new Serializer<TestClassA> ().from (bagObject);
         BagObject reconBagObject = Serializer.toBagObject (reconClass);
         AppTest.report (reconBagObject.toString (),bagObject.toString (), "Serializer test round trip");
     }
@@ -49,19 +45,19 @@ public class SerializerTest {
         Integer testArray[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         BagObject bagObject = Serializer.toBagObject (testArray);
         log.info (bagObject.toString ());
-        Integer reconArray[] = (Integer[]) Serializer.fromBagObject (bagObject);
+        Integer reconArray[] = new Serializer<Integer[]> ().from (bagObject);
         assertArrayEquals("Check array reconstitution", testArray, reconArray);
 
         int testArray2[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         bagObject = Serializer.toBagObject (testArray2);
         log.info (bagObject.toString ());
-        int reconArray2[] = (int[]) Serializer.fromBagObject (bagObject);
+        int reconArray2[] = new Serializer<int[]> ().from (bagObject);
         assertArrayEquals("Check array reconstitution", testArray2, reconArray2);
 
         int testArray3[][] = { {0,0}, {1,1}, {2,2} };
         bagObject = Serializer.toBagObject (testArray3);
         log.info (bagObject.toString ());
-        int reconArray3[][] = (int[][]) Serializer.fromBagObject (bagObject);
+        int reconArray3[][] = new Serializer<int[][]> ().from (bagObject);
         assertArrayEquals("Check array reconstitution", testArray3, reconArray3);
     }
 
@@ -73,7 +69,7 @@ public class SerializerTest {
         arrayList.add (5);
         BagObject bagObject = Serializer.toBagObject (arrayList);
         log.info (bagObject.toString ());
-        ArrayList<Integer> reconArrayList = (ArrayList<Integer>) Serializer.fromBagObject (bagObject);
+        ArrayList<Integer> reconArrayList = new Serializer<ArrayList<Integer>> ().from (bagObject);
         assertArrayEquals ("Check array list reconstitution", arrayList.toArray (), reconArrayList.toArray ());
     }
 
@@ -85,7 +81,7 @@ public class SerializerTest {
         hashMap.put ("C", 5);
         BagObject bagObject = Serializer.toBagObject (hashMap);
         log.info (bagObject.toString ());
-        HashMap<String, Integer> reconHashMap = (HashMap<String, Integer>) Serializer.fromBagObject (bagObject);
+        HashMap<String, Integer> reconHashMap = new Serializer<HashMap<String, Integer>> ().from (bagObject);
         assertArrayEquals ("Check hash map reconstitution - keys", hashMap.keySet ().toArray (), reconHashMap.keySet ().toArray ());
         assertArrayEquals ("Check hash map reconstitution - values", hashMap.values ().toArray (), reconHashMap.values ().toArray ());
 
@@ -107,7 +103,7 @@ public class SerializerTest {
         try {
             String serializedString = "{\"type\":\"java.lang.String\",\"v\":\"0.9\",\"value\":\"pdq\"}";
             BagObject serializedStringBagObject = BagObject.fromJsonString (serializedString);
-            String deserializedString = (String) Serializer.fromBagObject (serializedStringBagObject);
+            String deserializedString = new Serializer<String> ().from (serializedStringBagObject);
             AppTest.report (deserializedString, null, "Serializer test reconstituting a string with a bad version");
         } catch (IOException exception) {
             AppTest.report (false, true, "An exception is a failure case");
@@ -119,7 +115,7 @@ public class SerializerTest {
         try {
             String serializedString = "{\"type\":\"java.lang.Sring\",\"v\":\"1.0\",\"value\":\"pdq\"}";
             BagObject serializedStringBagObject = BagObject.fromJsonString (serializedString);
-            String deserializedString = (String) Serializer.fromBagObject (serializedStringBagObject);
+            String deserializedString = new Serializer<String> ().from (serializedStringBagObject);
             AppTest.report (deserializedString, null, "Serializer test reconstituting a modified source");
         } catch (IOException exception) {
             AppTest.report (false, true, "An exception is a failure case");
@@ -131,7 +127,7 @@ public class SerializerTest {
         TestClassC  testClassC = new TestClassC (1, 2L, 3.0f, 10, 20L, 30.0f);
         BagObject bagObjectC = Serializer.toBagObject (testClassC);
         log.info (bagObjectC.toString ());
-        TestClassC  reconClassC = (TestClassC) Serializer.fromBagObject (bagObjectC);
+        TestClassC  reconClassC = new Serializer<TestClassC> ().from (bagObjectC);
         AppTest.report (reconClassC.test (1, 2L, 3.0f, 10, 20L, 30.0f), true, "Serializer - Confirm reconstituted object matches original");
     }
 
@@ -139,62 +135,62 @@ public class SerializerTest {
     public void testArrayTypes() {
         long testArrayLong[] = {0L, 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L};
         BagObject bagObject = Serializer.toBagObject (testArrayLong);
-        assertArrayEquals (testArrayLong, (long[]) Serializer.fromBagObject (bagObject));
+        assertArrayEquals (testArrayLong, new Serializer<long[]> ().from (bagObject));
 
         short testArrayShort[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
         bagObject = Serializer.toBagObject (testArrayShort);
-        assertArrayEquals (testArrayShort, (short[]) Serializer.fromBagObject (bagObject));
+        assertArrayEquals (testArrayShort, new Serializer<short[]> ().from (bagObject));
 
         byte testArrayByte[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
         bagObject = Serializer.toBagObject (testArrayByte);
-        assertArrayEquals (testArrayByte, (byte[]) Serializer.fromBagObject (bagObject));
+        assertArrayEquals (testArrayByte, new Serializer<byte[]> ().from (bagObject));
 
         double testArrayDouble[] = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
         bagObject = Serializer.toBagObject (testArrayDouble);
-        assertArrayEquals (testArrayDouble, (double[]) Serializer.fromBagObject (bagObject), 1.0e-9);
+        assertArrayEquals (testArrayDouble, new Serializer<double[]> ().from (bagObject), 1.0e-9);
 
         float testArrayFloat[] = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f};
         bagObject = Serializer.toBagObject (testArrayFloat);
-        assertArrayEquals (testArrayFloat, (float[]) Serializer.fromBagObject (bagObject), 1.0e-6f);
+        assertArrayEquals (testArrayFloat, new Serializer<float[]> ().from (bagObject), 1.0e-6f);
 
         boolean testArrayBoolean[] = {true, false, true, false, true, false, true, false};
         bagObject = Serializer.toBagObject (testArrayBoolean);
-        assertArrayEquals (testArrayBoolean, (boolean[]) Serializer.fromBagObject (bagObject));
+        assertArrayEquals (testArrayBoolean, new Serializer<boolean[]> ().from (bagObject));
 
         char testArrayCharacter[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
         bagObject = Serializer.toBagObject (testArrayCharacter);
-        assertArrayEquals (testArrayCharacter, (char[]) Serializer.fromBagObject (bagObject));
+        assertArrayEquals (testArrayCharacter, new Serializer<char[]> ().from (bagObject));
     }
 
     @Test
     public void testBoxedArrayTypes() {
         Long testArrayLong[] = {0L, 1L, 2L, 3L, 4L, 5L, 6L, 7L, 8L, 9L};
         BagObject bagObject = Serializer.toBagObject (testArrayLong);
-        assertArrayEquals (testArrayLong, (Long[]) Serializer.fromBagObject (bagObject));
+        assertArrayEquals (testArrayLong, new Serializer<Long[]> ().from (bagObject));
 
         Short testArrayShort[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
         bagObject = Serializer.toBagObject (testArrayShort);
-        assertArrayEquals (testArrayShort, (Short[]) Serializer.fromBagObject (bagObject));
+        assertArrayEquals (testArrayShort, new Serializer<Short[]> ().from (bagObject));
 
         Byte testArrayByte[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
         bagObject = Serializer.toBagObject (testArrayByte);
-        assertArrayEquals (testArrayByte, (Byte[]) Serializer.fromBagObject (bagObject));
+        assertArrayEquals (testArrayByte, new Serializer<Byte[]> ().from (bagObject));
 
         Double testArrayDouble[] = {0.0, 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
         bagObject = Serializer.toBagObject (testArrayDouble);
-        assertArrayEquals (testArrayDouble, (Double[]) Serializer.fromBagObject (bagObject));
+        assertArrayEquals (testArrayDouble, new Serializer<Double[]> ().from (bagObject));
 
         Float testArrayFloat[] = {0.0f, 1.0f, 2.0f, 3.0f, 4.0f, 5.0f, 6.0f, 7.0f, 8.0f, 9.0f};
         bagObject = Serializer.toBagObject (testArrayFloat);
-        assertArrayEquals (testArrayFloat, (Float[]) Serializer.fromBagObject (bagObject));
+        assertArrayEquals (testArrayFloat, new Serializer<Float[]> ().from (bagObject));
 
         Boolean testArrayBoolean[] = {true, false, true, false, true, false, true, false};
         bagObject = Serializer.toBagObject (testArrayBoolean);
-        assertArrayEquals (testArrayBoolean, (Boolean[]) Serializer.fromBagObject (bagObject));
+        assertArrayEquals (testArrayBoolean, new Serializer<Boolean[]> ().from (bagObject));
 
         Character testArrayCharacter[] = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
         bagObject = Serializer.toBagObject (testArrayCharacter);
-        assertArrayEquals (testArrayCharacter, (Character[]) Serializer.fromBagObject (bagObject));
+        assertArrayEquals (testArrayCharacter, new Serializer<Character[]> ().from (bagObject));
     }
 
     @Test
@@ -206,7 +202,7 @@ public class SerializerTest {
                 new TestClassA (4, true, 4.5, "Roxy")
         };
         BagObject bagObject = Serializer.toBagObject (testArrayA);
-        TestClassA reconTestArrayA[] = (TestClassA[]) Serializer.fromBagObject (bagObject);
+        TestClassA reconTestArrayA[] = new Serializer<TestClassA[]> ().from (bagObject);
         boolean pass = true;
         for (int i = 0, end = testArrayA.length; i < end; ++i) {
             TestClassA left = testArrayA[i];
@@ -232,9 +228,10 @@ public class SerializerTest {
 
     @Test
     public void testOffsetDateTime () {
-        // deal with a type that has a private default consructor
+        // deal with a type that has a no default constructor?
         OffsetDateTime  odt = OffsetDateTime.now ();
         BagObject bagObject = Serializer.toBagObject (odt);
-        OffsetDateTime  reconOdt = (OffsetDateTime) Serializer.fromBagObject (bagObject);
+        OffsetDateTime  reconOdt = new Serializer<OffsetDateTime> ().from (bagObject);
+        assertEquals (odt, reconOdt);
     }
 }

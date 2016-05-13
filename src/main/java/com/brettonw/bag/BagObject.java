@@ -608,7 +608,7 @@ public class BagObject extends Base {
             // NOTE this should never happen unless there is a bug in toJsonString we don't know
             // about, and I can't generate a test case to cover it - so it reports as a lack of
             // coverage
-            log.error (exception);
+            log.debug (exception);
         }
         return null;
     }

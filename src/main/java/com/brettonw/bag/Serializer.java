@@ -5,6 +5,7 @@ import org.apache.logging.log4j.Logger;
 
 import java.lang.reflect.*;
 import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * A tool to convert data types to and from BagObjects for serialization. It is designed to support
@@ -12,11 +13,24 @@ import java.util.*;
  * arrays, and array or map-based containers of one of the previously mentioned types. It explicitly
  * supports BagObject and BagArray as well.
  */
-public final class Serializer {
-    Serializer () {}
-
+public final class Serializer<WorkingType> {
     private static final Logger log = LogManager.getLogger (Serializer.class);
 
+    // the non-static interface
+    public Serializer () {}
+
+    /**
+     * Deserialize the given BagObject representation back to the &lt;generic&gt; object it represents.
+     *
+     * @param bagObject the target BagObject to deserialize. It must be a valid representation of
+     *                  the encoded type(i.e. created by the toBagObject method).
+     * @return the reconstituted object, or null if the deserialization failed.
+     */
+    public WorkingType from (BagObject bagObject) {
+        return (WorkingType) fromBagObject (bagObject);
+    }
+
+    // the static interface
     private static final String TYPE_KEY = "type";
     private static final String VERSION_KEY = "v";
     private static final String KEY_KEY = "key";
@@ -30,6 +44,29 @@ public final class Serializer {
     // whether or not to support multiple deserializer formats when the time comes.
     private static final String SERIALIZER_VERSION_1 = "1.0";
     private static final String SERIALIZER_VERSION = SERIALIZER_VERSION_1;
+
+    // a type extension registry so that we can instantiate types that don't adhere to the
+    // 'Serializable' interface requirements.
+    private static final Map<Class, Supplier> typeExtensions = new HashMap<> ();
+
+    /**
+     * Add a handler function to be called when a type without a default constructor is
+     * deserialized.
+     *
+     * Some serialized types say they are Serializable (or act that way by default), but don't
+     * actually have a default constructor. In that case, we have to have a way fo link in functions
+     * that can be used to construct a default instance of that type for deserialization.
+     *
+     * @param c the Class to use this "constructor" for
+     * @param s the function to call when constructing the unknown type
+     */
+    public static void forType (Class c, Supplier s) {
+        typeExtensions.put (c, s);
+    }
+
+    static {
+        new TypeExtensions ();
+    }
 
     private static boolean isPrimitive (Class type) {
         // an obvious check to do here is type.isPrimitive (), but that is never true because Java
@@ -97,7 +134,7 @@ public final class Serializer {
                 } catch (IllegalAccessException exception) {
                     // NOTE this shouldn't happen, per the comments above, and is untestable for
                     // purpose of measuring coverage
-                    log.error (exception);
+                    log.debug (exception);
                 }
 
                 // restore the accessibility - not 100% sure this is necessary, better be safe than
@@ -188,34 +225,66 @@ public final class Serializer {
     }
 
     private static Object deserializeJavaObjectType (BagObject bagObject) throws ClassNotFoundException, IllegalAccessException, NoSuchMethodException, InstantiationException, InvocationTargetException {
-        // get the type and it's associated empty constructor. Even if the constructor is private,
-        // we force accessibility for serialization - this is an issue with the reflection API that
-        // we want to step around because serialization is assumed to be the primary goal, as
-        // opposed to viewing it as a way to workaround an API that needs to be over-ridden.
+        Object target = null;
+
+        // get the type and try to construct from a default constructor
         Class type = ClassLoader.getSystemClassLoader ().loadClass (bagObject.getString (TYPE_KEY));
-        Constructor constructor = type.getDeclaredConstructor();
-        boolean accessible = constructor.isAccessible ();
-        constructor.setAccessible(true);
-        Object target = constructor.newInstance ();
-        constructor.setAccessible(accessible);
+        try {
+            // get the type's associated empty constructor. Even if the constructor is private, we
+            // force accessibility for serialization - this is an issue with the reflection API that
+            // we want to step around because serialization is assumed to be the primary goal, as
+            // opposed to viewing it as a way to workaround an API that needs to be over-ridden.
+            //if (Serializable.class.isAssignableFrom (type)) {
+                Constructor constructor = type.getDeclaredConstructor ();
+                boolean accessible = constructor.isAccessible ();
+                constructor.setAccessible (true);
+                target = constructor.newInstance ();
+                constructor.setAccessible (accessible);
+            //}
+        } catch (NoSuchMethodException exception) {
+            // well... we are looking at an object that is technically not Serializable, as it has
+            // no default constructor, private or otherwise. I'v encountered this issue with a type
+            // that declares it implements Serializable (OffsetDateTime), so I know class authors
+            // lie about their classes, even in the java.lang.* class hierarchy.
+            log.debug (exception);
+        }
 
-        // traverse the fields via reflection to set the values, only the public values
-        BagObject value = bagObject.getBagObject (VALUE_KEY);
-        Set<Field> fieldSet = new HashSet<> (Arrays.asList (type.getFields ()));
-        fieldSet.addAll (Arrays.asList (type.getDeclaredFields ()));
-        for (Field field : fieldSet) {
-            // force accessibility for serialization, as above... this should prevent the
-            // IllegalAccessException from ever happening.
-            accessible = field.isAccessible ();
-            field.setAccessible (true);
+        // so... if we didn't get an object constructed at this point, we need to jump out to our
+        // type extensions to allows us to say, for type X, use this method to make a default one...
+        if (target == null) {
+            // check to see if the object is in our registry
+            if (typeExtensions.containsKey (type)) {
+                target = typeExtensions.get (type).get ();
+            } else {
+                log.error ("Don't know how to construct: " + type.getCanonicalName ());
 
-            // get the name and type, and set the value from the encode value
-            //log.trace ("Add " + field.getName () + " as " + field.getType ().getName ());
-            field.set (target, fromBagObject (value.getBagObject (field.getName ())));
+            }
+        }
 
-            // restore the accessibility - not 100% sure this is necessary, better be safe than
-            // sorry, right?
-            field.setAccessible (accessible);
+        // Wendy, is the water warm enough? Yes, Lisa. (Prince, RIP)
+        if (target != null) {
+            // traverse the fields via reflection to set the values, only the public values
+            BagObject value = bagObject.getBagObject (VALUE_KEY);
+            Set<Field> fieldSet = new HashSet<> (Arrays.asList (type.getFields ()));
+            fieldSet.addAll (Arrays.asList (type.getDeclaredFields ()));
+            for (Field field : fieldSet) {
+                // check if the field is static, we don't want to serialize any static values, as this
+                // leads to recursion
+                if (! Modifier.isStatic (field.getModifiers ())) {
+                    // force accessibility for serialization, as above... this should prevent the
+                    // IllegalAccessException from ever happening.
+                    boolean accessible = field.isAccessible ();
+                    field.setAccessible (true);
+
+                    // get the name and type, and set the value from the encode value
+                    //log.trace ("Add " + field.getName () + " as " + field.getType ().getName ());
+                    field.set (target, fromBagObject (value.getBagObject (field.getName ())));
+
+                    // restore the accessibility - not 100% sure this is necessary, better be safe
+                    // than sorry, right?
+                    field.setAccessible (accessible);
+                }
+            }
         }
         return target;
     }
