@@ -2,6 +2,7 @@ package com.brettonw.bag;
 
 enum SerializationType {
     PRIMITIVE,
+    ENUM,
     BAG_OBJECT,
     BAG_ARRAY,
     JAVA_OBJECT,

@@ -20,14 +20,20 @@ public final class Serializer<WorkingType> {
     public Serializer () {}
 
     /**
-     * Deserialize the given BagObject representation back to the &lt;generic&gt; object it represents.
+     * Deserialize the given BagObject representation back to the &lt;WorkingType&gt; object it
+     * represents. This is a type-safe helper function
      *
      * @param bagObject the target BagObject to deserialize. It must be a valid representation of
      *                  the encoded type(i.e. created by the toBagObject method).
      * @return the reconstituted object, or null if the deserialization failed.
      */
     public WorkingType from (BagObject bagObject) {
-        return (WorkingType) fromBagObject (bagObject);
+        try {
+            return (WorkingType) fromBagObject (bagObject);
+        } catch (Exception exception) {
+            log.error (exception);
+        }
+        return null;
     }
 
     // the static interface
@@ -86,6 +92,7 @@ public final class Serializer<WorkingType> {
     }
     private static SerializationType serializationType (Class type) {
         if (isPrimitive (type)) return SerializationType.PRIMITIVE;
+        if (type.isEnum ()) return SerializationType.ENUM;
         if (type.isArray ()) return SerializationType.ARRAY;
         if (Collection.class.isAssignableFrom (type)) return SerializationType.COLLECTION;
         if (Map.class.isAssignableFrom (type)) return SerializationType.MAP;
@@ -110,7 +117,23 @@ public final class Serializer<WorkingType> {
         return bagObject.put (VALUE_KEY, object);
     }
 
+    private static BagObject serializeJavaEnumType (BagObject bagObject, Object object, Class type) {
+        return bagObject.put (VALUE_KEY, object.toString ());
+    }
+
     private static BagObject serializeJavaObjectType (BagObject bagObject, Object object, Class type) {
+        try {
+            // get the type's associated empty constructor just to see if we can
+            Constructor constructor = type.getDeclaredConstructor ();
+        } catch (NoSuchMethodException exception) {
+            // well... we are looking at an object that is technically not Serializable, as it has
+            // no default constructor, private or otherwise. I want to warn the user if this type is
+            // not a known type in the typeExtensions, so they know the type can't be deserialized
+            if (!typeExtensions.containsKey (type)) {
+                log.warn ("Type (" + type.getCanonicalName () + ") cannot be deserialized. Consider adding a 'forType' extension to mimic a default constructor.");
+            }
+        }
+
         // this bag object will hold the value(s) of the fields
         BagObject value = new BagObject ();
 
@@ -190,6 +213,9 @@ public final class Serializer<WorkingType> {
             case PRIMITIVE:
                 bagObject = serializePrimitiveType (bagObject, object);
                 break;
+            case ENUM:
+                bagObject = serializeJavaEnumType (bagObject, object, type);
+                break;
             case BAG_OBJECT:
                 bagObject = serializePrimitiveType (bagObject, object);
                 break;
@@ -220,8 +246,13 @@ public final class Serializer<WorkingType> {
         // Character types don't have a constructor from a String, so we have to handle that as a
         // special case. Fingers crossed we don't find any others
         return (type.isAssignableFrom (Character.class)) ?
-            type.getConstructor (char.class).newInstance (valueString.charAt (0)) :
-            type.getConstructor (String.class).newInstance (valueString);
+                type.getConstructor (char.class).newInstance (valueString.charAt (0)) :
+                type.getConstructor (String.class).newInstance (valueString);
+    }
+
+    private static Object deserializeJavaEnumType (BagObject bagObject) throws ClassNotFoundException {
+        Class type = ClassLoader.getSystemClassLoader ().loadClass (bagObject.getString (TYPE_KEY));
+        return Enum.valueOf (type, bagObject.getString (VALUE_KEY));
     }
 
     private static Object deserializeJavaObjectType (BagObject bagObject) throws ClassNotFoundException, IllegalAccessException, NoSuchMethodException, InstantiationException, InvocationTargetException {
@@ -235,11 +266,11 @@ public final class Serializer<WorkingType> {
             // we want to step around because serialization is assumed to be the primary goal, as
             // opposed to viewing it as a way to workaround an API that needs to be over-ridden.
             //if (Serializable.class.isAssignableFrom (type)) {
-                Constructor constructor = type.getDeclaredConstructor ();
-                boolean accessible = constructor.isAccessible ();
-                constructor.setAccessible (true);
-                target = constructor.newInstance ();
-                constructor.setAccessible (accessible);
+            Constructor constructor = type.getDeclaredConstructor ();
+            boolean accessible = constructor.isAccessible ();
+            constructor.setAccessible (true);
+            target = constructor.newInstance ();
+            constructor.setAccessible (accessible);
             //}
         } catch (NoSuchMethodException exception) {
             // well... we are looking at an object that is technically not Serializable, as it has
@@ -257,7 +288,6 @@ public final class Serializer<WorkingType> {
                 target = typeExtensions.get (type).get ();
             } else {
                 log.error ("Don't know how to construct: " + type.getCanonicalName ());
-
             }
         }
 
@@ -412,6 +442,9 @@ public final class Serializer<WorkingType> {
             switch (serializationType (bagObject.getString (TYPE_KEY))) {
                 case PRIMITIVE:
                     result = deserializePrimitiveType (bagObject);
+                    break;
+                case ENUM:
+                    result = deserializeJavaEnumType (bagObject);
                     break;
                 case BAG_OBJECT:
                     result = bagObject.getBagObject (VALUE_KEY);

@@ -3,17 +3,19 @@ package com.brettonw.bag;
 import com.brettonw.AppTest;
 import com.brettonw.bag.test.TestClassA;
 import com.brettonw.bag.test.TestClassC;
+import com.brettonw.bag.test.TestClassD;
+import com.brettonw.bag.test.TestEnumXYZ;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
 
 
 public class SerializerTest {
@@ -31,7 +33,7 @@ public class SerializerTest {
     @Test
     public void testPojo() {
         // serialize a POJO
-        TestClassA testClass = new TestClassA (5, true, 123.0, "pdq");
+        TestClassA testClass = new TestClassA (5, true, 123.0, "pdq", TestEnumXYZ.ABC);
         BagObject bagObject = Serializer.toBagObject (testClass);
         log.info (bagObject.toString ());
 
@@ -196,10 +198,10 @@ public class SerializerTest {
     @Test
     public void testPojoArray() {
         TestClassA  testArrayA[] = {
-                new TestClassA (1, true, 3.5, "Joe"),
-                new TestClassA (2, true, 3.6, "Dave"),
-                new TestClassA (3, false, 19.2, "Bret"),
-                new TestClassA (4, true, 4.5, "Roxy")
+                new TestClassA (1, true, 3.5, "Joe", TestEnumXYZ.ABC),
+                new TestClassA (2, true, 3.6, "Dave", TestEnumXYZ.DEF),
+                new TestClassA (3, false, 19.2, "Bret", TestEnumXYZ.GHI),
+                new TestClassA (4, true, 4.5, "Roxy", TestEnumXYZ.GHI)
         };
         BagObject bagObject = Serializer.toBagObject (testArrayA);
         TestClassA reconTestArrayA[] = new Serializer<TestClassA[]> ().from (bagObject);
@@ -232,6 +234,28 @@ public class SerializerTest {
         OffsetDateTime  odt = OffsetDateTime.now ();
         BagObject bagObject = Serializer.toBagObject (odt);
         OffsetDateTime  reconOdt = new Serializer<OffsetDateTime> ().from (bagObject);
-        assertEquals (odt, reconOdt);
+        AppTest.report (odt, reconOdt, "Reconstructed OffsetDateTime should match the original");
+    }
+
+    @Test
+    public void testBogusType () {
+        // deal with a type that has a no default constructor?
+        OffsetDateTime  odt = OffsetDateTime.now ();
+        BagObject bagObject = Serializer.toBagObject (odt);
+        try {
+            LocalTime localTime = new Serializer<LocalTime> ().from (bagObject);
+            AppTest.report  (odt, localTime, "This should fail");
+        } catch (ClassCastException exception) {
+            AppTest.report (false, false, "Properly throw an exception if we can't cast the value");
+        }
+    }
+
+    @Test
+    public void testBadConstructorHandling () {
+        // deal with a type that has a no default constructor and no registered extension
+        TestClassD  d = new TestClassD ("Hello");
+        BagObject bagObject = Serializer.toBagObject (d);
+        TestClassD xxx = new Serializer<TestClassD> ().from (bagObject);
+        AppTest.report (d != xxx, true, "Properly fail on a type without a default constructor or registered extension");
     }
 }

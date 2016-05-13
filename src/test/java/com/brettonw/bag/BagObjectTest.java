@@ -2,6 +2,7 @@ package com.brettonw.bag;
 
 import com.brettonw.AppTest;
 import com.brettonw.bag.test.TestClassA;
+import com.brettonw.bag.test.TestEnumXYZ;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
@@ -113,7 +114,7 @@ public class BagObjectTest {
     public void testBarePojo() {
         // try to put a bare POJO into a bagObject
         try {
-            BagObject bareBagObject = new BagObject ().put ("barecheck", new TestClassA (2, false, 123.456, "pdq"));
+            BagObject bareBagObject = new BagObject ().put ("barecheck", new TestClassA (2, false, 123.456, "pdq", TestEnumXYZ.DEF));
             AppTest.report (bareBagObject != null, false, "BagObject - test bare POJO rejection");
         } catch (UnsupportedTypeException exception) {
             AppTest.report (true, true, "BagObject - test bare POJO rejection");
