@@ -601,14 +601,16 @@ public class BagObject extends Base {
     public static BagObject copy (BagObject bagObject) {
         // a quick and easy way to make a deep copy of a BagObject
         try {
-            return BagObject.fromJsonString (bagObject.toJsonString ());
+            if (bagObject != null) {
+                return BagObject.fromJsonString (bagObject.toJsonString ());
+            }
         } catch (IOException exception) {
             // NOTE this should never happen unless there is a bug in toJsonString we don't know
             // about, and I can't generate a test case to cover it - so it reports is lack of
             // coverage
             log.error (exception);
-            return null;
         }
+        return null;
     }
 
     /**
