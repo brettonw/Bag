@@ -2,7 +2,9 @@ package com.brettonw.bag;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import sun.reflect.ReflectionFactory;
 
+import java.io.Serializable;
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.function.Supplier;
@@ -70,10 +72,6 @@ public final class Serializer<WorkingType> {
         typeExtensions.put (c, s);
     }
 
-    static {
-        new TypeExtensions ();
-    }
-
     private static boolean isPrimitive (Class type) {
         // an obvious check to do here is type.isPrimitive (), but that is never true because Java
         // has boxed the primitives before they get here. So, we have to check for boxed primitives
@@ -126,10 +124,10 @@ public final class Serializer<WorkingType> {
             // get the type's associated empty constructor just to see if we can
             Constructor constructor = type.getDeclaredConstructor ();
         } catch (NoSuchMethodException exception) {
-            // well... we are looking at an object that is technically not Serializable, as it has
-            // no default constructor, private or otherwise. I want to warn the user if this type is
-            // not a known type in the typeExtensions, so they know the type can't be deserialized
-            if (!typeExtensions.containsKey (type)) {
+            // well... we are looking at an object that has no default constructor, private or
+            // otherwise.  want to warn the user if this type is not Serializable or not a known
+            // type in the typeExtensions, so they know the type can't be deserialized
+            if (!(Serializable.class.isAssignableFrom (type) || typeExtensions.containsKey (type))) {
                 log.warn ("Type (" + type.getCanonicalName () + ") cannot be deserialized. Consider adding a 'forType' extension to mimic a default constructor.");
             }
         }
@@ -255,6 +253,22 @@ public final class Serializer<WorkingType> {
         return Enum.valueOf (type, bagObject.getString (VALUE_KEY));
     }
 
+    private static <T> T create(Class<T> type) {
+        if (Serializable.class.isAssignableFrom (type)) {
+            try {
+                ReflectionFactory reflectionFactory = ReflectionFactory.getReflectionFactory ();
+                Constructor declaredConstructor = Object.class.getDeclaredConstructor ();
+                Constructor constructor = reflectionFactory.newConstructorForSerialization (type, declaredConstructor);
+                return type.cast (constructor.newInstance ());
+            } catch (RuntimeException exception) {
+                throw exception;
+            } catch (Exception exception) {
+                throw new IllegalStateException ("Cannot create object", exception);
+            }
+        }
+        return null;
+    }
+
     private static Object deserializeJavaObjectType (BagObject bagObject) throws ClassNotFoundException, IllegalAccessException, NoSuchMethodException, InstantiationException, InvocationTargetException {
         Object target = null;
 
@@ -280,10 +294,27 @@ public final class Serializer<WorkingType> {
             log.debug (exception);
         }
 
+        // if we didn't get the object at this point, try to recreate it as a Serializable object
+        if (target == null) {
+            // based on article at http://www.javaspecialists.eu/archive/Issue175.html
+            if (Serializable.class.isAssignableFrom (type)) {
+                try {
+                    ReflectionFactory reflectionFactory = ReflectionFactory.getReflectionFactory ();
+                    Constructor declaredConstructor = Object.class.getDeclaredConstructor ();
+                    Constructor constructor = reflectionFactory.newConstructorForSerialization (type, declaredConstructor);
+                    target = constructor.newInstance ();
+                } catch (RuntimeException exception) {
+                    throw exception;
+                } catch (Exception exception) {
+                    throw new IllegalStateException ("Cannot create object", exception);
+                }
+            }
+        }
+
         // so... if we didn't get an object constructed at this point, we need to jump out to our
         // type extensions to allows us to say, for type X, use this method to make a default one...
         if (target == null) {
-            // check to see if the object is in our registry
+            // check to see if the type is in our registry
             if (typeExtensions.containsKey (type)) {
                 target = typeExtensions.get (type).get ();
             } else {

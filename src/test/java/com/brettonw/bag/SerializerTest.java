@@ -1,10 +1,7 @@
 package com.brettonw.bag;
 
 import com.brettonw.AppTest;
-import com.brettonw.bag.test.TestClassA;
-import com.brettonw.bag.test.TestClassC;
-import com.brettonw.bag.test.TestClassD;
-import com.brettonw.bag.test.TestEnumXYZ;
+import com.brettonw.bag.test.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
@@ -257,5 +254,15 @@ public class SerializerTest {
         BagObject bagObject = Serializer.toBagObject (d);
         TestClassD xxx = new Serializer<TestClassD> ().from (bagObject);
         AppTest.report (d != xxx, true, "Properly fail on a type without a default constructor or registered extension");
+    }
+
+    @Test
+    public void testRegisteredConstructorHandling () {
+        // deal with a type that has a no default constructor and a registered extension
+        Serializer.forType (TestClassE.class,  () -> new TestClassE (null));
+        TestClassE  d = new TestClassE ("Hello");
+        BagObject bagObject = Serializer.toBagObject (d);
+        TestClassE xxx = new Serializer<TestClassE> ().from (bagObject);
+        AppTest.report (d, xxx, "Properly handle a type without a default constructor using a registered extension");
     }
 }
