@@ -4,10 +4,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import sun.reflect.ReflectionFactory;
 
-import java.io.Serializable;
 import java.lang.reflect.*;
 import java.util.*;
-import java.util.function.Supplier;
 
 /**
  * A tool to convert data types to and from BagObjects for serialization. It is designed to support
@@ -15,28 +13,8 @@ import java.util.function.Supplier;
  * arrays, and array or map-based containers of one of the previously mentioned types. It explicitly
  * supports BagObject and BagArray as well.
  */
-public final class Serializer<WorkingType> {
+public final class Serializer {
     private static final Logger log = LogManager.getLogger (Serializer.class);
-
-    // the non-static interface
-    public Serializer () {}
-
-    /**
-     * Deserialize the given BagObject representation back to the &lt;WorkingType&gt; object it
-     * represents. This is a type-safe helper function
-     *
-     * @param bagObject the target BagObject to deserialize. It must be a valid representation of
-     *                  the encoded type(i.e. created by the toBagObject method).
-     * @return the reconstituted object, or null if the deserialization failed.
-     */
-    public WorkingType from (BagObject bagObject) {
-        try {
-            return (WorkingType) fromBagObject (bagObject);
-        } catch (Exception exception) {
-            log.error (exception);
-        }
-        return null;
-    }
 
     // the static interface
     private static final String TYPE_KEY = "type";
@@ -52,25 +30,6 @@ public final class Serializer<WorkingType> {
     // whether or not to support multiple deserializer formats when the time comes.
     private static final String SERIALIZER_VERSION_1 = "1.0";
     private static final String SERIALIZER_VERSION = SERIALIZER_VERSION_1;
-
-    // a type extension registry so that we can instantiate types that don't adhere to the
-    // 'Serializable' interface requirements.
-    private static final Map<Class, Supplier> typeExtensions = new HashMap<> ();
-
-    /**
-     * Add a handler function to be called when a type without a default constructor is
-     * deserialized.
-     *
-     * Some serialized types say they are Serializable (or act that way by default), but don't
-     * actually have a default constructor. In that case, we have to have a way fo link in functions
-     * that can be used to construct a default instance of that type for deserialization.
-     *
-     * @param c the Class to use this "constructor" for
-     * @param s the function to call when constructing the unknown type
-     */
-    public static void forType (Class c, Supplier s) {
-        typeExtensions.put (c, s);
-    }
 
     private static boolean isPrimitive (Class type) {
         // an obvious check to do here is type.isPrimitive (), but that is never true because Java
@@ -120,18 +79,6 @@ public final class Serializer<WorkingType> {
     }
 
     private static BagObject serializeJavaObjectType (BagObject bagObject, Object object, Class type) {
-        try {
-            // get the type's associated empty constructor just to see if we can
-            Constructor constructor = type.getDeclaredConstructor ();
-        } catch (NoSuchMethodException exception) {
-            // well... we are looking at an object that has no default constructor, private or
-            // otherwise.  want to warn the user if this type is not Serializable or not a known
-            // type in the typeExtensions, so they know the type can't be deserialized
-            if (!(Serializable.class.isAssignableFrom (type) || typeExtensions.containsKey (type))) {
-                log.warn ("Type (" + type.getCanonicalName () + ") cannot be deserialized. Consider adding a 'forType' extension to mimic a default constructor.");
-            }
-        }
-
         // this bag object will hold the value(s) of the fields
         BagObject value = new BagObject ();
 
@@ -208,30 +155,14 @@ public final class Serializer<WorkingType> {
 
         // the next step depends on the actual type of what's being serialized
         switch (serializationType (type)) {
-            case PRIMITIVE:
-                bagObject = serializePrimitiveType (bagObject, object);
-                break;
-            case ENUM:
-                bagObject = serializeJavaEnumType (bagObject, object, type);
-                break;
-            case BAG_OBJECT:
-                bagObject = serializePrimitiveType (bagObject, object);
-                break;
-            case BAG_ARRAY:
-                bagObject = serializePrimitiveType (bagObject, object);
-                break;
-            case JAVA_OBJECT:
-                bagObject = serializeJavaObjectType (bagObject, object, type);
-                break;
-            case COLLECTION:
-                bagObject = serializeArrayType (bagObject, ((Collection) object).toArray ());
-                break;
-            case MAP:
-                bagObject = serializeMapType (bagObject, (Map) object);
-                break;
-            case ARRAY:
-                bagObject = serializeArrayType (bagObject, object);
-                break;
+            case PRIMITIVE: bagObject = serializePrimitiveType (bagObject, object); break;
+            case ENUM: bagObject = serializeJavaEnumType (bagObject, object, type); break;
+            case BAG_OBJECT: bagObject = serializePrimitiveType (bagObject, object); break;
+            case BAG_ARRAY: bagObject = serializePrimitiveType (bagObject, object); break;
+            case JAVA_OBJECT: bagObject = serializeJavaObjectType (bagObject, object, type); break;
+            case COLLECTION: bagObject = serializeArrayType (bagObject, ((Collection) object).toArray ()); break;
+            case MAP: bagObject = serializeMapType (bagObject, (Map) object); break;
+            case ARRAY: bagObject = serializeArrayType (bagObject, object); break;
         }
         return bagObject;
     }
@@ -259,47 +190,16 @@ public final class Serializer<WorkingType> {
         // get the type
         Class type = ClassLoader.getSystemClassLoader ().loadClass (bagObject.getString (TYPE_KEY));
 
-        // try to instantiate the object as a Serializable object
-        if (target == null) {
-            if (Serializable.class.isAssignableFrom (type)) {
-                try {
-                    ReflectionFactory reflectionFactory = ReflectionFactory.getReflectionFactory ();
-                    Constructor objectConstructor = Object.class.getDeclaredConstructor ();
-                    Constructor constructor = reflectionFactory.newConstructorForSerialization (type, objectConstructor);
-                    target = constructor.newInstance ();
-                } catch (Exception exception) {
-                    log.debug (exception);
-                }
-            }
-        }
-
-        // try to create the object using a default constructor (one with no arguments)
-        if (target == null) {
-            try {
-                // get the type's associated empty constructor. Even if the constructor is private,
-                // we force accessibility for serialization - this is an issue with the reflection
-                // API that we want to step around because serialization is assumed to be the
-                // primary goal, as opposed to viewing it as a way to workaround an API that needs
-                // to be over-ridden.
-                Constructor constructor = type.getDeclaredConstructor ();
-                boolean accessible = constructor.isAccessible ();
-                constructor.setAccessible (true);
-                target = constructor.newInstance ();
-                constructor.setAccessible (accessible);
-            } catch (NoSuchMethodException exception) {
-                log.debug (exception);
-            }
-        }
-
-        // try to jump out to our type extensions to allows us to say, for type X, use this method
-        // to make a default one...
-        if (target == null) {
-            // check to see if the type is in our registry
-            if (typeExtensions.containsKey (type)) {
-                target = typeExtensions.get (type).get ();
-            } else {
-                log.error ("Don't know how to construct: " + type.getCanonicalName ());
-            }
+        // instantiate the object using the serialization interface, this should effectively create
+        // the object without any initialization. we will do that next.
+        try {
+            ReflectionFactory reflectionFactory = ReflectionFactory.getReflectionFactory ();
+            Constructor objectConstructor = Object.class.getDeclaredConstructor ();
+            Constructor constructor = reflectionFactory.newConstructorForSerialization (type, objectConstructor);
+            target = constructor.newInstance ();
+            log.info ("constructed type (" + type.getCanonicalName () + ") using serialization.");
+        } catch (Exception exception) {
+            log.debug (exception);
         }
 
         // Wendy, is the water warm enough? Yes, Lisa. (Prince, RIP)
@@ -443,42 +343,26 @@ public final class Serializer<WorkingType> {
      * @return the reconstituted object (user must typecast it), or null if the reconstitution
      * failed.
      */
-    public static Object fromBagObject (BagObject bagObject) {
+    public static <WorkingType> WorkingType fromBagObject (BagObject bagObject) {
         Object  result = null;
         try {
             // we expect a future change might use a different approach to deserialization, so we
             // check to be sure this is the version we are working to
             checkVersion (bagObject.getString (VERSION_KEY));
             switch (serializationType (bagObject.getString (TYPE_KEY))) {
-                case PRIMITIVE:
-                    result = deserializePrimitiveType (bagObject);
-                    break;
-                case ENUM:
-                    result = deserializeJavaEnumType (bagObject);
-                    break;
-                case BAG_OBJECT:
-                    result = bagObject.getBagObject (VALUE_KEY);
-                    break;
-                case BAG_ARRAY:
-                    result = bagObject.getBagArray (VALUE_KEY);
-                    break;
-                case JAVA_OBJECT:
-                    result = deserializeJavaObjectType (bagObject);
-                    break;
-                case COLLECTION:
-                    result = deserializeCollectionType (bagObject);
-                    break;
-                case MAP:
-                    result = deserializeMapType (bagObject);
-                    break;
-                case ARRAY:
-                    result = deserializeArrayType (bagObject);
-                    break;
+                case PRIMITIVE: result = deserializePrimitiveType (bagObject); break;
+                case ENUM: result = deserializeJavaEnumType (bagObject); break;
+                case BAG_OBJECT: result = bagObject.getBagObject (VALUE_KEY); break;
+                case BAG_ARRAY: result = bagObject.getBagArray (VALUE_KEY); break;
+                case JAVA_OBJECT: result = deserializeJavaObjectType (bagObject); break;
+                case COLLECTION: result = deserializeCollectionType (bagObject); break;
+                case MAP: result = deserializeMapType (bagObject); break;
+                case ARRAY: result = deserializeArrayType (bagObject); break;
             }
         }
         catch (Exception exception) {
             log.error (exception);
         }
-        return result;
+        return (WorkingType) result;
     }
 }
