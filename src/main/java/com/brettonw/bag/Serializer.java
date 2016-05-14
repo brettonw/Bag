@@ -135,7 +135,7 @@ public final class Serializer<WorkingType> {
         // this bag object will hold the value(s) of the fields
         BagObject value = new BagObject ();
 
-        // gather all of the fields declared, public, private, static, etc., then loop over them all
+        // gather all of the fields declared; public, private, static, etc., then loop over them
         Set<Field> fieldSet = new HashSet<> (Arrays.asList (type.getFields ()));
         fieldSet.addAll (Arrays.asList (type.getDeclaredFields ()));
         for (Field field : fieldSet) {
@@ -253,66 +253,46 @@ public final class Serializer<WorkingType> {
         return Enum.valueOf (type, bagObject.getString (VALUE_KEY));
     }
 
-    private static <T> T create(Class<T> type) {
-        if (Serializable.class.isAssignableFrom (type)) {
-            try {
-                ReflectionFactory reflectionFactory = ReflectionFactory.getReflectionFactory ();
-                Constructor declaredConstructor = Object.class.getDeclaredConstructor ();
-                Constructor constructor = reflectionFactory.newConstructorForSerialization (type, declaredConstructor);
-                return type.cast (constructor.newInstance ());
-            } catch (RuntimeException exception) {
-                throw exception;
-            } catch (Exception exception) {
-                throw new IllegalStateException ("Cannot create object", exception);
-            }
-        }
-        return null;
-    }
-
     private static Object deserializeJavaObjectType (BagObject bagObject) throws ClassNotFoundException, IllegalAccessException, NoSuchMethodException, InstantiationException, InvocationTargetException {
         Object target = null;
 
-        // get the type and try to construct from a default constructor
+        // get the type
         Class type = ClassLoader.getSystemClassLoader ().loadClass (bagObject.getString (TYPE_KEY));
-        try {
-            // get the type's associated empty constructor. Even if the constructor is private, we
-            // force accessibility for serialization - this is an issue with the reflection API that
-            // we want to step around because serialization is assumed to be the primary goal, as
-            // opposed to viewing it as a way to workaround an API that needs to be over-ridden.
-            //if (Serializable.class.isAssignableFrom (type)) {
-            Constructor constructor = type.getDeclaredConstructor ();
-            boolean accessible = constructor.isAccessible ();
-            constructor.setAccessible (true);
-            target = constructor.newInstance ();
-            constructor.setAccessible (accessible);
-            //}
-        } catch (NoSuchMethodException exception) {
-            // well... we are looking at an object that is technically not Serializable, as it has
-            // no default constructor, private or otherwise. I'v encountered this issue with a type
-            // that declares it implements Serializable (OffsetDateTime), so I know class authors
-            // lie about their classes, even in the java.lang.* class hierarchy.
-            log.debug (exception);
-        }
 
-        // if we didn't get the object at this point, try to recreate it as a Serializable object
+        // try to instantiate the object as a Serializable object
         if (target == null) {
-            // based on article at http://www.javaspecialists.eu/archive/Issue175.html
             if (Serializable.class.isAssignableFrom (type)) {
                 try {
                     ReflectionFactory reflectionFactory = ReflectionFactory.getReflectionFactory ();
-                    Constructor declaredConstructor = Object.class.getDeclaredConstructor ();
-                    Constructor constructor = reflectionFactory.newConstructorForSerialization (type, declaredConstructor);
+                    Constructor objectConstructor = Object.class.getDeclaredConstructor ();
+                    Constructor constructor = reflectionFactory.newConstructorForSerialization (type, objectConstructor);
                     target = constructor.newInstance ();
-                } catch (RuntimeException exception) {
-                    throw exception;
                 } catch (Exception exception) {
-                    throw new IllegalStateException ("Cannot create object", exception);
+                    log.debug (exception);
                 }
             }
         }
 
-        // so... if we didn't get an object constructed at this point, we need to jump out to our
-        // type extensions to allows us to say, for type X, use this method to make a default one...
+        // try to create the object using a default constructor (one with no arguments)
+        if (target == null) {
+            try {
+                // get the type's associated empty constructor. Even if the constructor is private,
+                // we force accessibility for serialization - this is an issue with the reflection
+                // API that we want to step around because serialization is assumed to be the
+                // primary goal, as opposed to viewing it as a way to workaround an API that needs
+                // to be over-ridden.
+                Constructor constructor = type.getDeclaredConstructor ();
+                boolean accessible = constructor.isAccessible ();
+                constructor.setAccessible (true);
+                target = constructor.newInstance ();
+                constructor.setAccessible (accessible);
+            } catch (NoSuchMethodException exception) {
+                log.debug (exception);
+            }
+        }
+
+        // try to jump out to our type extensions to allows us to say, for type X, use this method
+        // to make a default one...
         if (target == null) {
             // check to see if the type is in our registry
             if (typeExtensions.containsKey (type)) {
@@ -324,14 +304,13 @@ public final class Serializer<WorkingType> {
 
         // Wendy, is the water warm enough? Yes, Lisa. (Prince, RIP)
         if (target != null) {
-            // traverse the fields via reflection to set the values, only the public values
+            // gather all of the fields declared; public, private, static, etc., then loop over them
             BagObject value = bagObject.getBagObject (VALUE_KEY);
             Set<Field> fieldSet = new HashSet<> (Arrays.asList (type.getFields ()));
             fieldSet.addAll (Arrays.asList (type.getDeclaredFields ()));
             for (Field field : fieldSet) {
-                // check if the field is static, we don't want to serialize any static values, as this
-                // leads to recursion
-                if (! Modifier.isStatic (field.getModifiers ())) {
+                // only populate this field if we serialized it
+                if (value.has (field.getName ())) {
                     // force accessibility for serialization, as above... this should prevent the
                     // IllegalAccessException from ever happening.
                     boolean accessible = field.isAccessible ();
