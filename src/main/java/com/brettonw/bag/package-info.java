@@ -1,10 +1,10 @@
 /**
  * Provides text-based storage of objects and un-formatted data in a simple, hierarchical key/value
  * store. It is loosely based on combination of XML, JSON (from www.json.org), and various other
- * serializers. Sometimes you want formatted text (JSON or XML), sometimes you want a serialized
- * Java Object, sometimes you want a database, and sometimes you want to move seamlessly between all
- * of them. The tight integration of these concepts in a single, lightweight, flexible, and high-
- * performance package lends itself to a broad range of applications.
+ * serializers. Sometimes you want formatted text (JSON), sometimes you want a serialized Java
+ * Object, sometimes you want a database, and sometimes you want to move seamlessly between all of
+ * them. The tight integration of these concepts in a single, lightweight, flexible, and
+ * high-performance package lends itself to a broad range of applications.
  * <p>
  * This package was originally intended for messaging, events, and other applications that require
  * complex values to be shared in a text-based data interchange format without the formality of
@@ -14,8 +14,8 @@
  * This package implements two low-level container classes for text-based storage of primitive types
  * (or their boxed analog), strings, and other bag types. The containers provide array or string-
  * keyed map design idioms, as BagArray and BagObject, respectively. They can be converted to JSON
- * or XML formatted strings, and reconstructed from a limited subset of those standard file formats
- * (i.e. the format that bag-types produce can be round-tripped as input).
+ * formatted strings, and reconstructed from a limited subset of that standard file format (i.e. the
+ * format that bag-types produce can be round-tripped as input).
  * <p>
  * <strong>Serializer</strong><br>
  * A means of serializing objects to and from a BagObject is provided. Where the basic bag types
@@ -60,7 +60,7 @@
  * The error handling philosophy is to return null and log failures. The user can choose to throw an
  * exception if they want, but Bag should be robust and continue chugging without killing the parent
  * application if an unanticipated fault happens. In the future, we will probably move to eliminate
- * the log4j dependency.
+ * the log4j2 dependency.
  * @author Bretton Wade
  */
 package com.brettonw.bag;

@@ -3,14 +3,21 @@ package com.brettonw.bag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.*;
+import java.io.DataOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
 public class Http {
     private static final Logger log = LogManager.getLogger (Http.class);
 
-    public static BagObject getBag (String urlString) {
+    @FunctionalInterface
+    public interface CheckedFunction<T, R> {
+        R apply(T t) throws Exception;
+    }
+
+    private static <T> T get (String urlString, CheckedFunction<InputStream, Object> function) {
         HttpURLConnection connection = null;
         try {
             // create the connection
@@ -21,7 +28,7 @@ public class Http {
 
             // get the response
             InputStream inputStream = connection.getInputStream();
-            return new BagObject (inputStream);
+            return (T) function.apply (inputStream);
         }
         catch (Exception exception) {
             log.error (exception);
@@ -33,7 +40,15 @@ public class Http {
         }
     }
 
-    public static BagObject postBag (String urlString, BagObject bagObject) {
+    public static BagObject getForBagObject (String urlString) {
+        return get (urlString, inputStream -> new BagObject (inputStream));
+    }
+
+    public static BagArray getForBagArray (String urlString) {
+        return get (urlString, inputStream -> new BagArray (inputStream));
+    }
+
+    public static <T> T post (String urlString, Base base, CheckedFunction<InputStream, Object> function) {
         HttpURLConnection connection = null;
         try {
             // create the connection
@@ -41,7 +56,7 @@ public class Http {
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
-            String  jsonString = bagObject.toJsonString();
+            String  jsonString = base.toJsonString();
             connection.setRequestProperty("Content-Length", Integer.toString(jsonString.getBytes().length));
             connection.setUseCaches(false);
 
@@ -54,7 +69,7 @@ public class Http {
 
             // get the response
             InputStream inputStream = connection.getInputStream();
-            return new BagObject (inputStream);
+            return (T) function.apply (inputStream);
         } catch (Exception exception) {
             log.error (exception);
             return null;
@@ -64,4 +79,12 @@ public class Http {
             }
         }
     }
+    public static BagObject postForBagObject (String urlString, Base base) {
+        return post (urlString, base, inputStream -> new BagObject (inputStream));
+    }
+
+    public static BagArray postForBagArray (String urlString, Base base) {
+        return post (urlString, base, inputStream -> new BagArray (inputStream));
+    }
+
 }
