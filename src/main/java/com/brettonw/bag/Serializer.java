@@ -197,7 +197,6 @@ public final class Serializer {
             Constructor objectConstructor = Object.class.getDeclaredConstructor ();
             Constructor constructor = reflectionFactory.newConstructorForSerialization (type, objectConstructor);
             target = constructor.newInstance ();
-            log.info ("constructed type (" + type.getCanonicalName () + ") using serialization.");
         } catch (Exception exception) {
             log.error (exception);
         }
