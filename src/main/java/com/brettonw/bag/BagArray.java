@@ -26,8 +26,7 @@ public class BagArray extends Base {
      * Create a new BagArray with a default underlying storage size.
      */
     public BagArray () {
-        count = 0;
-        container = new Object[START_SIZE];
+        init (START_SIZE);
     }
 
     /**
@@ -38,8 +37,56 @@ public class BagArray extends Base {
      *             to normal allocation behavior.
      */
     public BagArray (int size) {
+        init (size);
+    }
+
+    /**
+     * Create a new BagArray as deep copy of another BagArray
+     */
+    public BagArray (BagArray bagArray) {
+        try {
+            init (bagArray.getCount (), new JsonParser (bagArray.toJsonString ()));
+        } catch (IOException exception) {
+            // NOTE this should never happen unless there is a bug we don't know about, and I can't
+            // generate a test case to cover it, so it reports as a lack of coverage
+            log.error (exception);
+        }
+    }
+
+    /**
+     * Create a new BagArray initialized from a JSON formatted string
+     * @throws JsonParseException if the parser fails and the array is left in an unusable state
+     */
+    public BagArray (String jsonString) throws IOException, JsonParseException {
+        init (START_SIZE, new JsonParser (jsonString));
+    }
+
+    /**
+     * Create a new BagArray initialized from a JSON formatted string read from an inputStream
+     * @throws JsonParseException if the parser fails and the array is left in an unusable state
+     */
+    public BagArray (InputStream jsonInputStream) throws IOException, JsonParseException {
+        init (START_SIZE, new JsonParser (jsonInputStream));
+    }
+
+    /**
+     * Create a new BagArray initialized from a JSON formatted string read from a file
+     * @throws JsonParseException if the parser fails and the array is left in an unusable state
+     */
+    public BagArray (File jsonFile) throws IOException, JsonParseException {
+        init (START_SIZE, new JsonParser (jsonFile));
+    }
+
+    private void init (int containerSize) {
         count = 0;
-        container = new Object[size];
+        container = new Object[containerSize];
+    }
+
+    private void init (int containerSize, Parser parser) throws IOException, JsonParseException {
+        init (containerSize);
+        if (parser.readBagArray (this) == null) {
+            throw new JsonParseException ();
+        }
     }
 
     /**
@@ -287,55 +334,4 @@ public class BagArray extends Base {
         return enclose (result.toString (), SQUARE_BRACKETS);
     }
 
-    /**
-     * Returns the BagArray represented as XML.
-     *
-     * @return A String containing the XML representation of the underlying store.
-     */
-    public String toXmlString (String name) {
-        StringBuilder result = new StringBuilder ();
-        for (int i = 0; i < count; ++i) {
-            String string = getXmlString (name, container[i]);
-            result.append (string);
-        }
-        return result.toString ();
-    }
-
-    /**
-     * Returns a BagArray extracted from a JSON representation in a string.
-     *
-     * @param  input A String containing a JSON encoding of a BagArray.
-     * @return A new BagArray containing the elements encoded in the input.
-     */
-    public static BagArray fromJsonString (String input) throws IOException {
-        // parse the string out... it is assumed to be a well formed BagArray serialization
-        JsonParser parser = new JsonParser (input);
-        return parser.readBagArray ();
-    }
-
-    /**
-     * Returns a BagArray extracted from a JSON representation in an input stream.
-     *
-     * @param  inputStream An input stream containing a JSON encoding of a BagArray.
-     * @return A new BagArray containing the elements encoded in the input.
-     * @throws IOException if the stream input can not be read
-     */
-    public static BagArray fromStream (InputStream inputStream) throws IOException {
-        // parse the string out... it is assumed to be a well formed BagArray serialization
-        JsonParser parser = new JsonParser (inputStream);
-        return parser.readBagArray ();
-    }
-
-    /**
-     * Returns a BagArray extracted from a JSON representation in a file.
-     *
-     * @param  file A file containing a JSON encoding of a BagArray.
-     * @return A new BagArray containing the elements encoded in the input.
-     * @throws IOException if the file input can not be read
-     */
-    public static BagArray fromFile (File file) throws IOException {
-        // parse the string out... it is assumed to be a well formed BagArray serialization
-        JsonParser parser = new JsonParser (file);
-        return parser.readBagArray ();
-    }
 }

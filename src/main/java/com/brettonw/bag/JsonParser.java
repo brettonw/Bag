@@ -24,9 +24,8 @@ class JsonParser extends Parser {
     }
 
     @Override
-    BagArray readBagArray () {
+    BagArray readBagArray (BagArray bagArray) {
         // <Array> :: [ ] | [ <Elements> ]
-        BagArray bagArray = new BagArray();
         return (expect('[') && readElements (bagArray) && require(']')) ? bagArray : null;
     }
 
@@ -60,9 +59,8 @@ class JsonParser extends Parser {
     }
 
     @Override
-    BagObject readBagObject () {
+    BagObject readBagObject (BagObject bagObject) {
         // <Object> ::= { } | { <Members> }
-        BagObject bagObject = new BagObject();
         return (expect('{') && readMembers (bagObject) && require('}')) ? bagObject : null;
     }
 
@@ -161,11 +159,11 @@ class JsonParser extends Parser {
         if (check ()) {
             switch (input.charAt (index)) {
                 case '{':
-                    value = readBagObject ();
+                    value = readBagObject (new BagObject ());
                     break;
 
                 case '[':
-                    value = readBagArray ();
+                    value = readBagArray (new BagArray ());
                     break;
 
                 case '"':

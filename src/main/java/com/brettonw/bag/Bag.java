@@ -16,15 +16,15 @@ public class Bag {
     }
 
     public Bag (String string) throws IOException {
-        container = BagObject.fromJsonString (string);
+        container = new BagObject (string);
     }
 
     public Bag (InputStream stream) throws IOException {
-        container = BagObject.fromStream (stream);
+        container = new BagObject (stream);
     }
 
     public Bag (File file) throws IOException {
-        container = BagObject.fromFile (file);
+        container = new BagObject (file);
     }
 
     public Bag (BagObject container) {

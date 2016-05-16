@@ -6,8 +6,6 @@ abstract class Base {
     static final String CURLY_BRACKETS[] = { "{", "}" };
 
     private static final String QUOTES[] = { "\"" };
-    private static final String ANGLE_BRACKETS[] = { "<", ">" };
-    private static final String ANGLE_CLOSE_BRACKETS[] = { "</", ">" };
 
 
     String enclose (String input, String bracket[]) {
@@ -18,11 +16,6 @@ abstract class Base {
 
     String quote (String input) {
         return enclose (input, QUOTES);
-    }
-
-    String encloseXml (String name, String input) {
-        String brackets[] = { enclose (name, ANGLE_BRACKETS), enclose (name, ANGLE_CLOSE_BRACKETS) };
-        return enclose (input, brackets);
     }
 
     String getJsonString (Object object) {
@@ -45,28 +38,6 @@ abstract class Base {
         // the bare value 'null' (not quoted)
         return "null";
     }
-
-    String getXmlString (String name, Object object) {
-        if (object != null) {
-            switch (object.getClass ().getName ()) {
-                case "java.lang.String":
-                    return encloseXml (name, (String) object);
-
-                case "com.brettonw.bag.BagObject":
-                case "com.brettonw.bag.BagArray":
-                    return ((Base) object).toXmlString (name);
-
-                // we omit the default case, because there should not be any other types stored in
-                // the Bag class - as in, they would not make it into the container, as the
-                // "objectify" method will gate that
-            }
-        }
-        // if we stored a null, we need to emit it as a value. This will only happen in the
-        // array types
-        return encloseXml (name, "");
-    }
-
-
 
     Object objectify (Object value) {
         if (value != null) {
@@ -98,10 +69,19 @@ abstract class Base {
     }
 
     abstract public String toJsonString ();
-    abstract public String toXmlString (String name);
 
     @Override
     public String toString () {
         return toJsonString ();
+    }
+
+    @Override
+    public boolean equals (Object object) {
+        return toString ().equals (object.toString ());
+    }
+
+    @Override
+    public int hashCode () {
+        return toString ().hashCode ();
     }
 }

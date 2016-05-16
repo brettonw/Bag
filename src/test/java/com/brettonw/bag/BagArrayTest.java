@@ -30,11 +30,26 @@ public class BagArrayTest {
 
             // convert that bag to a string
             String bagArrayAsString = bagArray.toString ();
-            BagArray reconBagArray = BagArray.fromJsonString (bagArrayAsString);
+            BagArray reconBagArray = new BagArray (bagArrayAsString);
             AppTest.report (reconBagArray.toString (), bagArrayAsString, "BagArray - simple round trip with null values");
         } catch (IOException exception) {
             AppTest.report (false, true, "An exception is a failure case");
         }
+    }
+
+    @Test
+    public void testCopyConstructor() {
+        // a first basic test
+        BagArray bagArray = new BagArray ()
+                .add ("abdefg")
+                .add (123456)
+                .add (123.456)
+                .add (true);
+        bagArray.insert (1, 234567);
+        bagArray.replace (2, 345678);
+
+        BagArray duplicate = new BagArray (bagArray);
+        AppTest.report (bagArray, duplicate, "BagArray - deep copy should succeed and be equal to the original");
     }
 
     @Test
@@ -63,7 +78,7 @@ public class BagArrayTest {
             String testString = testArray.toString ();
             AppTest.report (testString, testString, "BagArray simple toString exercise (" + testString + ")");
 
-            BagArray reconArray = BagArray.fromJsonString (testString);
+            BagArray reconArray = new BagArray (testString);
             String reconString = reconArray.toString ();
             AppTest.report (reconString, testString, "BagArray simple reconstitution");
         } catch (IOException exception) {
@@ -90,7 +105,7 @@ public class BagArrayTest {
             String testString = testArray.toString ();
             AppTest.report (testString, testString, "BagArray complex toString exercise (" + testString + ")");
 
-            BagArray reconArray = BagArray.fromJsonString (testString);
+            BagArray reconArray = new BagArray (testString);
             String reconString = reconArray.toString ();
             AppTest.report (reconString, testString, "BagArray complex reconstitution");
 
@@ -107,7 +122,7 @@ public class BagArrayTest {
             AppTest.report (reconArray.getBagArray (1), childArray, "BagArray store and retrieve a BagArray");
             AppTest.report (reconArray.getBagObject (1), null, "BagArray simple invalid type extraction as BagObject");
             reconString = reconArray.toString ();
-            testArray = BagArray.fromJsonString (reconString);
+            testArray = new BagArray (reconString);
             AppTest.report (testArray.toString (), reconString, "BagArray reconstitute with an array containing an array");
         } catch (IOException exception) {
             AppTest.report (false, true, "An exception is a failure case");
@@ -118,9 +133,9 @@ public class BagArrayTest {
     public void testRegressionCase() {
         try {
             File testFile = new File ("data", "UCS_Satellite_Database_2-1-14.json");
-            BagArray bagArray = BagArray.fromFile (testFile);
+            BagArray bagArray = new BagArray (testFile);
             AppTest.report (bagArray != null, true, "BagArray - Regression Test 1");
-            bagArray = BagArray.fromStream (new FileInputStream (testFile));
+            bagArray = new BagArray (new FileInputStream (testFile));
             AppTest.report (bagArray != null, true, "BagArray - Regression Test 2");
         } catch (Exception exception) {
             AppTest.report (false, true, "BagArray - Regression Test 1 - Exception failure");
@@ -128,24 +143,22 @@ public class BagArrayTest {
     }
 
     @Test
-    public void testXml() {
-        BagObject bagObject = new BagObject ().put ("array",
-                new BagArray ()
-                        .add (5)
-                        .add ("hello")
-                        .add (null)
-                        .add ("world")
-                        .add (735.6));
-        String xml = bagObject.toXmlString ("xml");
-        String expect = "<xml><array>5</array><array>hello</array><array></array><array>world</array><array>735.6</array></xml>";
-        AppTest.report (xml, expect, "BagArray - test XML");
+    public void testEmptyArrayStrings() {
+        try {
+            BagArray bagArray = new BagArray ("[]");
+            AppTest.report (bagArray != null, true, "BagArray - test empty shell");
+        } catch (IOException exception) {
+            AppTest.report (false, true, "An exception is a failure case");
+        }
     }
 
     @Test
-    public void testEmptyArrayStrings() {
+    public void testReconstructFromBogusStrings() {
         try {
-            BagArray bagArray = BagArray.fromJsonString ("[]");
+            BagArray bagArray = new BagArray ("[123 234 345 456]");
             AppTest.report (bagArray != null, true, "BagArray - test empty shell");
+        } catch (JsonParseException jsonParseException) {
+            AppTest.report (false, false, "Bogus array parsing should fail");
         } catch (IOException exception) {
             AppTest.report (false, true, "An exception is a failure case");
         }

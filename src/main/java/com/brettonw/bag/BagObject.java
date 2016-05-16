@@ -41,7 +41,6 @@ public class BagObject extends Base {
 
     /**
      * Create a new BagObject with hint for the underlying storage size.
-     *
      * @param size The expected number of elements in the BagObject, treated as a hint to optimize
      *             memory allocation. If additional elements are stored, the BagObject will revert
      *             to normal allocation behavior.
@@ -50,9 +49,53 @@ public class BagObject extends Base {
         init (size);
     }
 
+    /**
+     * Create a new BagObject as deep copy of another BagObject
+     */
+    public BagObject (BagObject bagObject) {
+        try {
+            init (bagObject.getCount (), new JsonParser (bagObject.toJsonString ()));
+        } catch (IOException exception) {
+            // NOTE this should never happen unless there is a bug we don't know about, and I can't
+            // generate a test case to cover it, so it reports as a lack of coverage
+            log.error (exception);
+        }
+    }
+
+    /**
+     * Create a new BagObject initialized from a JSON formatted string
+     * @throws JsonParseException if the parser fails and the object is left in an unusable state
+     */
+    public BagObject (String jsonString) throws IOException, JsonParseException {
+        init (DEFAULT_CONTAINER_SIZE, new JsonParser (jsonString));
+    }
+
+    /**
+     * Create a new BagObject initialized from a JSON formatted string read from an inputStream
+     * @throws JsonParseException if the parser fails and the object is left in an unusable state
+     */
+    public BagObject (InputStream jsonInputStream) throws IOException, JsonParseException {
+        init (DEFAULT_CONTAINER_SIZE, new JsonParser (jsonInputStream));
+    }
+
+    /**
+     * Create a new BagObject initialized from a JSON formatted string read from a file
+     * @throws JsonParseException if the parser fails and the object is left in an unusable state
+     */
+    public BagObject (File jsonFile) throws IOException, JsonParseException {
+        init (DEFAULT_CONTAINER_SIZE, new JsonParser (jsonFile));
+    }
+
     private void init (int containerSize) {
         count = 0;
         container = new Pair[containerSize];
+    }
+
+    private void init (int containerSize, Parser parser) throws IOException, JsonParseException {
+        init (containerSize);
+        if (parser.readBagObject (this) == null) {
+            throw new JsonParseException ();
+        }
     }
 
     /**
@@ -566,75 +609,4 @@ public class BagObject extends Base {
         }
         return enclose (result.toString (), CURLY_BRACKETS);
     }
-    /**
-     * Returns the BagObject represented as XML.
-     *
-     * @param  name A String giving the name of the unit for enclosure.
-     * @return A String containing the XML representation of the underlying store.
-     */
-    public String toXmlString (String name) {
-        StringBuilder result = new StringBuilder ();
-        for (int i = 0; i < count; ++i) {
-            Pair pair = container[i];
-            result.append (getXmlString (pair.key, pair.value));
-        }
-        return encloseXml (name, result.toString ());
-    }
-
-    /**
-     * Returns a BagObject extracted from a JSON representation.
-     *
-     * @param  input A String containing a JSON encoding of a BagObject.
-     * @return A new BagObject containing the elements encoded in the input.
-     */
-    public static BagObject fromJsonString (String input) throws IOException {
-        // parse the string out... it is assumed to be a well formed BagObject serialization
-        JsonParser parser = new JsonParser (input);
-        return parser.readBagObject ();
-    }
-
-    /**
-     * Creates a deep copy of a BagObject
-     * @param bagObject A BagObject you want to copy
-     * @return a deep copy of the requested BagObject
-     */
-    public static BagObject copy (BagObject bagObject) {
-        // a quick and easy way to make a deep copy of a BagObject
-        try {
-            if (bagObject != null) {
-                return BagObject.fromJsonString (bagObject.toJsonString ());
-            }
-        } catch (IOException exception) {
-            // NOTE this should never happen unless there is a bug in toJsonString we don't know
-            // about, and I can't generate a test case to cover it - so it reports as a lack of
-            // coverage
-            log.debug (exception);
-        }
-        return null;
-    }
-
-    /**
-     * Returns a BagObject extracted from a JSON representation.
-     *
-     * @param  inputStream An InputStream containing a JSON encoding of a BagObject.
-     * @return A new BagObject containing the elements encoded in the input.
-     * @throws IOException if the stream input can not be read
-     */
-    public static BagObject fromStream (InputStream inputStream) throws IOException {
-        JsonParser parser = new JsonParser (inputStream);
-        return parser.readBagObject ();
-    }
-
-    /**
-     * Returns a BagObject extracted from a JSON representation.
-     *
-     * @param  file A File containing a JSON encoding of a BagObject.
-     * @return A new BagObject containing the elements encoded in the input.
-     * @throws IOException if the file can not be read
-     */
-    public static BagObject fromFile (File file) throws IOException {
-        JsonParser parser = new JsonParser (file);
-        return parser.readBagObject ();
-    }
-
 }

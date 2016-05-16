@@ -199,7 +199,7 @@ public final class Serializer {
             target = constructor.newInstance ();
             log.info ("constructed type (" + type.getCanonicalName () + ") using serialization.");
         } catch (Exception exception) {
-            log.debug (exception);
+            log.error (exception);
         }
 
         // Wendy, is the water warm enough? Yes, Lisa. (Prince, RIP)

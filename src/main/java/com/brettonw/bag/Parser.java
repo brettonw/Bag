@@ -126,6 +126,6 @@ abstract class Parser {
     }
 
 
-    abstract BagArray readBagArray ();
-    abstract BagObject readBagObject ();
+    abstract BagArray readBagArray (BagArray bagArray);
+    abstract BagObject readBagObject (BagObject bagObject);
 }
