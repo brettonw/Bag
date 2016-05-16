@@ -48,17 +48,13 @@
  * bagObject.getString ("root/users/brettonw/last-name");</code> describes a four level hierarchy of
  * BagObjects, with the leaf object having a String value under the key <code>"last-name"</code>.
  * <p>
- * <strong>JSON and XML</strong><br>
- * Bag can consume a superset of valid JSON text in <code>BagObject.fromJsonString</code>. The
- * output of the <code>toJsonString</code> method is valid JSON. The primary difference between Bag
- * parsing of JSON, and that file standard is bare (unquoted) strings are allowed anywhere a quoted
- * string would be allowed, as in: <code>{ first-name: bretton, last-name: wade }</code>. Note that
- * whitespace, and the following characters are not allowed in bare values: ",:[]{}
- * <p>
- * Bag can consume a subset of valid XML text in <code>BagObject.fromXmlString</code>. The output of
- * the <code>toXmlString</code> method is valid XML, without attributes, and where each node will
- * only have a value or children. The consumption of XML formatted strings is limited that same set
- * of characteristics.
+ * <strong>JSON</strong><br>
+ * Bag can consume a superset of valid JSON text in inputs (Constructors from Strings, streams,
+ * files, and etc.). The output of the <code>toJsonString</code> method is valid JSON. The primary
+ * difference between Bag parsing of JSON, and that file standard is bare (unquoted) strings are
+ * allowed anywhere a quoted string would be allowed, as in: <code>{ first-name: bretton, last-name:
+ * wade }</code>. Note that whitespace, and the following characters are not allowed in bare
+ * values: ",:[]{}
  * <p>
  * <strong>Error Handling</strong><br>
  * The error handling philosophy is to return null and log failures. The user can choose to throw an
