@@ -163,4 +163,17 @@ public class BagArrayTest {
             AppTest.report (false, true, "An exception is a failure case");
         }
     }
+
+    @Test
+    public void testCopyOfEmptyArray () {
+        try {
+            BagArray empty = new BagArray ();
+            BagArray copy = new BagArray (empty);
+            AppTest.report (empty, copy, "Copy of empty array should succeed");
+            copy.add ("test");
+            AppTest.report (copy.getString (0), "test", "Copy of empty array should yield usable array");
+        } catch (Exception exception) {
+            AppTest.report (true, false, "Copy of empty array should succeed");
+        }
+    }
 }

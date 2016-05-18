@@ -79,7 +79,7 @@ public class BagArray extends Base {
 
     private void init (int containerSize) {
         count = 0;
-        container = new Object[containerSize];
+        container = new Object[Math.max (containerSize, 1)];
     }
 
     private void init (int containerSize, Parser parser) throws IOException, JsonParseException {

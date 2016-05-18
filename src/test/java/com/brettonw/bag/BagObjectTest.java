@@ -342,7 +342,14 @@ public class BagObjectTest {
 
     @Test
     public void testCopyOfEmptyObject () {
-        BagObject emptyObject = new BagObject ();
-        
+        try {
+            BagObject emptyObject = new BagObject ();
+            BagObject copy = new BagObject (emptyObject);
+            AppTest.report (emptyObject, copy, "Copy of empty object should succeed");
+            copy.put ("test", "x");
+            AppTest.report (copy.getString ("test"), "x", "Copy of empty object should yield usable object");
+        } catch (Exception exception) {
+            AppTest.report (true, false, "Copy of empty object should succeed");
+        }
     }
 }
