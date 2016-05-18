@@ -339,4 +339,10 @@ public class BagObjectTest {
             AppTest.report (false, false, "BagObject - clone of null should fail");
         }
     }
+
+    @Test
+    public void testCopyOfEmptyObject () {
+        BagObject emptyObject = new BagObject ();
+        
+    }
 }

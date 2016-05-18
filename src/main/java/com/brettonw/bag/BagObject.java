@@ -88,7 +88,7 @@ public class BagObject extends Base {
 
     private void init (int containerSize) {
         count = 0;
-        container = new Pair[containerSize];
+        container = new Pair[Math.max (containerSize, DEFAULT_CONTAINER_SIZE)];
     }
 
     private void init (int containerSize, Parser parser) throws IOException, JsonParseException {
