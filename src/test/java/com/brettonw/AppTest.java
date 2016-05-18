@@ -1,9 +1,6 @@
 package com.brettonw;
 
-import com.brettonw.bag.BagArrayTest;
-import com.brettonw.bag.BagObjectTest;
-import com.brettonw.bag.KeyTest;
-import com.brettonw.bag.SerializerTest;
+import com.brettonw.bag.*;
 import junit.framework.TestCase;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -15,6 +12,7 @@ import org.junit.runners.Suite;
         BagArrayTest.class,
         BagObjectTest.class,
         KeyTest.class,
+        HttpTest.class,
         SerializerTest.class
 })
 

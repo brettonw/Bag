@@ -1,5 +1,8 @@
 package com.brettonw.bag;
 
+/**
+ * A helper class for composing paths used in BagObject indexing.
+ */
 public final class Key {
     Key () {}
 

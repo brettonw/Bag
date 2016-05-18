@@ -9,11 +9,16 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+/**
+ * A helper class for GET and POST with JSON data in the request and the response.
+ */
 public class Http {
+    Http () {}
+
     private static final Logger log = LogManager.getLogger (Http.class);
 
     @FunctionalInterface
-    public interface CheckedFunction<T, R> {
+    interface CheckedFunction<T, R> {
         R apply(T t) throws Exception;
     }
 
@@ -40,10 +45,20 @@ public class Http {
         }
     }
 
+    /**
+     * returns a BagObject derived from a JSON-formatted response to a GET
+     * @param urlString address to fetch the JSON formatted response from
+     * @return the JSON response parsed into a BagObject
+     */
     public static BagObject getForBagObject (String urlString) {
         return get (urlString, inputStream -> new BagObject (inputStream));
     }
 
+    /**
+     * returns a BagArray derived from a JSON-formatted response to a GET
+     * @param urlString address to fetch the JSON formatted response from
+     * @return the JSON response parsed into a BagArray
+     */
     public static BagArray getForBagArray (String urlString) {
         return get (urlString, inputStream -> new BagArray (inputStream));
     }
@@ -79,10 +94,22 @@ public class Http {
             }
         }
     }
+    /**
+     * returns a BagObject derived from a JSON-formatted response to a POST with JSON-formatted post
+     * data (either a BagObject or BagArray)
+     * @param urlString address to fetch the JSON-formatted response from
+     * @return the JSON response parsed into a BagObject
+     */
     public static BagObject postForBagObject (String urlString, Base base) {
         return post (urlString, base, inputStream -> new BagObject (inputStream));
     }
 
+    /**
+     * returns a BagArray derived from a JSON-formatted response to a POST with JSON-formatted post
+     * data (either a BagObject or BagArray)
+     * @param urlString address to fetch the JSON-formatted response from
+     * @return the JSON response parsed into a BagObject
+     */
     public static BagArray postForBagArray (String urlString, Base base) {
         return post (urlString, base, inputStream -> new BagArray (inputStream));
     }
