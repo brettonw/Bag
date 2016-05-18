@@ -300,4 +300,12 @@ public class SerializerTest {
         TestClassE xxx = Serializer.fromBagObject (bagObject);
         AppTest.report (d, xxx, "Properly handle a serialized typen");
     }
+
+    @Test
+    public void testNull () {
+        BagObject bagObject = Serializer.toBagObject (null);
+        AppTest.report (bagObject, null, "Serialize null results in null");
+        Object object = Serializer.fromBagObject (null);
+        AppTest.report (object, null, "Deserialize null results in null");
+    }
 }

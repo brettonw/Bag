@@ -41,7 +41,7 @@ public class Bag {
         return this;
     }
 
-    public Object get (String key) {
+    public <T> T get (String key) {
         BagObject serializedObject = container.getBagObject (key);
         return (serializedObject != null) ? Serializer.fromBagObject (serializedObject) : null;
     }

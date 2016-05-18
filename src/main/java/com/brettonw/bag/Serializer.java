@@ -169,9 +169,11 @@ public final class Serializer {
      */
     public static BagObject toBagObject (Object object) {
         // fill out the header of the encapsulating bag
-        return new BagObject (2)
+        return (object != null)
+                ? new BagObject (2)
                 .put (VERSION_KEY, SERIALIZER_VERSION)
-                .put (VALUE_KEY, serialize (object));
+                .put (VALUE_KEY, serialize (object))
+                : null;
     }
 
     @SuppressWarnings (value="unchecked")
@@ -181,9 +183,9 @@ public final class Serializer {
 
         // Character types don't have a constructor from a String, so we have to handle that as a
         // special case. Fingers crossed we don't find any others
-        return (type.isAssignableFrom (Character.class)) ?
-                type.getConstructor (char.class).newInstance (valueString.charAt (0)) :
-                type.getConstructor (String.class).newInstance (valueString);
+        return (type.isAssignableFrom (Character.class))
+                ? type.getConstructor (char.class).newInstance (valueString.charAt (0))
+                : type.getConstructor (String.class).newInstance (valueString);
     }
 
     private static Object deserializeJavaEnumType (BagObject bagObject) throws ClassNotFoundException {
@@ -335,10 +337,11 @@ public final class Serializer {
         return target;
     }
 
-    private static void checkVersion (String got) throws BadVersionException {
+    private static boolean checkVersion (String got) throws BadVersionException {
         if (! got.equals (SERIALIZER_VERSION)) {
             throw new BadVersionException (got, SERIALIZER_VERSION);
         }
+        return true;
     }
 
     private static Object deserialize (BagObject bagObject) {
@@ -371,7 +374,8 @@ public final class Serializer {
     public static <WorkingType> WorkingType fromBagObject (BagObject bagObject) {
         // we expect a future change might use a different approach to deserialization, so we
         // check to be sure this is the version we are working to
-        checkVersion (bagObject.getString (VERSION_KEY));
-        return (WorkingType) deserialize (bagObject.getBagObject (VALUE_KEY));
+        return ((bagObject != null) && checkVersion (bagObject.getString (VERSION_KEY)))
+                ? (WorkingType) deserialize (bagObject.getBagObject (VALUE_KEY))
+                : null;
     }
 }
