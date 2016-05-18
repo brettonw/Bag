@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * A high-level container for typed objects based on BagObject.
+ */
 public class Bag {
     private BagObject container;
 
@@ -37,13 +40,13 @@ public class Bag {
     }
 
     public Bag put (String key, Object object) {
-        container.put (key, Serializer.toBagObject (object));
+        container.put (key, Serializer.serialize (object));
         return this;
     }
 
-    public <T> T get (String key) {
+    public <WorkingType> WorkingType get (String key) {
         BagObject serializedObject = container.getBagObject (key);
-        return (serializedObject != null) ? Serializer.fromBagObject (serializedObject) : null;
+        return (serializedObject != null) ? (WorkingType) Serializer.deserialize (serializedObject) : null;
     }
 
     public String toString () {

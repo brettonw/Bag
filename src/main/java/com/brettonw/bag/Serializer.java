@@ -137,7 +137,7 @@ public final class Serializer {
         return bagObject.put (VALUE_KEY, value);
     }
 
-    private static BagObject serialize (Object object) {
+    static BagObject serialize (Object object) {
         // fill out the header of the encapsulating bag
         Class type = object.getClass ();
         BagObject bagObject = new BagObject (2)
@@ -344,7 +344,7 @@ public final class Serializer {
         return true;
     }
 
-    private static Object deserialize (BagObject bagObject) {
+    static Object deserialize (BagObject bagObject) {
         Object  result = null;
         try {
             switch (serializationType (bagObject.getString (TYPE_KEY))) {
