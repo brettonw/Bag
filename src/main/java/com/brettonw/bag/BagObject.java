@@ -594,6 +594,7 @@ public class BagObject extends Base {
      *
      * @return A String containing the JSON representation of the underlying store.
      */
+    @Override
     public String toJsonString () {
         StringBuilder result = new StringBuilder ();
         boolean isFirst = true;

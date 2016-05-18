@@ -320,6 +320,7 @@ public class BagArray extends Base {
      *
      * @return A String containing the JSON representation of the underlying store.
      */
+    @Override
     public String toJsonString () {
         StringBuilder result = new StringBuilder ();
         boolean first = true;
@@ -333,5 +334,4 @@ public class BagArray extends Base {
         }
         return enclose (result.toString (), SQUARE_BRACKETS);
     }
-
 }
