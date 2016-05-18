@@ -105,10 +105,18 @@ public class SerializerTest {
     @Test
     public void testVersionHandler() {
         try {
-            String serializedString = "{\"type\":\"java.lang.String\",\"v\":\"0.9\",\"value\":\"pdq\"}";
+            BagObject mockup = new BagObject ()
+                    .put (Serializer.VERSION_KEY, "0.9")
+                    .put (Serializer.VALUE_KEY, new BagObject ()
+                            .put (Serializer.TYPE_KEY, "java.lang.String")
+                            .put (Serializer.VALUE_KEY, "PDQ")
+                    );
+            String serializedString = mockup.toJsonString ();
             BagObject serializedStringBagObject = new BagObject (serializedString);
             String deserializedString = Serializer.fromBagObject (serializedStringBagObject);
-            AppTest.report (deserializedString, null, "Serializer test reconstituting a string with a bad version");
+            AppTest.report (serializedString, deserializedString, "Serializer test reconstituting a string with a bad version should throw exception");
+        } catch (BadVersionException exception) {
+            AppTest.report (false, false, "Serializer test reconstituting a string with a bad version should fail");
         } catch (IOException exception) {
             AppTest.report (false, true, "An exception is a failure case");
         }
@@ -117,7 +125,13 @@ public class SerializerTest {
     @Test
     public void testError() {
         try {
-            String serializedString = "{\"type\":\"java.lang.Sring\",\"v\":\"1.0\",\"value\":\"pdq\"}";
+            BagObject mockup = new BagObject ()
+                    .put (Serializer.VERSION_KEY, Serializer.SERIALIZER_VERSION)
+                    .put (Serializer.VALUE_KEY, new BagObject ()
+                            .put (Serializer.TYPE_KEY, "java.lang.Sring")
+                            .put (Serializer.VALUE_KEY, "PDQ")
+                    );
+            String serializedString =mockup.toJsonString ();
             BagObject serializedStringBagObject = new BagObject (serializedString);
             String deserializedString = Serializer.fromBagObject (serializedStringBagObject);
             AppTest.report (deserializedString, null, "Serializer test reconstituting a modified source");
@@ -221,7 +235,25 @@ public class SerializerTest {
     @Test
     public void testBogusArrayString() {
         try {
-            String bogusArrayString = "{\"type\":\"[java.lang.Integer;\",\"v\":\"1.0\",\"value\":[{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"0\"},{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"1\"},{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"2\"},{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"3\"},{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"4\"},{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"5\"},{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"6\"},{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"7\"},{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"8\"},{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"9\"}]}";
+            BagObject mockup = new BagObject ()
+                    .put (Serializer.VERSION_KEY, Serializer.SERIALIZER_VERSION)
+                    .put (Serializer.VALUE_KEY, new BagObject ()
+                            .put (Serializer.TYPE_KEY, "[java.lang.Integer;")
+                            .put (Serializer.VALUE_KEY, new BagArray ()
+                                    .add (new BagObject ().put (Serializer.TYPE_KEY, "java.lang.Integer").put (Serializer.VALUE_KEY, 0))
+                                    .add (new BagObject ().put (Serializer.TYPE_KEY, "java.lang.Integer").put (Serializer.VALUE_KEY, 1))
+                                    .add (new BagObject ().put (Serializer.TYPE_KEY, "java.lang.Integer").put (Serializer.VALUE_KEY, 2))
+                                    .add (new BagObject ().put (Serializer.TYPE_KEY, "java.lang.Integer").put (Serializer.VALUE_KEY, 3))
+                                    .add (new BagObject ().put (Serializer.TYPE_KEY, "java.lang.Integer").put (Serializer.VALUE_KEY, 4))
+                                    .add (new BagObject ().put (Serializer.TYPE_KEY, "java.lang.Integer").put (Serializer.VALUE_KEY, 5))
+                                    .add (new BagObject ().put (Serializer.TYPE_KEY, "java.lang.Integer").put (Serializer.VALUE_KEY, 6))
+                                    .add (new BagObject ().put (Serializer.TYPE_KEY, "java.lang.Integer").put (Serializer.VALUE_KEY, 7))
+                                    .add (new BagObject ().put (Serializer.TYPE_KEY, "java.lang.Integer").put (Serializer.VALUE_KEY, 8))
+                                    .add (new BagObject ().put (Serializer.TYPE_KEY, "java.lang.Integer").put (Serializer.VALUE_KEY, 9))
+                            )
+                    );
+            //String bogusArrayString = "{\"type\":\"[java.lang.Integer;\",\"v\":\"1.0\",\"value\":[{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"0\"},{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"1\"},{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"2\"},{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"3\"},{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"4\"},{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"5\"},{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"6\"},{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"7\"},{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"8\"},{\"type\":\"java.lang.Integer\",\"v\":\"1.0\",\"value\":\"9\"}]}";
+            String bogusArrayString = mockup.toJsonString ();
             BagObject bogusArray = new BagObject (bogusArrayString);
             Object result = Serializer.fromBagObject (bogusArray);
             AppTest.report (result, null, "Serializer - test bogus array string");

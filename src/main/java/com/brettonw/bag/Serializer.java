@@ -17,10 +17,10 @@ public final class Serializer {
     private static final Logger log = LogManager.getLogger (Serializer.class);
 
     // the static interface
-    private static final String TYPE_KEY = "type";
-    private static final String VERSION_KEY = "v";
-    private static final String KEY_KEY = "key";
-    private static final String VALUE_KEY = "value";
+    static final String TYPE_KEY = "type";
+    static final String VERSION_KEY = "v";
+    static final String KEY_KEY = "key";
+    static final String VALUE_KEY = "value";
 
     // future changes might require the serializer to know a different type of encoding is expected.
     // we use a two step version, where changes in the ".x" region don't require a new deserializer
@@ -28,8 +28,9 @@ public final class Serializer {
     // indicate a completely new deserializer is needed. we will not ever support serializing to
     // older formats (link against the old version of this package if you want that). we will decide
     // whether or not to support multiple deserializer formats when the time comes.
-    private static final String SERIALIZER_VERSION_1 = "1.0";
-    private static final String SERIALIZER_VERSION = SERIALIZER_VERSION_1;
+    static final String SERIALIZER_VERSION_1 = "1.0";
+    static final String SERIALIZER_VERSION_2 = "2";
+    static final String SERIALIZER_VERSION = SERIALIZER_VERSION_2;
 
     private static boolean isPrimitive (Class type) {
         // an obvious check to do here is type.isPrimitive (), but that is never true because Java
@@ -98,7 +99,7 @@ public final class Serializer {
 
                 // get the name and type, and get the value to encode
                 try {
-                    value.put (field.getName (), toBagObject (field.get (object)));
+                    value.put (field.getName (), serialize (field.get (object)));
                 } catch (IllegalAccessException exception) {
                     // NOTE this shouldn't happen, per the comments above, and is untestable for
                     // purpose of measuring coverage
@@ -118,7 +119,7 @@ public final class Serializer {
         BagArray value = new BagArray (length);
         for (int i = 0; i < length; ++i) {
             // at runtime, we don't know what the array type is, and frankly we don't care
-            value.add (toBagObject (Array.get (object, i)));
+            value.add (serialize (Array.get (object, i)));
         }
         return bagObject.put (VALUE_KEY, value);
     }
@@ -129,11 +130,31 @@ public final class Serializer {
         for (Object key : keys) {
             Object item = object.get (key);
             BagObject pair = new BagObject (2)
-                    .put (KEY_KEY, toBagObject (key))
-                    .put (VALUE_KEY, toBagObject (item));
+                    .put (KEY_KEY, serialize (key))
+                    .put (VALUE_KEY, serialize (item));
             value.add (pair);
         }
         return bagObject.put (VALUE_KEY, value);
+    }
+
+    private static BagObject serialize (Object object) {
+        // fill out the header of the encapsulating bag
+        Class type = object.getClass ();
+        BagObject bagObject = new BagObject (2)
+                .put (TYPE_KEY, type.getName ());
+
+        // the next step depends on the actual type of what's being serialized
+        switch (serializationType (type)) {
+            case PRIMITIVE: bagObject = serializePrimitiveType (bagObject, object); break;
+            case ENUM: bagObject = serializeJavaEnumType (bagObject, object, type); break;
+            case BAG_OBJECT: bagObject = serializePrimitiveType (bagObject, object); break;
+            case BAG_ARRAY: bagObject = serializePrimitiveType (bagObject, object); break;
+            case JAVA_OBJECT: bagObject = serializeJavaObjectType (bagObject, object, type); break;
+            case COLLECTION: bagObject = serializeArrayType (bagObject, ((Collection) object).toArray ()); break;
+            case MAP: bagObject = serializeMapType (bagObject, (Map) object); break;
+            case ARRAY: bagObject = serializeArrayType (bagObject, object); break;
+        }
+        return bagObject;
     }
 
     /**
@@ -148,23 +169,9 @@ public final class Serializer {
      */
     public static BagObject toBagObject (Object object) {
         // fill out the header of the encapsulating bag
-        Class type = object.getClass ();
-        BagObject bagObject = new BagObject (3)
-                .put (TYPE_KEY, type.getName ())
-                .put (VERSION_KEY, SERIALIZER_VERSION);
-
-        // the next step depends on the actual type of what's being serialized
-        switch (serializationType (type)) {
-            case PRIMITIVE: bagObject = serializePrimitiveType (bagObject, object); break;
-            case ENUM: bagObject = serializeJavaEnumType (bagObject, object, type); break;
-            case BAG_OBJECT: bagObject = serializePrimitiveType (bagObject, object); break;
-            case BAG_ARRAY: bagObject = serializePrimitiveType (bagObject, object); break;
-            case JAVA_OBJECT: bagObject = serializeJavaObjectType (bagObject, object, type); break;
-            case COLLECTION: bagObject = serializeArrayType (bagObject, ((Collection) object).toArray ()); break;
-            case MAP: bagObject = serializeMapType (bagObject, (Map) object); break;
-            case ARRAY: bagObject = serializeArrayType (bagObject, object); break;
-        }
-        return bagObject;
+        return new BagObject (2)
+                .put (VERSION_KEY, SERIALIZER_VERSION)
+                .put (VALUE_KEY, serialize (object));
     }
 
     @SuppressWarnings (value="unchecked")
@@ -217,7 +224,7 @@ public final class Serializer {
 
                     // get the name and type, and set the value from the encode value
                     //log.trace ("Add " + field.getName () + " as " + field.getType ().getName ());
-                    field.set (target, fromBagObject (value.getBagObject (field.getName ())));
+                    field.set (target, deserialize (value.getBagObject (field.getName ())));
 
                     // restore the accessibility - not 100% sure this is necessary, better be safe
                     // than sorry, right?
@@ -234,7 +241,7 @@ public final class Serializer {
         Collection target = (Collection) type.newInstance ();
         BagArray value = bagObject.getBagArray (VALUE_KEY);
         for (int i = 0, end = value.getCount (); i < end; ++i) {
-            target.add (fromBagObject (value.getBagObject (i)));
+            target.add (deserialize (value.getBagObject (i)));
         }
         return target;
     }
@@ -246,7 +253,7 @@ public final class Serializer {
         BagArray value = bagObject.getBagArray (VALUE_KEY);
         for (int i = 0, end = value.getCount (); i < end; ++i) {
             BagObject entry = value.getBagObject (i);
-            target.put (fromBagObject (entry.getBagObject (KEY_KEY)), fromBagObject (entry.getBagObject (VALUE_KEY)));
+            target.put (deserialize (entry.getBagObject (KEY_KEY)), deserialize (entry.getBagObject (VALUE_KEY)));
         }
         return target;
     }
@@ -315,7 +322,7 @@ public final class Serializer {
                 BagObject newBagObject = values.getBagObject (i);
                 populateArray (newTarget, newBagObject);
             } else {
-                Array.set (target, i, fromBagObject (values.getBagObject (i)));
+                Array.set (target, i, deserialize (values.getBagObject (i)));
             }
         }
     }
@@ -334,20 +341,9 @@ public final class Serializer {
         }
     }
 
-    /**
-     * Reconstitute the given BagObject representation back to the object it represents.
-     *
-     * @param bagObject the target BagObject to deserialize. It must be a valid representation of
-     *                  the encoded type(i.e. created by the toBagObject method).
-     * @return the reconstituted object (user must typecast it), or null if the reconstitution
-     * failed.
-     */
-    public static <WorkingType> WorkingType fromBagObject (BagObject bagObject) {
+    private static Object deserialize (BagObject bagObject) {
         Object  result = null;
         try {
-            // we expect a future change might use a different approach to deserialization, so we
-            // check to be sure this is the version we are working to
-            checkVersion (bagObject.getString (VERSION_KEY));
             switch (serializationType (bagObject.getString (TYPE_KEY))) {
                 case PRIMITIVE: result = deserializePrimitiveType (bagObject); break;
                 case ENUM: result = deserializeJavaEnumType (bagObject); break;
@@ -362,6 +358,20 @@ public final class Serializer {
         catch (Exception exception) {
             log.error (exception);
         }
-        return (WorkingType) result;
+        return result;
+    }
+    /**
+     * Reconstitute the given BagObject representation back to the object it represents.
+     *
+     * @param bagObject the target BagObject to deserialize. It must be a valid representation of
+     *                  the encoded type(i.e. created by the toBagObject method).
+     * @return the reconstituted object (user must typecast it), or null if the reconstitution
+     * failed.
+     */
+    public static <WorkingType> WorkingType fromBagObject (BagObject bagObject) {
+        // we expect a future change might use a different approach to deserialization, so we
+        // check to be sure this is the version we are working to
+        checkVersion (bagObject.getString (VERSION_KEY));
+        return (WorkingType) deserialize (bagObject.getBagObject (VALUE_KEY));
     }
 }
