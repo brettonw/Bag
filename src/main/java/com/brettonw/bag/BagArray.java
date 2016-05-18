@@ -10,9 +10,9 @@ import java.io.InputStream;
 /**
  * A collection of text-based values stored in a zero-based indexed array.
  * <p>
- * Note: the BagArray class, from a memory allocation standpoint, is not designed to efficiently
- * work with dynamic storage of very large numbers of elements (more than 1,000s). It will work,
- * but we have not chosen to focus on this as a potential use-case.
+ * Note: the BagArray class, from a memory allocation standpoint, is not designed to work
+ * efficiently with dynamic storage of very large numbers of elements (more than 1,000s). It will
+ * work, but we have not chosen to focus on this as a potential use-case.
  */
 public class BagArray extends Base {
     private static final Logger log = LogManager.getLogger (BagArray.class);
@@ -46,7 +46,7 @@ public class BagArray extends Base {
     public BagArray (BagArray bagArray) {
         try {
             init (bagArray.getCount (), new JsonParser (bagArray.toJsonString ()));
-        } catch (IOException exception) {
+        } catch (Exception exception) {
             // NOTE this should never happen unless there is a bug we don't know about, and I can't
             // generate a test case to cover it, so it reports as a lack of coverage
             log.error (exception);
