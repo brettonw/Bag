@@ -1,9 +1,9 @@
 - Following release instructions at http://central.sonatype.org/pages/apache-maven.html
     * mvn release:clean release:prepare release:perform
 
-- some thinking about xml and arrays...
-- add xml deserialization
 - document the Bag type
-- add a Database type, based on a bagarray, complete with sort, search, filter, etc.
+- add a Database type, based on a bagarray, complete with sort, search, filter, etc. (or just do
+  that on BagArray?)
 - add a "simpleSerializer" that takes BagObjects, and uses name conversion to map POJO field names
   to install values, so a... createFromSimpleBagObject type of thing...
+- in BagArray, allow indexing using a path, and convert the first component to an integer
