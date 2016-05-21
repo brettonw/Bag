@@ -1,14 +1,10 @@
 package com.brettonw.bag;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.util.Supplier;
 
 import java.util.function.Function;
 
 abstract class BagBase {
-    private static final Logger log = LogManager.getLogger (BagBase.class);
-
     // data and functions for exporting as strings
     static final String SQUARE_BRACKETS[] = { "[", "]" };
     static final String CURLY_BRACKETS[] = { "{", "}" };
@@ -77,27 +73,6 @@ abstract class BagBase {
 
     abstract public Object getObject (String key);
 
-    // XXX experimental thoughts... there are two types of gets here - parsed gets, or core gets
-    // (String, BagArray, BagObject)
-    /*
-    private <T extends BagBase> T get (String key) {
-        Object object = getObject (key);
-        return (object instanceof BagBase) ? (T) object : null;
-    }
-    */
-
-    /*
-    private <T> T get (String key, Supplier<T> notFound) {
-        T value = getObject (key);
-        return (value != null) ? value : notFound.get ();
-    }
-    */
-
-    private <T> T getParsed (String key, Function<String, T> parser, Supplier<T> notFound) {
-        Object object = getObject (key);
-        return (object instanceof String) ? parser.apply ((String) object) : notFound.get ();
-    }
-
     /**
      * Retrieve a mapped element and return it as a String.
      *
@@ -118,6 +93,55 @@ abstract class BagBase {
     public String getString (String key, Supplier<String> notFound) {
         Object object = getObject (key);
         return (object instanceof String) ? (String) object : notFound.get ();
+    }
+
+    /**
+     * Retrieve a mapped element and return it as a BagObject.
+     *
+     * @param key A string value used to index the element.
+     * @return The element as a BagObject, or null if the element is not found.
+     */
+    public BagObject getBagObject (String key) {
+        return getBagObject (key, () -> null);
+    }
+
+    /**
+     * Retrieve a mapped element and return it as a BagObject.
+     *
+     * @param key A string value used to index the element.
+     * @param notFound A function to create a new BagObject if the requested key was not found
+     * @return The element as a BagObject, or notFound if the element is not found.
+     */
+    public BagObject getBagObject (String key, Supplier<BagObject> notFound) {
+        Object object = getObject (key);
+        return (object instanceof BagObject) ? (BagObject) object : notFound.get ();
+    }
+
+    /**
+     * Retrieve a mapped element and return it as a BagArray.
+     *
+     * @param key A string value used to index the element.
+     * @return The element as a BagArray, or null if the element is not found.
+     */
+    public BagArray getBagArray (String key) {
+        return getBagArray (key, () -> null);
+    }
+
+    /**
+     * Retrieve a mapped element and return it as a BagArray.
+     *
+     * @param key A string value used to index the element.
+     * @param notFound A function to create a new BagArray if the requested key was not found
+     * @return The element as a BagArray, or notFound if the element is not found.
+     */
+    public BagArray getBagArray (String key, Supplier<BagArray> notFound) {
+        Object object = getObject (key);
+        return (object instanceof BagArray) ? (BagArray) object : notFound.get ();
+    }
+
+    private <T> T getParsed (String key, Function<String, T> parser, Supplier<T> notFound) {
+        Object object = getObject (key);
+        return (object instanceof String) ? parser.apply ((String) object) : notFound.get ();
     }
 
     /**
@@ -224,51 +248,6 @@ abstract class BagBase {
     public Float getFloat (String key, Supplier<Float> notFound) {
         return getParsed (key, (input) -> new Float (input), notFound);
     }
-
-    /**
-     * Retrieve a mapped element and return it as a BagObject.
-     *
-     * @param key A string value used to index the element.
-     * @return The element as a BagObject, or null if the element is not found.
-     */
-    public BagObject getBagObject (String key) {
-        return getBagObject (key, () -> null);
-    }
-
-    /**
-     * Retrieve a mapped element and return it as a BagObject.
-     *
-     * @param key A string value used to index the element.
-     * @param notFound A function to create a new BagObject if the requested key was not found
-     * @return The element as a BagObject, or notFound if the element is not found.
-     */
-    public BagObject getBagObject (String key, Supplier<BagObject> notFound) {
-        Object object = getObject (key);
-        return (object instanceof BagObject) ? (BagObject) object : notFound.get ();
-    }
-
-    /**
-     * Retrieve a mapped element and return it as a BagArray.
-     *
-     * @param key A string value used to index the element.
-     * @return The element as a BagArray, or null if the element is not found.
-     */
-    public BagArray getBagArray (String key) {
-        return getBagArray (key, () -> null);
-    }
-
-    /**
-     * Retrieve a mapped element and return it as a BagArray.
-     *
-     * @param key A string value used to index the element.
-     * @param notFound A function to create a new BagArray if the requested key was not found
-     * @return The element as a BagArray, or notFound if the element is not found.
-     */
-    public BagArray getBagArray (String key, Supplier<BagArray> notFound) {
-        Object object = getObject (key);
-        return (object instanceof BagArray) ? (BagArray) object : notFound.get ();
-    }
-
 
     abstract public String toJsonString ();
 
