@@ -48,6 +48,11 @@
  * bagObject.getString ("root/users/brettonw/last-name");</code> describes a four level hierarchy of
  * BagObjects, with the leaf object having a String value under the key <code>"last-name"</code>.
  * <p>
+ * BagArrays also support hierarchical indexing (for <code>get</code> operations only -
+ * <code>put</code> is planned for a future release). The indexed string value should be in integer
+ * in the range of the array size, or one of the special values <code>#first</code> or
+ * <code>#last</code>.
+ * <p>
  * <strong>JSON</strong><br>
  * Bag can consume a superset of valid JSON text in inputs (Constructors from Strings, streams,
  * files, and etc.). The output of the <code>toJsonString</code> method is valid JSON. The primary

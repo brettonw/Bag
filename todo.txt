@@ -6,7 +6,6 @@
   that on BagArray?)
 - add a "simpleSerializer" that takes BagObjects, and uses name conversion to map POJO field names
   to install values, so a... createFromSimpleBagObject type of thing...
-- in BagArray, allow indexing using a path, and convert the first component to an integer
 - in BagArray, allow string based indexing for a 'put' operation
 - rename 'getObject' to 'get'?
 - 'putType' and 'getType' methods that invoke the Serializer?

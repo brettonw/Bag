@@ -4,6 +4,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.util.Supplier;
 
+import java.util.function.Function;
+
 abstract class BagBase {
     private static final Logger log = LogManager.getLogger (BagBase.class);
 
@@ -75,6 +77,27 @@ abstract class BagBase {
 
     abstract public Object getObject (String key);
 
+    // XXX experimental thoughts... there are two types of gets here - parsed gets, or core gets
+    // (String, BagArray, BagObject)
+    /*
+    private <T extends BagBase> T get (String key) {
+        Object object = getObject (key);
+        return (object instanceof BagBase) ? (T) object : null;
+    }
+    */
+
+    /*
+    private <T> T get (String key, Supplier<T> notFound) {
+        T value = getObject (key);
+        return (value != null) ? value : notFound.get ();
+    }
+    */
+
+    private <T> T getParsed (String key, Function<String, T> parser, Supplier<T> notFound) {
+        Object object = getObject (key);
+        return (object instanceof String) ? parser.apply ((String) object) : notFound.get ();
+    }
+
     /**
      * Retrieve a mapped element and return it as a String.
      *
@@ -82,28 +105,19 @@ abstract class BagBase {
      * @return The element as a string, or null if the element is not found (or not a String).
      */
     public String getString (String key) {
-        Object object = getObject (key);
-        return (object instanceof String) ? (String) object : null;
-        /*
-        try {
-            return (String) object;
-        } catch (ClassCastException exception) {
-            log.warn ("Cannot cast value type (" + object.getClass ().getName () + ") to String for key (" + key + ")");
-        }
-        return null;
-        */
+        return getString (key, () -> null);
     }
 
     /**
      * Retrieve a mapped element and return it as a String.
      *
      * @param key A string value used to index the element.
-     * @param notFound A String value to return if the key was not found
+     * @param notFound A function to create a new String if the requested key was not found
      * @return The element as a string, or notFound if the element is not found.
      */
-    public String getString (String key, String notFound) {
-        String value = getString (key);
-        return (value != null) ? value : notFound;
+    public String getString (String key, Supplier<String> notFound) {
+        Object object = getObject (key);
+        return (object instanceof String) ? (String) object : notFound.get ();
     }
 
     /**
@@ -113,20 +127,18 @@ abstract class BagBase {
      * @return The element as a Boolean, or null if the element is not found.
      */
     public Boolean getBoolean (String key) {
-        String string = getString (key);
-        return (string != null) ? Boolean.parseBoolean (string) : null;
+        return getParsed (key, (input) -> new Boolean (input), () -> null);
     }
 
     /**
      * Retrieve a mapped element and return it as a Boolean.
      *
      * @param key A string value used to index the element.
-     * @param notFound A Boolean value to return if the key was not found
+     * @param notFound A function to create a new Boolean if the requested key was not found
      * @return The element as a Boolean, or notFound if the element is not found.
      */
-    public Boolean getBoolean (String key, Boolean notFound) {
-        Boolean value = getBoolean (key);
-        return (value != null) ? value : notFound;
+    public Boolean getBoolean (String key, Supplier<Boolean> notFound) {
+        return getParsed (key, (input) -> new Boolean (input), notFound);
     }
 
     /**
@@ -136,20 +148,18 @@ abstract class BagBase {
      * @return The element as a Long, or null if the element is not found.
      */
     public Long getLong (String key) {
-        String string = getString (key);
-        return (string != null) ? Long.parseLong (string) : null;
+        return getParsed (key, (input) -> new Long (input), () -> null);
     }
 
     /**
      * Retrieve a mapped element and return it as a Long.
      *
      * @param key A string value used to index the element.
-     * @param notFound A Long value to return if the key was not found
+     * @param notFound A function to create a new Long if the requested key was not found
      * @return The element as a Long, or notFound if the element is not found.
      */
-    public Long getLong (String key, Long notFound) {
-        Long value = getLong (key);
-        return (value != null) ? value : notFound;
+    public Long getLong (String key, Supplier<Long> notFound) {
+        return getParsed (key, (input) -> new Long (input), notFound);
     }
 
     /**
@@ -159,20 +169,18 @@ abstract class BagBase {
      * @return The element as an Integer, or null if the element is not found.
      */
     public Integer getInteger (String key) {
-        Long value = getLong (key);
-        return (value != null) ? value.intValue () : null;
+        return getParsed (key, (input) -> new Integer (input), () -> null);
     }
 
     /**
      * Retrieve a mapped element and return it as an Integer.
      *
      * @param key A string value used to index the element.
-     * @param notFound An Integer value to return if the key was not found
+     * @param notFound A function to create a new Integer if the requested key was not found
      * @return The element as an Integer, or notFound if the element is not found.
      */
-    public Integer getInteger (String key, Integer notFound) {
-        Long value = getLong (key);
-        return (value != null) ? value.intValue () : notFound;
+    public Integer getInteger (String key, Supplier<Integer> notFound) {
+        return getParsed (key, (input) -> new Integer (input), notFound);
     }
 
     /**
@@ -182,20 +190,18 @@ abstract class BagBase {
      * @return The element as a Double, or null if the element is not found.
      */
     public Double getDouble (String key) {
-        String string = getString (key);
-        return (string != null) ? Double.parseDouble (string) : null;
+        return getParsed (key, (input) -> new Double (input), () -> null);
     }
 
     /**
      * Retrieve a mapped element and return it as a Double.
      *
      * @param key A string value used to index the element.
-     * @param notFound A Double value to return if the key was not found
+     * @param notFound A function to create a new Double if the requested key was not found
      * @return The element as a Double, or notFound if the element is not found.
      */
-    public Double getDouble (String key, Double notFound) {
-        Double value = getDouble (key);
-        return (value != null) ? value : notFound;
+    public Double getDouble (String key, Supplier<Double> notFound) {
+        return getParsed (key, (input) -> new Double (input), notFound);
     }
 
     /**
@@ -205,20 +211,18 @@ abstract class BagBase {
      * @return The element as a Float, or null if the element is not found.
      */
     public Float getFloat (String key) {
-        Double value = getDouble (key);
-        return (value != null) ? value.floatValue () : null;
+        return getParsed (key, (input) -> new Float (input), () -> null);
     }
 
     /**
      * Retrieve a mapped element and return it as a Float.
      *
      * @param key A string value used to index the element.
-     * @param notFound A Float value to return if the key was not found
+     * @param notFound A function to create a new Float if the requested key was not found
      * @return The element as a Float, or notFound if the element is not found.
      */
-    public Float getFloat (String key, Float notFound) {
-        Double value = getDouble (key);
-        return (value != null) ? value.floatValue () : notFound;
+    public Float getFloat (String key, Supplier<Float> notFound) {
+        return getParsed (key, (input) -> new Float (input), notFound);
     }
 
     /**
@@ -228,40 +232,19 @@ abstract class BagBase {
      * @return The element as a BagObject, or null if the element is not found.
      */
     public BagObject getBagObject (String key) {
-        Object object = getObject (key);
-        return (object instanceof BagObject) ? (BagObject) object : null;
-        /*
-        try {
-            return (BagObject) object;
-        } catch (ClassCastException exception) {
-            log.warn ("Cannot cast value type (" + object.getClass ().getName () + ") to BagObject for key (" + key + ")");
-        }
-        return null;
-        */
+        return getBagObject (key, () -> null);
     }
 
     /**
      * Retrieve a mapped element and return it as a BagObject.
      *
      * @param key A string value used to index the element.
-     * @param notFound A BagObject to return if the key was not found
+     * @param notFound A function to create a new BagObject if the requested key was not found
      * @return The element as a BagObject, or notFound if the element is not found.
      */
-    public BagObject getBagObject (String key, BagObject notFound) {
-        BagObject value = getBagObject (key);
-        return (value != null) ? value : notFound;
-    }
-
-    /**
-     * Retrieve a mapped element and return it as a BagObject.
-     *
-     * @param key A string value used to index the element.
-     * @param supplier A function to create a new object if the requested key was not found
-     * @return The element as a BagObject, or supplier.get () if the element is not found.
-     */
-    public BagObject getBagObject (String key, Supplier<BagObject> supplier) {
-        BagObject value = getBagObject (key);
-        return (value != null) ? value : supplier.get ();
+    public BagObject getBagObject (String key, Supplier<BagObject> notFound) {
+        Object object = getObject (key);
+        return (object instanceof BagObject) ? (BagObject) object : notFound.get ();
     }
 
     /**
@@ -271,28 +254,19 @@ abstract class BagBase {
      * @return The element as a BagArray, or null if the element is not found.
      */
     public BagArray getBagArray (String key) {
-        Object object = getObject (key);
-        return (object instanceof BagArray) ? (BagArray) object : null;
-        /*
-        try {
-            return (BagArray) object;
-        } catch (ClassCastException exception) {
-            log.warn ("Cannot cast value type (" + object.getClass ().getName () + ") to BagArray for key (" + key + ")");
-        }
-        return null;
-        */
+        return getBagArray (key, () -> null);
     }
 
     /**
      * Retrieve a mapped element and return it as a BagArray.
      *
      * @param key A string value used to index the element.
-     * @param notFound A BagArray to return if the key was not found
+     * @param notFound A function to create a new BagArray if the requested key was not found
      * @return The element as a BagArray, or notFound if the element is not found.
      */
-    public BagArray getBagArray (String key, BagArray notFound) {
-        BagArray value = getBagArray (key);
-        return (value != null) ? value : notFound;
+    public BagArray getBagArray (String key, Supplier<BagArray> notFound) {
+        Object object = getObject (key);
+        return (object instanceof BagArray) ? (BagArray) object : notFound.get ();
     }
 
 
