@@ -14,7 +14,7 @@ import java.io.InputStream;
  * efficiently with dynamic storage of very large numbers of elements (more than 1,000s). It will
  * work, but we have not chosen to focus on this as a potential use-case.
  */
-public class BagArray extends Base {
+public class BagArray extends BagBase {
     private static final Logger log = LogManager.getLogger (BagArray.class);
 
     private static final int START_SIZE = 1;
@@ -209,6 +209,42 @@ public class BagArray extends Base {
 
     private Object getObject (int index) {
         return ((index >= 0) && (index < count)) ? container[index] : null;
+    }
+
+    private int keyToIndex (String key) {
+        switch (key) {
+            case "#first": return 0;
+            case "#last": return count - 1;
+            case "#add": return count;
+            default: return Integer.parseInt (key);
+        }
+    }
+
+    /**
+     * Return an object stored at the requested key value. The key may be a simple number, or a
+     * special keyword indicating the #first or #last element in the array, #add for putting at the
+     * end of the array, or it may be a path (with keys separated by "/") to create a hierarchical
+     * "bag-of-bags" that is indexed recursively.
+     * <p>
+     *
+     * @param key A string value used to index the element, using "/" as separators, for example:
+     *             "12/com/brettonw" or "#last/completed"
+     * @return The indexed element (if found), or null
+     */
+    @Override
+    public Object getObject (String key) {
+        // separate the key into path components, the "local" key value is the first component, so
+        // use that to conduct the search. We are only interested in values that indicate the search
+        // found the requested key
+        String path[] = Key.split (key);
+        int index = keyToIndex (path[0]);
+        if ((index >= 0) && (index < count)) {
+            // grab the found element... if the path was only one element long, this is the element
+            // we were looking for, otherwise recur on the found element as another BagObject
+            Object found = container[index];
+            return (path.length == 1) ? found : ((BagBase) found).getObject (path[1]);
+        }
+        return null;
     }
 
     /**

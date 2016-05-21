@@ -7,3 +7,14 @@
 - add a "simpleSerializer" that takes BagObjects, and uses name conversion to map POJO field names
   to install values, so a... createFromSimpleBagObject type of thing...
 - in BagArray, allow indexing using a path, and convert the first component to an integer
+- in BagArray, allow string based indexing for a 'put' operation
+- rename 'getObject' to 'get'?
+- 'putType' and 'getType' methods that invoke the Serializer?
+- should the serializer be automatically invoked when objectify fails with an unknown type? I think
+  not, because the user will otherwise have to know to extract via the serializer
+- XML...
+- iterators?
+- make a separate stringifier object, like the parser... so I can move the JSON and XML knowledge
+  OUT of the base containers
+
+

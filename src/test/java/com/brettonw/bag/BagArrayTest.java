@@ -176,4 +176,17 @@ public class BagArrayTest {
             AppTest.report (true, false, "Copy of empty array should succeed");
         }
     }
+
+    @Test
+    public void testKeyIndex () {
+        BagObject bagObject = new BagObject ()
+                .put ("a", new BagArray ()
+                        .add (new BagObject ()
+                            .put ("x", "y")
+                        )
+                );
+        AppTest.report (bagObject.getString ("a/#first/x"), "y", "Hierarchical indexing of arrays using strings - 1");
+        AppTest.report (bagObject.getString ("a/#last/x"), "y", "Hierarchical indexing of arrays using strings - 2");
+        AppTest.report (bagObject.getString ("a/0/x"), "y", "Hierarchical indexing of arrays using strings - 3");
+    }
 }
