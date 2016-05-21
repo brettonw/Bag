@@ -127,7 +127,7 @@ abstract class BagBase {
      * @return The element as a Boolean, or null if the element is not found.
      */
     public Boolean getBoolean (String key) {
-        return getParsed (key, (input) -> new Boolean (input), () -> null);
+        return getBoolean (key, () -> null);
     }
 
     /**
@@ -148,7 +148,7 @@ abstract class BagBase {
      * @return The element as a Long, or null if the element is not found.
      */
     public Long getLong (String key) {
-        return getParsed (key, (input) -> new Long (input), () -> null);
+        return getLong (key, () -> null);
     }
 
     /**
@@ -169,7 +169,7 @@ abstract class BagBase {
      * @return The element as an Integer, or null if the element is not found.
      */
     public Integer getInteger (String key) {
-        return getParsed (key, (input) -> new Integer (input), () -> null);
+        return getInteger (key, () -> null);
     }
 
     /**
@@ -190,7 +190,7 @@ abstract class BagBase {
      * @return The element as a Double, or null if the element is not found.
      */
     public Double getDouble (String key) {
-        return getParsed (key, (input) -> new Double (input), () -> null);
+        return getDouble (key, () -> null);
     }
 
     /**
@@ -211,7 +211,7 @@ abstract class BagBase {
      * @return The element as a Float, or null if the element is not found.
      */
     public Float getFloat (String key) {
-        return getParsed (key, (input) -> new Float (input), () -> null);
+        return getFloat (key, () -> null);
     }
 
     /**
