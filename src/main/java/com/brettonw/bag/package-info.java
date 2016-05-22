@@ -55,7 +55,7 @@
  * <p>
  * <strong>JSON</strong><br>
  * Bag can consume a superset of valid JSON text in inputs (Constructors from Strings, streams,
- * files, and etc.). The output of the <code>toJsonString</code> method is valid JSON. The primary
+ * files, and etc.). The output of the <code>from</code> method is valid JSON. The primary
  * difference between Bag parsing of JSON, and that file standard is bare (unquoted) strings are
  * allowed anywhere a quoted string would be allowed, as in: <code>{ first-name: bretton, last-name:
  * wade }</code>. Note that whitespace, and the following characters are not allowed in bare

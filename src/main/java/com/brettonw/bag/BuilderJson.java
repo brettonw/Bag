@@ -7,8 +7,8 @@ public class BuilderJson extends Builder {
         if (object != null) {
             switch (object.getClass ().getName ()) {
                 case "java.lang.String": return quote ((String) object);
-                case "com.brettonw.bag.BagObject": return toJsonString ((BagObject) object);
-                case "com.brettonw.bag.BagArray": return toJsonString ((BagArray) object);
+                case "com.brettonw.bag.BagObject": return from ((BagObject) object);
+                case "com.brettonw.bag.BagArray": return from ((BagArray) object);
 
                 // we omit the default case, because there should not be any other types stored in
                 // the Bag class - as in, they would not make it into the container, as the
@@ -21,7 +21,7 @@ public class BuilderJson extends Builder {
         return "null";
     }
 
-    public static String toJsonString (BagObject bagObject) {
+    public static String from (BagObject bagObject) {
         StringBuilder stringBuilder = new StringBuilder ();
 
         String keys[] = bagObject.keys ();
@@ -38,7 +38,7 @@ public class BuilderJson extends Builder {
         return enclose (stringBuilder.toString (), CURLY_BRACKETS);
     }
 
-    public static String toJsonString (BagArray bagArray) {
+    public static String from (BagArray bagArray) {
         StringBuilder stringBuilder = new StringBuilder ();
         String separator = "";
         for (int i = 0, end = bagArray.getCount (); i < end; ++i) {

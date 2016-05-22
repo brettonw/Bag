@@ -358,6 +358,6 @@ public class BagArray extends Bag {
      */
     @Override
     public String toJsonString () {
-        return BuilderJson.toJsonString (this);
+        return BuilderJson.from (this);
     }
 }
