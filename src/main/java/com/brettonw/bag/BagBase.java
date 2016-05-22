@@ -5,43 +5,6 @@ import org.apache.logging.log4j.util.Supplier;
 import java.util.function.Function;
 
 abstract class BagBase {
-    // data and functions for exporting as strings
-    static final String SQUARE_BRACKETS[] = { "[", "]" };
-    static final String CURLY_BRACKETS[] = { "{", "}" };
-
-    private static final String QUOTES[] = { "\"" };
-
-    String enclose (String input, String bracket[]) {
-        String bracket0 = bracket[0];
-        String bracket1 = (bracket.length > 1) ? bracket[1] : bracket0;
-        return bracket0 + input + bracket1;
-    }
-
-    String quote (String input) {
-        return enclose (input, QUOTES);
-    }
-
-    String getJsonString (Object object) {
-        if (object != null) {
-            switch (object.getClass ().getName ()) {
-                case "java.lang.String":
-                    return quote ((String) object);
-
-                case "com.brettonw.bag.BagObject":
-                case "com.brettonw.bag.BagArray":
-                    return ((BagBase) object).toJsonString ();
-
-                // we omit the default case, because there should not be any other types stored in
-                // the Bag class - as in, they would not make it into the container, as the
-                // "objectify" method will gate that
-            }
-        }
-        // if we stored a null, we need to emit it as a value. This will only happen in the
-        // array types, and is handled on the parsing side with a special case for reading
-        // the bare value 'null' (not quoted)
-        return "null";
-    }
-
     Object objectify (Object value) {
         if (value != null) {
             Class type = value.getClass ();

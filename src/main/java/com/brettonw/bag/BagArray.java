@@ -358,16 +358,6 @@ public class BagArray extends BagBase {
      */
     @Override
     public String toJsonString () {
-        StringBuilder result = new StringBuilder ();
-        boolean first = true;
-        for (int i = 0; i < count; ++i) {
-            result.append (first ? "" : ",");
-            first = false;
-            String string = getJsonString (container[i]);
-            if (string != null) {
-                result.append (string);
-            }
-        }
-        return enclose (result.toString (), SQUARE_BRACKETS);
+        return JsonBuilder.toJsonString (this);
     }
 }

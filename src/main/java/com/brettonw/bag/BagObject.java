@@ -385,18 +385,7 @@ public class BagObject extends BagBase {
      */
     @Override
     public String toJsonString () {
-        StringBuilder result = new StringBuilder ();
-        boolean isFirst = true;
-        for (int i = 0; i < count; ++i) {
-            result.append (isFirst ? "" : ",");
-            isFirst = false;
-
-            Pair pair = container[i];
-            result
-                    .append (quote (pair.key))
-                    .append (":")
-                    .append (getJsonString (pair.value));
-        }
-        return enclose (result.toString (), CURLY_BRACKETS);
+        return JsonBuilder.toJsonString (this);
     }
+
 }

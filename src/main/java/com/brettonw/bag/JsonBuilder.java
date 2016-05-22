@@ -5,6 +5,8 @@ public class JsonBuilder {
     private static final String CURLY_BRACKETS[] = { "{", "}" };
     private static final String QUOTES[] = { "\"" };
 
+    JsonBuilder () {}
+
     static String enclose (String input, String bracket[]) {
         String bracket0 = bracket[0];
         String bracket1 = (bracket.length > 1) ? bracket[1] : bracket0;
