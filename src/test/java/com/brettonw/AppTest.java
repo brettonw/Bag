@@ -13,7 +13,8 @@ import org.junit.runners.Suite;
         BagObjectTest.class,
         KeyTest.class,
         HttpTest.class,
-        SerializerTest.class
+        SerializerTest.class,
+        JsonBuilderTest.class
 })
 
 public class AppTest {

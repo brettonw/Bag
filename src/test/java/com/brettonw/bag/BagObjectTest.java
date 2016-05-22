@@ -306,28 +306,35 @@ public class BagObjectTest {
         // test the copy
         bagObject = new BagObject (bagObject);
 
+        AppTest.report (bagObject.getString ("x"), "y", "BagObject - Test that 'notFound' method still correctly returns requested string value");
         AppTest.report (bagObject.getString ("x", () -> "xxx"), "y", "BagObject - Test that 'notFound' method still correctly returns requested string value");
         AppTest.report (bagObject.getString ("xxx", () -> "yyy"), "yyy", "BagObject - Test that 'notFound' method correctly returns notFound string value");
 
+        AppTest.report (bagObject.getBoolean ("c"), true, "BagObject - Test that 'notFound' method still correctly returns requested boolean value");
         AppTest.report (bagObject.getBoolean ("c", () -> false), true, "BagObject - Test that 'notFound' method still correctly returns requested boolean value");
         AppTest.report (bagObject.getBoolean ("ccc", () -> true), true, "BagObject - Test that 'notFound' method correctly returns notFound boolean value");
 
+        AppTest.report (bagObject.getInteger ("e"), 1234567, "BagObject - Test that 'notFound' method still correctly returns requested integer value");
         AppTest.report (bagObject.getInteger ("e", () -> 345), 1234567, "BagObject - Test that 'notFound' method still correctly returns requested integer value");
         AppTest.report (bagObject.getInteger ("eee", () -> 345), 345, "BagObject - Test that 'notFound' method correctly returns notFound integer value");
 
+        AppTest.report (bagObject.getLong ("e"), 1234567L, "BagObject - Test that 'notFound' method still correctly returns requested long value");
         AppTest.report (bagObject.getLong ("e", () -> 345L), 1234567L, "BagObject - Test that 'notFound' method still correctly returns requested long value");
         AppTest.report (bagObject.getLong ("eee", () -> 345L), 345L, "BagObject - Test that 'notFound' method correctly returns notFound long value");
 
+        AppTest.report (bagObject.getFloat ("d"), 3.141592654f, "BagObject - Test that 'notFound' method still correctly returns requested float value");
         AppTest.report (bagObject.getFloat ("d", () -> 6.28f), 3.141592654f, "BagObject - Test that 'notFound' method still correctly returns requested float value");
         AppTest.report (bagObject.getFloat ("ddd", () -> 6.28f), 6.28f, "BagObject - Test that 'notFound' method correctly returns notFound float value");
 
+        AppTest.report (bagObject.getDouble ("d"), 3.141592654, "BagObject - Test that 'notFound' method still correctly returns requested double value");
         AppTest.report (bagObject.getDouble ("d", () -> 6.28), 3.141592654, "BagObject - Test that 'notFound' method still correctly returns requested double value");
         AppTest.report (bagObject.getDouble ("ddd", () -> 6.28), 6.28, "BagObject - Test that 'notFound' method correctly returns notFound double value");
 
+        AppTest.report (bagObject.getBagObject ("q"), null, "BagObject - test that method correctly fails on not found BagObject");
         AppTest.report (bagObject.getBagObject ("f", () -> new BagObject ().put ("hello", "moto")).getString ("hello"), "world", "BagObject - test that 'notFound' method correctly returns found BagObject");
         AppTest.report (bagObject.getBagObject ("fff", () -> new BagObject ().put ("hello", "moto")).getString ("hello"), "moto", "BagObject - test that 'notFound' method correctly returns notFound BagObject");
-        AppTest.report (bagObject.getBagObject ("q", () -> new BagObject ().put ("q", "r")).getString ("q"), "r", "BagObject - test that closure creates a new object correctly");
 
+        AppTest.report (bagObject.getBagArray ("q"), null, "BagObject - test that method correctly fails on not found BagObject");
         AppTest.report (bagObject.getBagArray ("g", () -> new BagArray ().add (345)).getInteger (0), 123, "BagObject - test that 'notFound' method correctly returns found BagArray");
         AppTest.report (bagObject.getBagArray ("ggg", () -> new BagArray ().add (345)).getInteger (0), 345, "BagObject - test that 'notFound' method correctly returns notFound BagArray");
 

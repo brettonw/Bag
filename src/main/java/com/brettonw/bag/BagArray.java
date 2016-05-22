@@ -207,7 +207,7 @@ public class BagArray extends BagBase {
         return this;
     }
 
-    private Object getObject (int index) {
+    Object getObject (int index) {
         return ((index >= 0) && (index < count)) ? container[index] : null;
     }
 
