@@ -1,6 +1,6 @@
 package com.brettonw.bag;
 
-// The JsonParser is loosely modeled after a JSON parser grammar from the site (http://www.json.org).
+// The ParserJson is loosely modeled after a JSON parser grammar from the site (http://www.json.org).
 // The main difference is that we ignore differences between value types (all of them will be
 // strings internally), and assume the input is a well formed string representation of a BagObject
 // or BagArray in JSON-ish format
@@ -10,16 +10,16 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
-class JsonParser extends Parser {
-    JsonParser (String input) throws IOException {
+class ParserJson extends Parser {
+    ParserJson (String input) throws IOException {
         super (input);
     }
 
-    JsonParser (InputStream inputStream) throws IOException {
+    ParserJson (InputStream inputStream) throws IOException {
         super (inputStream);
     }
 
-    JsonParser (File file) throws IOException {
+    ParserJson (File file) throws IOException {
         super (file);
     }
 

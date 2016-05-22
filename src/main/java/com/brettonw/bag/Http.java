@@ -63,7 +63,7 @@ public class Http {
         return get (urlString, inputStream -> new BagArray (inputStream));
     }
 
-    public static <T> T post (String urlString, BagBase bagBase, CheckedFunction<InputStream, Object> function) {
+    public static <T> T post (String urlString, Bag bag, CheckedFunction<InputStream, Object> function) {
         HttpURLConnection connection = null;
         try {
             // create the connection
@@ -71,7 +71,7 @@ public class Http {
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
-            String  jsonString = bagBase.toJsonString();
+            String  jsonString = bag.toJsonString();
             connection.setRequestProperty("Content-Length", Integer.toString(jsonString.getBytes().length));
             connection.setUseCaches(false);
 
@@ -100,8 +100,8 @@ public class Http {
      * @param urlString address to fetch the JSON-formatted response from
      * @return the JSON response parsed into a BagObject
      */
-    public static BagObject postForBagObject (String urlString, BagBase bagBase) {
-        return post (urlString, bagBase, inputStream -> new BagObject (inputStream));
+    public static BagObject postForBagObject (String urlString, Bag bag) {
+        return post (urlString, bag, inputStream -> new BagObject (inputStream));
     }
 
     /**
@@ -110,8 +110,8 @@ public class Http {
      * @param urlString address to fetch the JSON-formatted response from
      * @return the JSON response parsed into a BagObject
      */
-    public static BagArray postForBagArray (String urlString, BagBase bagBase) {
-        return post (urlString, bagBase, inputStream -> new BagArray (inputStream));
+    public static BagArray postForBagArray (String urlString, Bag bag) {
+        return post (urlString, bag, inputStream -> new BagArray (inputStream));
     }
 
 }

@@ -1,21 +1,7 @@
 package com.brettonw.bag;
 
-public class JsonBuilder {
-    private static final String SQUARE_BRACKETS[] = { "[", "]" };
-    private static final String CURLY_BRACKETS[] = { "{", "}" };
-    private static final String QUOTES[] = { "\"" };
-
-    JsonBuilder () {}
-
-    static String enclose (String input, String bracket[]) {
-        String bracket0 = bracket[0];
-        String bracket1 = (bracket.length > 1) ? bracket[1] : bracket0;
-        return bracket0 + input + bracket1;
-    }
-
-    static String quote (String input) {
-        return enclose (input, QUOTES);
-    }
+public class BuilderJson extends Builder {
+    BuilderJson () {}
 
     static String getJsonString (Object object) {
         if (object != null) {

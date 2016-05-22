@@ -14,7 +14,7 @@ import java.io.InputStream;
  * efficiently with dynamic storage of very large numbers of elements (more than 1,000s). It will
  * work, but we have not chosen to focus on this as a potential use-case.
  */
-public class BagArray extends BagBase {
+public class BagArray extends Bag {
     private static final Logger log = LogManager.getLogger (BagArray.class);
 
     private static final int START_SIZE = 1;
@@ -45,7 +45,7 @@ public class BagArray extends BagBase {
      */
     public BagArray (BagArray bagArray) {
         try {
-            init (bagArray.getCount (), new JsonParser (bagArray.toJsonString ()));
+            init (bagArray.getCount (), new ParserJson (bagArray.toJsonString ()));
         } catch (Exception exception) {
             // NOTE this should never happen unless there is a bug we don't know about, and I can't
             // generate a test case to cover it, so it reports as a lack of coverage
@@ -58,7 +58,7 @@ public class BagArray extends BagBase {
      * @throws JsonParseException if the parser fails and the array is left in an unusable state
      */
     public BagArray (String jsonString) throws IOException, JsonParseException {
-        init (START_SIZE, new JsonParser (jsonString));
+        init (START_SIZE, new ParserJson (jsonString));
     }
 
     /**
@@ -66,7 +66,7 @@ public class BagArray extends BagBase {
      * @throws JsonParseException if the parser fails and the array is left in an unusable state
      */
     public BagArray (InputStream jsonInputStream) throws IOException, JsonParseException {
-        init (START_SIZE, new JsonParser (jsonInputStream));
+        init (START_SIZE, new ParserJson (jsonInputStream));
     }
 
     /**
@@ -74,7 +74,7 @@ public class BagArray extends BagBase {
      * @throws JsonParseException if the parser fails and the array is left in an unusable state
      */
     public BagArray (File jsonFile) throws IOException, JsonParseException {
-        init (START_SIZE, new JsonParser (jsonFile));
+        init (START_SIZE, new ParserJson (jsonFile));
     }
 
     private void init (int containerSize) {
@@ -242,7 +242,7 @@ public class BagArray extends BagBase {
             // grab the found element... if the path was only one element long, this is the element
             // we were looking for, otherwise recur on the found element as another BagObject
             Object found = container[index];
-            return (path.length == 1) ? found : ((BagBase) found).getObject (path[1]);
+            return (path.length == 1) ? found : ((Bag) found).getObject (path[1]);
         }
         return null;
     }
@@ -358,6 +358,6 @@ public class BagArray extends BagBase {
      */
     @Override
     public String toJsonString () {
-        return JsonBuilder.toJsonString (this);
+        return BuilderJson.toJsonString (this);
     }
 }

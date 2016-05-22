@@ -10,7 +10,7 @@ import java.io.InputStream;
 /**
  * A collection of text-based values store in key/value pairs (maintained in a sorted array).
  */
-public class BagObject extends BagBase {
+public class BagObject extends Bag {
     private static final Logger log = LogManager.getLogger (BagObject.class);
 
     private static final int DEFAULT_CONTAINER_SIZE = 1;
@@ -53,7 +53,7 @@ public class BagObject extends BagBase {
      */
     public BagObject (BagObject bagObject) {
         try {
-            init (bagObject.getCount (), new JsonParser (bagObject.toJsonString ()));
+            init (bagObject.getCount (), new ParserJson (bagObject.toJsonString ()));
         } catch (IOException exception) {
             // NOTE this should never happen unless there is a bug we don't know about, and I can't
             // generate a test case to cover it, so it reports as a lack of coverage
@@ -66,7 +66,7 @@ public class BagObject extends BagBase {
      * @throws JsonParseException if the parser fails and the object is left in an unusable state
      */
     public BagObject (String jsonString) throws IOException, JsonParseException {
-        init (DEFAULT_CONTAINER_SIZE, new JsonParser (jsonString));
+        init (DEFAULT_CONTAINER_SIZE, new ParserJson (jsonString));
     }
 
     /**
@@ -74,7 +74,7 @@ public class BagObject extends BagBase {
      * @throws JsonParseException if the parser fails and the object is left in an unusable state
      */
     public BagObject (InputStream jsonInputStream) throws IOException, JsonParseException {
-        init (DEFAULT_CONTAINER_SIZE, new JsonParser (jsonInputStream));
+        init (DEFAULT_CONTAINER_SIZE, new ParserJson (jsonInputStream));
     }
 
     /**
@@ -82,7 +82,7 @@ public class BagObject extends BagBase {
      * @throws JsonParseException if the parser fails and the object is left in an unusable state
      */
     public BagObject (File jsonFile) throws IOException, JsonParseException {
-        init (DEFAULT_CONTAINER_SIZE, new JsonParser (jsonFile));
+        init (DEFAULT_CONTAINER_SIZE, new ParserJson (jsonFile));
     }
 
     private void init (int containerSize) {
@@ -188,7 +188,7 @@ public class BagObject extends BagBase {
             // we were looking for, otherwise recur on the found element as another BagObject
             Pair pair = container[index];
             Object found = pair.value;
-            return (path.length == 1) ? found : ((BagBase) found).getObject (path[1]);
+            return (path.length == 1) ? found : ((Bag) found).getObject (path[1]);
         }
         return null;
     }
@@ -385,7 +385,7 @@ public class BagObject extends BagBase {
      */
     @Override
     public String toJsonString () {
-        return JsonBuilder.toJsonString (this);
+        return BuilderJson.toJsonString (this);
     }
 
 }
