@@ -182,7 +182,7 @@ public class BagArrayTest {
         BagObject bagObject = new BagObject ()
                 .put ("a", new BagArray ()
                         .add (new BagObject ()
-                            .put ("x", "y")
+                                .put ("x", "y")
                         )
                 );
         AppTest.report (bagObject.getString ("a/#first/x"), "y", "Hierarchical indexing of arrays using strings - 1");
