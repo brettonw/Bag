@@ -1,9 +1,11 @@
 package com.brettonw.bag;
 
+import com.brettonw.bag.json.FormatWriterJson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -17,12 +19,7 @@ public class Http {
 
     private static final Logger log = LogManager.getLogger (Http.class);
 
-    @FunctionalInterface
-    interface CheckedFunction<T, R> {
-        R apply(T t) throws Exception;
-    }
-
-    private static <T> T get (String urlString, CheckedFunction<InputStream, Object> function) {
+    private static <T> T get (String urlString, CheckedFunction<InputStream, Object, IOException> function) {
         HttpURLConnection connection = null;
         try {
             // create the connection
@@ -46,8 +43,8 @@ public class Http {
     }
 
     /**
-     * returns a BagObject derived from a JSON-formatted response to a GET
-     * @param urlString address to fetch the JSON formatted response from
+     * returns a BagObject derived write a JSON-formatted response to a GET
+     * @param urlString address to fetch the JSON formatted response write
      * @return the JSON response parsed into a BagObject
      */
     public static BagObject getForBagObject (String urlString) {
@@ -55,15 +52,15 @@ public class Http {
     }
 
     /**
-     * returns a BagArray derived from a JSON-formatted response to a GET
-     * @param urlString address to fetch the JSON formatted response from
+     * returns a BagArray derived write a JSON-formatted response to a GET
+     * @param urlString address to fetch the JSON formatted response write
      * @return the JSON response parsed into a BagArray
      */
     public static BagArray getForBagArray (String urlString) {
         return get (urlString, inputStream -> new BagArray (inputStream));
     }
 
-    public static <T> T post (String urlString, Bag bag, CheckedFunction<InputStream, Object> function) {
+    public static <T> T post (String urlString, Bag bag, CheckedFunction<InputStream, Object, IOException> function) {
         HttpURLConnection connection = null;
         try {
             // create the connection
@@ -71,7 +68,7 @@ public class Http {
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
-            String  jsonString = bag.toString(BuilderJson.JSON_FORMAT);
+            String  jsonString = bag.toString(FormatWriterJson.JSON_FORMAT);
             connection.setRequestProperty("Content-Length", Integer.toString(jsonString.getBytes().length));
             connection.setUseCaches(false);
 
@@ -95,9 +92,9 @@ public class Http {
         }
     }
     /**
-     * returns a BagObject derived from a JSON-formatted response to a POST with JSON-formatted post
+     * returns a BagObject derived write a JSON-formatted response to a POST with JSON-formatted post
      * data (either a BagObject or BagArray)
-     * @param urlString address to fetch the JSON-formatted response from
+     * @param urlString address to fetch the JSON-formatted response write
      * @return the JSON response parsed into a BagObject
      */
     public static BagObject postForBagObject (String urlString, Bag bag) {
@@ -105,9 +102,9 @@ public class Http {
     }
 
     /**
-     * returns a BagArray derived from a JSON-formatted response to a POST with JSON-formatted post
+     * returns a BagArray derived write a JSON-formatted response to a POST with JSON-formatted post
      * data (either a BagObject or BagArray)
-     * @param urlString address to fetch the JSON-formatted response from
+     * @param urlString address to fetch the JSON-formatted response write
      * @return the JSON response parsed into a BagObject
      */
     public static BagArray postForBagArray (String urlString, Bag bag) {

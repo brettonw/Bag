@@ -1,13 +1,18 @@
 package com.brettonw.bag;
 
+import com.brettonw.bag.json.FormatReaderJson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
-abstract class Parser {
-    private static final Logger log = LogManager.getLogger (Parser.class);
+abstract public class FormatReader {
+    public static final String DEFAULT_FORMAT = "default";
+
+    private static final Logger log = LogManager.getLogger (FormatReader.class);
 
     protected int index;
     protected String input;
@@ -35,17 +40,17 @@ abstract class Parser {
         lastLineIndex = 0;
     }
 
-    Parser (String input) throws IOException {
+    public FormatReader (String input) throws IOException {
         Reader inputReader = new StringReader (input);
         init (readInput (inputReader));
     }
 
-    Parser (InputStream inputStream) throws IOException {
+    public FormatReader (InputStream inputStream) throws IOException {
         Reader inputReader = new InputStreamReader (inputStream);
         init (readInput (inputReader));
     }
 
-    Parser (File file) throws IOException {
+    public FormatReader (File file) throws IOException {
         Reader inputReader = new FileReader (file);
         init (readInput (inputReader));
     }
@@ -91,12 +96,12 @@ abstract class Parser {
 
     protected boolean require (boolean condition, String explanation) {
         if (! condition) {
-            onParseError (explanation + " REQUIRED");
+            onReadError (explanation + " REQUIRED");
         }
         return condition;
     }
 
-    protected void onParseError (String errorMessage) {
+    protected void onReadError (String errorMessage) {
 
         // log the messages, we only need to output the line if this is the first time the error is
         // being reported
@@ -126,6 +131,36 @@ abstract class Parser {
     }
 
 
-    abstract BagArray readBagArray (BagArray bagArray);
-    abstract BagObject readBagObject (BagObject bagObject);
+    abstract public BagArray read (BagArray bagArray);
+    abstract public BagObject read (BagObject bagObject);
+
+    // static type registration by name
+    private static Map<String, CheckedFunction<String, FormatReader, IOException>> formatReaders = new HashMap<> ();
+
+    public static void registerFormatReader (String format, boolean replace, CheckedFunction<String, FormatReader, IOException> factory) {
+        if ((! replace) || (! formatReaders.containsKey(format))) {
+            formatReaders.put(format, factory);
+        }
+    }
+
+    public static BagArray read (BagArray bagArray, String format, String input) throws IOException {
+        if (formatReaders.containsKey(format)) {
+            FormatReader formatReader = formatReaders.get(format).apply (input);
+            return formatReader.read (bagArray);
+        }
+        return null;
+    }
+
+    public static BagObject read (BagObject bagObject, String format, String input) throws IOException {
+        if (formatReaders.containsKey(format)) {
+            FormatReader formatReader = formatReaders.get(format).apply (input);
+            return formatReader.read (bagObject);
+        }
+        return null;
+    }
+
+    // JSON is the default format
+    static {
+        registerFormatReader (DEFAULT_FORMAT, false, input -> new FormatReaderJson (input));
+    }
 }

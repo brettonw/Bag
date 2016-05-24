@@ -1,19 +1,21 @@
-package com.brettonw.bag;
+package com.brettonw.bag.json;
 
-public class BuilderJson extends Builder {
+import com.brettonw.bag.BagArray;
+import com.brettonw.bag.BagObject;
+import com.brettonw.bag.FormatWriter;
+
+public class FormatWriterJson extends FormatWriter {
     public static final String JSON_FORMAT = "json";
 
     static final String[] CURLY_BRACKETS = { "{", "}" };
     static final String[] SQUARE_BRACKETS = { "[", "]" };
 
-    BuilderJson () {}
-
-    String getJsonString (Object object) {
+    private String getJsonString (Object object) {
         if (object != null) {
             switch (object.getClass ().getName ()) {
                 case "java.lang.String": return quote ((String) object);
-                case "com.brettonw.bag.BagObject": return from ((BagObject) object);
-                case "com.brettonw.bag.BagArray": return from ((BagArray) object);
+                case "com.brettonw.bag.BagObject": return write ((BagObject) object);
+                case "com.brettonw.bag.BagArray": return write ((BagArray) object);
 
                 // we omit the default case, because there should not be any other types stored in
                 // the Bag classes - as in, they would not make it into the container, as the
@@ -27,7 +29,7 @@ public class BuilderJson extends Builder {
     }
 
     @Override
-    public String from (BagObject bagObject) {
+    public String write (BagObject bagObject) {
         StringBuilder stringBuilder = new StringBuilder ();
         String separator = "";
         String keys[] = bagObject.keys();
@@ -44,7 +46,7 @@ public class BuilderJson extends Builder {
     }
 
     @Override
-    public String from (BagArray bagArray) {
+    public String write (BagArray bagArray) {
         StringBuilder stringBuilder = new StringBuilder ();
         String separator = "";
         for (int i = 0, end = bagArray.getCount(); i < end; ++i) {
@@ -56,8 +58,8 @@ public class BuilderJson extends Builder {
         return enclose(stringBuilder.toString(), SQUARE_BRACKETS);
     }
 
-    // install me as the default JSON format builder
+    // install me as the default JSON format write
     static {
-        Builder.registerBuilder(JSON_FORMAT, false, () -> new BuilderJson());
+        registerFormatWriter (JSON_FORMAT, false, () -> new FormatWriterJson ());
     }
 }

@@ -157,7 +157,7 @@ public class BagArrayTest {
         try {
             BagArray bagArray = new BagArray ("[123 234 345 456]");
             AppTest.report (bagArray != null, true, "BagArray - test empty shell");
-        } catch (JsonParseException jsonParseException) {
+        } catch (ReadException readException) {
             AppTest.report (false, false, "Bogus array parsing should fail");
         } catch (IOException exception) {
             AppTest.report (false, true, "An exception is a failure case");

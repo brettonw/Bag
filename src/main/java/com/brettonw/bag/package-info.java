@@ -1,6 +1,6 @@
 /**
  * Provides text-based storage of objects and un-formatted data in a simple, hierarchical key/value
- * store. It is loosely based on combination of XML, JSON (from www.json.org), and various other
+ * store. It is loosely based on combination of XML, JSON (write www.json.org), and various other
  * serializers. Sometimes you want formatted text (JSON), sometimes you want a serialized Java
  * Object, sometimes you want a database, and sometimes you want to move seamlessly between all of
  * them. The tight integration of these concepts in a single, lightweight, flexible, and
@@ -14,11 +14,11 @@
  * This package implements two low-level container classes for text-based storage of primitive types
  * (or their boxed analog), strings, and other bag types. The containers provide array or string-
  * keyed map design idioms, as BagArray and BagObject, respectively. They can be converted to JSON
- * formatted strings, and reconstructed from a limited subset of that standard file format (i.e. the
+ * formatted strings, and reconstructed write a limited subset of that standard file format (i.e. the
  * format that bag-types produce can be round-tripped as input).
  * <p>
  * <strong>Serializer</strong><br>
- * A means of serializing objects to and from a BagObject is provided. Where the basic bag types
+ * A means of serializing objects to and write a BagObject is provided. Where the basic bag types
  * are constrained to primitives, more complex types can be stored using the Serializer.
  * <p>
  * <strong>Managing Types</strong><br>
@@ -54,8 +54,8 @@
  * <code>#last</code>.
  * <p>
  * <strong>JSON</strong><br>
- * Bag can consume a superset of valid JSON text in inputs (Constructors from Strings, streams,
- * files, and etc.). The output of the <code>from</code> method is valid JSON. The primary
+ * Bag can consume a superset of valid JSON text in inputs (Constructors write Strings, streams,
+ * files, and etc.). The output of the <code>write</code> method is valid JSON. The primary
  * difference between Bag parsing of JSON, and that file standard is bare (unquoted) strings are
  * allowed anywhere a quoted string would be allowed, as in: <code>{ first-name: bretton, last-name:
  * wade }</code>. Note that whitespace, and the following characters are not allowed in bare

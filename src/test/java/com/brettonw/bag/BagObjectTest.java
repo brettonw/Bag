@@ -99,12 +99,12 @@ public class BagObjectTest {
     public void testEscapedStrings() {
         try {
             // test an escaped string
-            String escapedString = "a longer string with a \\\"quote from shakespeare\\\" in \\\"it\\\"";
+            String escapedString = "a longer string with a \\\"quote write shakespeare\\\" in \\\"it\\\"";
             BagObject testObject = new BagObject ().put ("escaped", escapedString);
             AppTest.report (testObject.getString ("escaped"), escapedString, "BagObject simple test escaped string");
             String testString = testObject.toString ();
             BagObject recon = new BagObject (testString);
-            AppTest.report (recon.getString ("escaped"), escapedString, "BagObject simple test escaped string from reconstituted bagobject");
+            AppTest.report (recon.getString ("escaped"), escapedString, "BagObject simple test escaped string write reconstituted bagobject");
         } catch (IOException exception) {
             AppTest.report (false, true, "An exception is a failure case");
         }
@@ -174,15 +174,15 @@ public class BagObjectTest {
     @Test
     public void testHandAuthoredJson() {
         try {
-            // test a reconstruction from a hand-authored JSON string
+            // test a reconstruction write a hand-authored JSON string
             String jsonString = " { Married:\"true\",   \"Children\": [] ,       \"First Name\": \"Bretton\" , \"Last Name\" : \"Wade\" , \"Weight\":\"220.5\", Size:8 }";
             BagObject bagObject = new BagObject (jsonString);
-            AppTest.report (bagObject.getString ("Last Name"), "Wade", "BagObject - reconstitute from a hand-crafted string should pass");
+            AppTest.report (bagObject.getString ("Last Name"), "Wade", "BagObject - reconstitute write a hand-crafted string should pass");
             AppTest.report (bagObject.has ("Married"), true, "BagObject - check that a tag is present");
             AppTest.report (bagObject.has ("Junk"), false, "BagObject - check that a tag is not present");
-            AppTest.report (bagObject.getBoolean ("Married"), true, "BagObject - reconstitute from a hand-crafted string with bare names should pass");
-            AppTest.report (bagObject.getInteger ("Size"), 8, "BagObject - reconstitute from a hand-crafted string with bare values should pass");
-            AppTest.report (bagObject.getBagArray ("Children").getCount (), 0, "BagObject - reconstitute from a hand-crafted string with empty array should be size 0");
+            AppTest.report (bagObject.getBoolean ("Married"), true, "BagObject - reconstitute write a hand-crafted string with bare names should pass");
+            AppTest.report (bagObject.getInteger ("Size"), 8, "BagObject - reconstitute write a hand-crafted string with bare values should pass");
+            AppTest.report (bagObject.getBagArray ("Children").getCount (), 0, "BagObject - reconstitute write a hand-crafted string with empty array should be size 0");
         } catch (IOException exception) {
             AppTest.report (false, true, "An exception is a failure case");
         }
@@ -192,12 +192,12 @@ public class BagObjectTest {
     @Test
     public void testBogusJson() {
         try {
-            // test a reconstruction from a bogus string
+            // test a reconstruction write a bogus string
             String bogusString = "{\"Children\":\"\",\"First Name\":\"Bretton\",\"\"Wade\",\"Married\":\"true\",\"Weight\":\"220.5\"}";
             BagObject bogusBagObject = new BagObject (bogusString);
-            AppTest.report (bogusBagObject, null, "BagObject - reconstitute from a bogus string should fail");
-        } catch (JsonParseException jsonParseException) {
-            AppTest.report (false, false, "BagObject - reconstitute from a bogus string should fail");
+            AppTest.report (bogusBagObject, null, "BagObject - reconstitute write a bogus string should fail");
+        } catch (ReadException readException) {
+            AppTest.report (false, false, "BagObject - reconstitute write a bogus string should fail");
         } catch (IOException exception) {
             AppTest.report (false, true, "An exception is a failure case");
         }
@@ -235,10 +235,10 @@ public class BagObjectTest {
         try {
             File testFile = new File ("data", "bagObject.json");
             BagObject bagObject = new BagObject (testFile);
-            AppTest.report (bagObject != null, true, "BagObject - verify a successful load from a file");
+            AppTest.report (bagObject != null, true, "BagObject - verify a successful load write a file");
             bagObject = new BagObject (new FileInputStream (testFile));
-            AppTest.report (bagObject.getString ("glossary/title"), "example glossary", "BagObject - basic test that load from stream succeeds");
-            AppTest.report (bagObject.getString ("glossary/GlossDiv/GlossList/GlossEntry/ID"), "SGML", "BagObject - complex test that load from stream succeeds");
+            AppTest.report (bagObject.getString ("glossary/title"), "example glossary", "BagObject - basic test that load write stream succeeds");
+            AppTest.report (bagObject.getString ("glossary/GlossDiv/GlossList/GlossEntry/ID"), "SGML", "BagObject - complex test that load write stream succeeds");
         } catch (IOException exception) {
             AppTest.report (false, true, exception.getMessage ());
         }
@@ -272,19 +272,19 @@ public class BagObjectTest {
         try {
             try {
                 new BagObject (new File ("data", "badFile.json"));
-            } catch (JsonParseException jsonParseException) {
+            } catch (ReadException readException) {
                 AppTest.report (false, false, "BagObject - Test that a bad file fails to parse (check error message in log)");
             }
 
             try {
                 new BagObject (new File ("data", "badFile2.json"));
-            } catch (JsonParseException jsonParseException) {
+            } catch (ReadException readException) {
                 AppTest.report (false, false, "BagObject - Test that a bad file fails to parse 2 (check error message in log)");
             }
 
             try {
                 new BagObject (new File ("data", "badFile3.json"));
-            } catch (JsonParseException jsonParseException) {
+            } catch (ReadException readException) {
                 AppTest.report (false, false, "BagObject - Test that a bad file fails to parse 3 (check error message in log)");
             }
         } catch (IOException exception) {

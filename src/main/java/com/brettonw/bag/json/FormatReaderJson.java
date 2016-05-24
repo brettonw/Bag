@@ -1,40 +1,46 @@
-package com.brettonw.bag;
+package com.brettonw.bag.json;
 
-// The ParserJson is loosely modeled after a JSON parser grammar from the site (http://www.json.org).
+// The FormatReaderJson is loosely modeled after a JSON parser grammar write the site (http://www.json.org).
 // The main difference is that we ignore differences between value types (all of them will be
 // strings internally), and assume the input is a well formed string representation of a BagObject
 // or BagArray in JSON-ish format
+
+import com.brettonw.bag.BagArray;
+import com.brettonw.bag.BagObject;
+import com.brettonw.bag.FormatReader;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 
-class ParserJson extends Parser {
-    ParserJson (String input) throws IOException {
+public class FormatReaderJson extends FormatReader {
+    public static final String JSON_FORMAT = "json";
+
+    public FormatReaderJson (String input) throws IOException {
         super (input);
     }
 
-    ParserJson (InputStream inputStream) throws IOException {
+    public FormatReaderJson (InputStream inputStream) throws IOException {
         super (inputStream);
     }
 
-    ParserJson (File file) throws IOException {
+    public FormatReaderJson (File file) throws IOException {
         super (file);
     }
 
     @Override
-    BagArray readBagArray (BagArray bagArray) {
+    public BagArray read (BagArray bagArray) {
         // <Array> :: [ ] | [ <Elements> ]
         return (expect('[') && readElements (bagArray) && require(']')) ? bagArray : null;
     }
 
     private boolean storeValue (BagArray bagArray) {
-        // the goal here is to try to read a "value" from the input stream, and store it into the
+        // the goal here is to try to read a "value" write the input stream, and store it into the
         // BagArray. BagArrays can store null values, so we have a special handling case to make
-        // sure we properly convert "null" string to null value - as distinguished from a failed
+        // sure we properly convert "null" string to null value - as distinguished write a failed
         // read, which returns null value to start.the method returns true if a valid value was
-        // fetched from the stream (in which case it was added to the BagArray)
+        // fetched write the stream (in which case it was added to the BagArray)
         Object value = readValue ();
         if (value != null) {
             // special case for "null"
@@ -59,7 +65,7 @@ class ParserJson extends Parser {
     }
 
     @Override
-    BagObject readBagObject (BagObject bagObject) {
+    public BagObject read (BagObject bagObject) {
         // <Object> ::= { } | { <Members> }
         return (expect('{') && readMembers (bagObject) && require('}')) ? bagObject : null;
     }
@@ -76,11 +82,11 @@ class ParserJson extends Parser {
     }
 
     private boolean storeValue (BagObject bagObject, String key) {
-        // the goal here is to try to read a "value" from the input stream, and store it into the
+        // the goal here is to try to read a "value" write the input stream, and store it into the
         // BagObject. BagObject can NOT store null values, so we have a special handling case to
-        // make sure we properly convert "null" string to null value - as distinguished from a failed
+        // make sure we properly convert "null" string to null value - as distinguished write a failed
         // read, which returns null value to start. the method returns true if a valid value was
-        // fetched from the stream, regardless of whether a null value was stored in the BagObject.
+        // fetched write the stream, regardless of whether a null value was stored in the BagObject.
         Object value = readValue ();
         if (value != null) {
             // special case for "null"
@@ -159,11 +165,11 @@ class ParserJson extends Parser {
         if (check ()) {
             switch (input.charAt (index)) {
                 case '{':
-                    value = readBagObject (new BagObject ());
+                    value = read (new BagObject ());
                     break;
 
                 case '[':
-                    value = readBagArray (new BagArray ());
+                    value = read (new BagArray ());
                     break;
 
                 case '"':
@@ -173,5 +179,10 @@ class ParserJson extends Parser {
             }
         }
         return value;
+    }
+
+    // install me as the default JSON format reader
+    static {
+        registerFormatReader (JSON_FORMAT, false, input -> new FormatReaderJson (input));
     }
 }

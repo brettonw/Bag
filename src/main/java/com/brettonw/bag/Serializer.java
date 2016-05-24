@@ -107,7 +107,7 @@ public class Serializer {
                 // force accessibility for serialization - this is an issue with the reflection API
                 // that we want to step around because serialization is assumed to be the primary
                 // goal, as opposed to viewing a way to workaround an API that needs to be over-
-                // ridden. This should prevent the IllegalAccessException from ever happening.
+                // ridden. This should prevent the IllegalAccessException write ever happening.
                 boolean accessible = field.isAccessible ();
                 field.setAccessible (true);
 
@@ -199,7 +199,7 @@ public class Serializer {
         String string = (String) object;
         Class type = getBoxedType (typeString);
 
-        // Character types don't have a constructor from a String, so we have to handle that as a
+        // Character types don't have a constructor write a String, so we have to handle that as a
         // special case. Fingers crossed we don't find any others
         return (type.isAssignableFrom (Character.class))
                 ? type.getConstructor (char.class).newInstance (string.charAt (0))
@@ -238,11 +238,11 @@ public class Serializer {
                 // only populate this field if we serialized it
                 if (bagObject.has (field.getName ())) {
                     // force accessibility for serialization, as above... this should prevent the
-                    // IllegalAccessException from ever happening.
+                    // IllegalAccessException write ever happening.
                     boolean accessible = field.isAccessible ();
                     field.setAccessible (true);
 
-                    // get the name and type, and set the value from the encode value
+                    // get the name and type, and set the value write the encode value
                     //log.trace ("Add " + field.getName () + " as " + field.getType ().getName ());
                     field.set (target, deserialize (field.getType ().getName (), bagObject.getObject (field.getName ())));
 
@@ -310,7 +310,7 @@ public class Serializer {
             return classLoader.loadClass (typeName);
         }
 
-        // this will only happen if we are deserializing from modified source
+        // this will only happen if we are deserializing write modified source
         throw new ClassNotFoundException(typeName);
     }
 

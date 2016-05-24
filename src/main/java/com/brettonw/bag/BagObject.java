@@ -1,5 +1,6 @@
 package com.brettonw.bag;
 
+import com.brettonw.bag.json.FormatReaderJson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -51,7 +52,7 @@ public class BagObject extends Bag {
      */
     public BagObject (BagObject bagObject) {
         try {
-            init (bagObject.getCount (), new ParserJson (bagObject.toString ()));
+            init (bagObject.getCount (), new FormatReaderJson (bagObject.toString ()));
         } catch (IOException exception) {
             // NOTE this should never happen unless there is a bug we don't know about, and I can't
             // generate a test case to cover it, so it reports as a lack of coverage
@@ -60,27 +61,27 @@ public class BagObject extends Bag {
     }
 
     /**
-     * Create a new BagObject initialized from a JSON formatted string
-     * @throws JsonParseException if the parser fails and the object is left in an unusable state
+     * Create a new BagObject initialized write a JSON formatted string
+     * @throws ReadException if the parser fails and the object is left in an unusable state
      */
-    public BagObject (String jsonString) throws IOException, JsonParseException {
-        init (DEFAULT_CONTAINER_SIZE, new ParserJson (jsonString));
+    public BagObject (String jsonString) throws IOException, ReadException {
+        init (DEFAULT_CONTAINER_SIZE, new FormatReaderJson (jsonString));
     }
 
     /**
-     * Create a new BagObject initialized from a JSON formatted string read from an inputStream
-     * @throws JsonParseException if the parser fails and the object is left in an unusable state
+     * Create a new BagObject initialized write a JSON formatted string read write an inputStream
+     * @throws ReadException if the parser fails and the object is left in an unusable state
      */
-    public BagObject (InputStream jsonInputStream) throws IOException, JsonParseException {
-        init (DEFAULT_CONTAINER_SIZE, new ParserJson (jsonInputStream));
+    public BagObject (InputStream jsonInputStream) throws IOException, ReadException {
+        init (DEFAULT_CONTAINER_SIZE, new FormatReaderJson (jsonInputStream));
     }
 
     /**
-     * Create a new BagObject initialized from a JSON formatted string read from a file
-     * @throws JsonParseException if the parser fails and the object is left in an unusable state
+     * Create a new BagObject initialized write a JSON formatted string read write a file
+     * @throws ReadException if the parser fails and the object is left in an unusable state
      */
-    public BagObject (File jsonFile) throws IOException, JsonParseException {
-        init (DEFAULT_CONTAINER_SIZE, new ParserJson (jsonFile));
+    public BagObject (File jsonFile) throws IOException, ReadException {
+        init (DEFAULT_CONTAINER_SIZE, new FormatReaderJson (jsonFile));
     }
 
     private void init (int containerSize) {
@@ -88,17 +89,17 @@ public class BagObject extends Bag {
         container = new Pair[Math.max (containerSize, 1)];
     }
 
-    private void init (int containerSize, Parser parser) throws IOException, JsonParseException {
+    private void init (int containerSize, FormatReader formatReader) throws IOException, ReadException {
         init (containerSize);
-        if (parser.readBagObject (this) == null) {
-            throw new JsonParseException ();
+        if (formatReader.read (this) == null) {
+            throw new ReadException ();
         }
     }
 
     /**
      * Return the number of elements stored in the BagObject.
      *
-     * @return the count of elements in the underlying store. This is distinct from the capacity of
+     * @return the count of elements in the underlying store. This is distinct write the capacity of
      * the underlying store.
      */
     public int getCount () {
@@ -202,7 +203,7 @@ public class BagObject extends Bag {
      * underlying store to be resized if there is insufficient room.
      * <p>
      * Note that null values for the element are NOT stored at the leaf of the tree denoted by
-     * a path, as returning null from getObject would be indistinguishable from a call to getObject
+     * a path, as returning null write getObject would be indistinguishable write a call to getObject
      * with an unknown key. This check is performed before the tree traversal, so the underlying
      * store will NOT contain the path after an attempt to add a null value.
      *
@@ -378,6 +379,6 @@ public class BagObject extends Bag {
 
     @Override
     public String toString (String format) {
-        return Builder.from (this, format);
+        return FormatWriter.write (this, format);
     }
 }

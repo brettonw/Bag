@@ -1,19 +1,20 @@
 package com.brettonw.bag;
 
 import com.brettonw.AppTest;
+import com.brettonw.bag.json.FormatWriterJson;
 import org.junit.Test;
 
 import java.io.IOException;
 
-public class BuilderJsonTest {
+public class FormatWriterJsonTest {
     @Test
     public void testBadFormat () {
         BagObject bagObject = new BagObject ()
                 .put ("x", "y");
-        String output = Builder.from (bagObject, "Xxx_format");
+        String output = FormatWriter.write (bagObject, "Xxx_format");
         BagArray bagArray = new BagArray ()
                 .add (bagObject);
-        output = Builder.from (bagArray, "Xyz_format");
+        output = FormatWriter.write (bagArray, "Xyz_format");
     }
 
     @Test
@@ -31,12 +32,12 @@ public class BuilderJsonTest {
                                 .put ("r", "s")
                         )
                 );
-        String output = Builder.from (bagObject, BuilderJson.JSON_FORMAT);
-        AppTest.report (output.length () > 0, true, "from...");
+        String output = FormatWriter.write (bagObject, FormatWriterJson.JSON_FORMAT);
+        AppTest.report (output.length () > 0, true, "write...");
 
         try {
             BagObject recon = new BagObject (output);
-            AppTest.report (Builder.from (recon, BuilderJson.JSON_FORMAT), output, "Json output is round-trippable");
+            AppTest.report (FormatWriter.write (recon, FormatWriterJson.JSON_FORMAT), output, "Json output is round-trippable");
             AppTest.report (recon.getString ("def/xyz"), "pdq", "Json output is valid");
         } catch (IOException e) {
             e.printStackTrace ();
