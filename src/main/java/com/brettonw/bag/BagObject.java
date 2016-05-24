@@ -64,7 +64,7 @@ public class BagObject extends Bag {
      * @throws ReadException if the parser fails and the object is left in an unusable state
      */
     public BagObject (String formattedString) throws IOException, ReadException {
-        init (DEFAULT_CONTAINER_SIZE, FormatReaderJson.JSON_FORMAT, new StringReader (formattedString));
+        init (DEFAULT_CONTAINER_SIZE, FormatReader.deduceFormat (null, null, FormatReaderJson.JSON_FORMAT), new StringReader (formattedString));
     }
 
     /**
@@ -73,7 +73,7 @@ public class BagObject extends Bag {
      * @throws ReadException if the parser fails and the object is left in an unusable state
      */
     public BagObject (String format, String formattedString) throws IOException, ReadException {
-        init (DEFAULT_CONTAINER_SIZE, format, new StringReader (formattedString));
+        init (DEFAULT_CONTAINER_SIZE, FormatReader.deduceFormat (format, null, FormatReaderJson.JSON_FORMAT), new StringReader (formattedString));
     }
 
     /**
@@ -82,7 +82,7 @@ public class BagObject extends Bag {
      * @throws ReadException if the parser fails and the object is left in an unusable state
      */
     public BagObject (String format, InputStream formattedInputStream) throws IOException, ReadException {
-        init (DEFAULT_CONTAINER_SIZE, format, new InputStreamReader (formattedInputStream));
+        init (DEFAULT_CONTAINER_SIZE, FormatReader.deduceFormat (format, null, FormatReaderJson.JSON_FORMAT), new InputStreamReader (formattedInputStream));
     }
 
     /**
@@ -90,7 +90,7 @@ public class BagObject extends Bag {
      * @throws ReadException if the parser fails and the object is left in an unusable state
      */
     public BagObject (File formattedFile) throws IOException, ReadException {
-        init (DEFAULT_CONTAINER_SIZE, FormatReader.validFileType (formattedFile, FormatReaderJson.JSON_FORMAT), new FileReader (formattedFile));
+        init (DEFAULT_CONTAINER_SIZE, FormatReader.deduceFormat (null, formattedFile.getName (), FormatReaderJson.JSON_FORMAT), new FileReader (formattedFile));
     }
 
     /**
@@ -99,7 +99,7 @@ public class BagObject extends Bag {
      * @throws ReadException if the parser fails and the object is left in an unusable state
      */
     public BagObject (String format, File formattedFile) throws IOException, ReadException {
-        init (DEFAULT_CONTAINER_SIZE, format, new FileReader (formattedFile));
+        init (DEFAULT_CONTAINER_SIZE, FormatReader.deduceFormat (format, formattedFile.getName (), FormatReaderJson.JSON_FORMAT), new FileReader (formattedFile));
     }
 
     private void init (int containerSize) {

@@ -4,7 +4,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Arrays;
@@ -117,15 +116,29 @@ abstract public class FormatReader {
         }
     }
 
-    protected static String getFileType (File file) {
-        String fileName = file.getName ();
-        int i = fileName.lastIndexOf('.');
-        return (i > 0) ? fileName.substring(i+1) : null;
-    }
+    public static String deduceFormat (String format, String fileName, String notFound) {
+        // did the user tell us? if so, go with it...
+        if (format != null) {
+            return format;
+        }
 
-    public static String validFileType (File file, String notFound) {
-        String extension = getFileType (file);
-        return formatReaders.containsKey (extension) ? extension : notFound;
+        // if there was a filename
+        if (fileName != null) {
+            int i = fileName.lastIndexOf('.');
+            String extension = (i > 0) ? fileName.substring (i + 1) : null;
+            if ((extension != null) && formatReaders.containsKey (extension)) {
+                return extension;
+            }
+        }
+
+        // ok, what if there is only one file reader (probably a normal case)
+        if (formatReaders.size () == 1) {
+            return (String) formatReaders.keySet ().toArray ()[0];
+        }
+
+        // if we had the input, we could maybe query on that...
+
+        return notFound;
     }
 
     private static String readInput (Reader input) throws IOException {
@@ -140,8 +153,8 @@ abstract public class FormatReader {
     }
 
     public static BagArray read (BagArray bagArray, String format, Reader reader) throws IOException {
+        String input = readInput (reader);
         if (formatReaders.containsKey(format)) {
-            String input = readInput (reader);
             FormatReader formatReader = formatReaders.get(format).apply (input);
             return formatReader.read (bagArray);
         }
@@ -149,8 +162,8 @@ abstract public class FormatReader {
     }
 
     public static BagObject read (BagObject bagObject, String format, Reader reader) throws IOException {
+        String input = readInput (reader);
         if (formatReaders.containsKey(format)) {
-            String input = readInput (reader);
             FormatReader formatReader = formatReaders.get(format).apply (input);
             return formatReader.read (bagObject);
         }

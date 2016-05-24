@@ -10,4 +10,27 @@
   not, because the user will otherwise have to know to extract via the serializer
 - XML...
 - iterators?
+- reader auto-detect the format?
+- "public" sweep
+- javadoc sweep
 
+Ways to create a BagObject (or BagArray):
+- new BagObject ().put(...);
+- new BagObject (5).put(...).put(...).put(...).put(...).put(...);
+- new BagObject (oldBagObject);
+- new BagObject (String input);
+- new BagObject (String format, String input);
+- new BagObject (String format, InputStream inputStream);
+- new BagObject (String format, File file);
+- new BagObject (File file);
+
+Ways to get the formats to use:
+- ask the user to provide one (what if they say null?)
+- if there's only one registered way, always use that?
+- use the extension of the filename (if present)
+- check the inputString itself ("<" vs. "{" vs. "[" as the first character...), have the formatreader
+  do this?
+- magic
+
+We have a bunch of "adapters" sitting on the front of the readers - File, InputStream, String, etc.;
+can they be leveraged or abstracted away?

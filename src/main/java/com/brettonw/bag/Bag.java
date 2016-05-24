@@ -4,6 +4,7 @@ import com.brettonw.bag.json.FormatReaderJson;
 import com.brettonw.bag.json.FormatWriterJson;
 import org.apache.logging.log4j.util.Supplier;
 
+import java.io.File;
 import java.util.function.Function;
 
 abstract class Bag {
