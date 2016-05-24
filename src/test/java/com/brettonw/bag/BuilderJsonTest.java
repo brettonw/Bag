@@ -26,12 +26,12 @@ public class BuilderJsonTest {
                                 .put ("r", "s")
                         )
                 );
-        String output = BuilderJson.from (bagObject);
+        String output = Builder.from (bagObject, BuilderJson.JSON_FORMAT);
         AppTest.report (output.length () > 0, true, "from...");
 
         try {
             BagObject recon = new BagObject (output);
-            AppTest.report (BuilderJson.from (recon), output, "Json output is round-trippable");
+            AppTest.report (Builder.from (recon, BuilderJson.JSON_FORMAT), output, "Json output is round-trippable");
             AppTest.report (recon.getString ("def/xyz"), "pdq", "Json output is valid");
         } catch (IOException e) {
             e.printStackTrace ();

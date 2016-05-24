@@ -26,10 +26,8 @@ public class BagObject extends Bag {
         }
     }
 
-
     private Pair[] container;
     private int count;
-
 
     /**
      * Create a new BagObject with a default underlying storage size.
@@ -53,7 +51,7 @@ public class BagObject extends Bag {
      */
     public BagObject (BagObject bagObject) {
         try {
-            init (bagObject.getCount (), new ParserJson (bagObject.toJsonString ()));
+            init (bagObject.getCount (), new ParserJson (bagObject.toString ()));
         } catch (IOException exception) {
             // NOTE this should never happen unless there is a bug we don't know about, and I can't
             // generate a test case to cover it, so it reports as a lack of coverage
@@ -378,14 +376,8 @@ public class BagObject extends Bag {
         return keys;
     }
 
-    /**
-     * Returns the BagObject represented as JSON.
-     *
-     * @return A String containing the JSON representation of the underlying store.
-     */
     @Override
-    public String toJsonString () {
-        return BuilderJson.from (this);
+    public String toString (String format) {
+        return Builder.from (this, format);
     }
-
 }

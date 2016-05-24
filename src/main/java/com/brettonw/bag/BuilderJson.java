@@ -1,9 +1,14 @@
 package com.brettonw.bag;
 
 public class BuilderJson extends Builder {
+    public static final String JSON_FORMAT = "json";
+
+    static final String[] CURLY_BRACKETS = { "{", "}" };
+    static final String[] SQUARE_BRACKETS = { "[", "]" };
+
     BuilderJson () {}
 
-    static String getJsonString (Object object) {
+    String getJsonString (Object object) {
         if (object != null) {
             switch (object.getClass ().getName ()) {
                 case "java.lang.String": return quote ((String) object);
@@ -11,7 +16,7 @@ public class BuilderJson extends Builder {
                 case "com.brettonw.bag.BagArray": return from ((BagArray) object);
 
                 // we omit the default case, because there should not be any other types stored in
-                // the Bag class - as in, they would not make it into the container, as the
+                // the Bag classes - as in, they would not make it into the container, as the
                 // "objectify" method will gate that
             }
         }
@@ -21,35 +26,38 @@ public class BuilderJson extends Builder {
         return "null";
     }
 
-    static final String[] CURLY_BRACKETS = { "{", "}" };
-    static final String[] SQUARE_BRACKETS = { "[", "]" };
-
-    public static String from (BagObject bagObject) {
+    @Override
+    public String from (BagObject bagObject) {
         StringBuilder stringBuilder = new StringBuilder ();
-
-        String keys[] = bagObject.keys ();
         String separator = "";
+        String keys[] = bagObject.keys();
         for (int i = 0, end = keys.length; i < end; ++i) {
             stringBuilder
-                    .append (separator)
-                    .append (quote (keys[i]))
-                    .append (":")
-                    .append (getJsonString (bagObject.getObject (keys[i])));
-            Object object = bagObject.getObject (keys[i]);
+                    .append(separator)
+                    .append(quote(keys[i]))
+                    .append(":")
+                    .append(getJsonString(bagObject.getObject(keys[i])));
+            Object object = bagObject.getObject(keys[i]);
             separator = ",";
         }
-        return enclose (stringBuilder.toString (), CURLY_BRACKETS);
+        return enclose(stringBuilder.toString(), CURLY_BRACKETS);
     }
 
-    public static String from (BagArray bagArray) {
+    @Override
+    public String from (BagArray bagArray) {
         StringBuilder stringBuilder = new StringBuilder ();
         String separator = "";
-        for (int i = 0, end = bagArray.getCount (); i < end; ++i) {
+        for (int i = 0, end = bagArray.getCount(); i < end; ++i) {
             stringBuilder
-                    .append (separator)
-                    .append (getJsonString (bagArray.getObject (i)));
+                    .append(separator)
+                    .append(getJsonString(bagArray.getObject(i)));
             separator = ",";
         }
-        return enclose (stringBuilder.toString (), SQUARE_BRACKETS);
+        return enclose(stringBuilder.toString(), SQUARE_BRACKETS);
+    }
+
+    // install me as the default JSON format builder
+    static {
+        Builder.registerBuilder(JSON_FORMAT, false, () -> new BuilderJson());
     }
 }

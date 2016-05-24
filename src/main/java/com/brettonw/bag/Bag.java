@@ -5,6 +5,8 @@ import org.apache.logging.log4j.util.Supplier;
 import java.util.function.Function;
 
 abstract class Bag {
+    private static String defaultFormat = Builder.DEFAULT_FORMAT;
+
     Object objectify (Object value) {
         if (value != null) {
             Class type = value.getClass ();
@@ -212,12 +214,7 @@ abstract class Bag {
         return getParsed (key, (input) -> new Float (input), notFound);
     }
 
-    abstract public String toJsonString ();
-
-    @Override
-    public String toString () {
-        return toJsonString ();
-    }
+    abstract public String toString (String format);
 
     @Override
     public boolean equals (Object object) {
@@ -228,4 +225,10 @@ abstract class Bag {
     public int hashCode () {
         return toString ().hashCode ();
     }
+
+    @Override
+    public String toString () {
+        return toString(defaultFormat);
+    }
+
 }

@@ -45,7 +45,7 @@ public class BagArray extends Bag {
      */
     public BagArray (BagArray bagArray) {
         try {
-            init (bagArray.getCount (), new ParserJson (bagArray.toJsonString ()));
+            init (bagArray.getCount (), new ParserJson (bagArray.toString ()));
         } catch (Exception exception) {
             // NOTE this should never happen unless there is a bug we don't know about, and I can't
             // generate a test case to cover it, so it reports as a lack of coverage
@@ -351,13 +351,8 @@ public class BagArray extends Bag {
         return null;
     }
 
-    /**
-     * Returns the BagArray represented as JSON.
-     *
-     * @return A String containing the JSON representation of the underlying store.
-     */
     @Override
-    public String toJsonString () {
-        return BuilderJson.from (this);
+    public String toString (String format) {
+        return Builder.from (this, format);
     }
 }
