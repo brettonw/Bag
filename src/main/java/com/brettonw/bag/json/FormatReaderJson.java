@@ -9,24 +9,18 @@ import com.brettonw.bag.BagArray;
 import com.brettonw.bag.BagObject;
 import com.brettonw.bag.FormatReader;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Arrays;
 
 public class FormatReaderJson extends FormatReader {
     public static final String JSON_FORMAT = "json";
 
-    public FormatReaderJson (String input) throws IOException {
+    public FormatReaderJson (String input) {
         super (input);
     }
 
-    public FormatReaderJson (InputStream inputStream) throws IOException {
-        super (inputStream);
-    }
-
-    public FormatReaderJson (File file) throws IOException {
-        super (file);
+    @Override
+    public boolean inputIsFormat (String input) {
+        return true;
     }
 
     @Override

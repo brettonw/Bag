@@ -4,10 +4,13 @@ import com.brettonw.bag.json.FormatReaderJson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.Reader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 abstract public class FormatReader {
     public static final String DEFAULT_FORMAT = "default";
@@ -32,7 +35,7 @@ abstract public class FormatReader {
         return stringBuilder.toString ();
     }
 
-    private void init (String input) {
+    public FormatReader (String input) {
         this.input = input;
         inputLength = input.length ();
         index = 0;
@@ -40,6 +43,7 @@ abstract public class FormatReader {
         lastLineIndex = 0;
     }
 
+    /*
     public FormatReader (String input) throws IOException {
         Reader inputReader = new StringReader (input);
         init (readInput (inputReader));
@@ -54,6 +58,7 @@ abstract public class FormatReader {
         Reader inputReader = new FileReader (file);
         init (readInput (inputReader));
     }
+    */
 
     protected boolean check () {
         return (! error) && (index < inputLength);
@@ -130,29 +135,31 @@ abstract public class FormatReader {
         }
     }
 
-
+    abstract public boolean inputIsFormat (String input);
     abstract public BagArray read (BagArray bagArray);
     abstract public BagObject read (BagObject bagObject);
 
     // static type registration by name
-    private static Map<String, CheckedFunction<String, FormatReader, IOException>> formatReaders = new HashMap<> ();
+    private static Map<String, Function<String, FormatReader>> formatReaders = new HashMap<> ();
 
-    public static void registerFormatReader (String format, boolean replace, CheckedFunction<String, FormatReader, IOException> factory) {
+    public static void registerFormatReader (String format, boolean replace, Function<String, FormatReader> factory) {
         if ((! replace) || (! formatReaders.containsKey(format))) {
             formatReaders.put(format, factory);
         }
     }
 
-    public static BagArray read (BagArray bagArray, String format, String input) throws IOException {
+    public static BagArray read (BagArray bagArray, String format, Reader reader) throws IOException {
         if (formatReaders.containsKey(format)) {
+            String input = readInput (reader);
             FormatReader formatReader = formatReaders.get(format).apply (input);
             return formatReader.read (bagArray);
         }
         return null;
     }
 
-    public static BagObject read (BagObject bagObject, String format, String input) throws IOException {
+    public static BagObject read (BagObject bagObject, String format, Reader reader) throws IOException {
         if (formatReaders.containsKey(format)) {
+            String input = readInput (reader);
             FormatReader formatReader = formatReaders.get(format).apply (input);
             return formatReader.read (bagObject);
         }
