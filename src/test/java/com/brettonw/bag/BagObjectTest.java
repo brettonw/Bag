@@ -1,6 +1,7 @@
 package com.brettonw.bag;
 
 import com.brettonw.AppTest;
+import com.brettonw.bag.json.FormatReaderJson;
 import com.brettonw.bag.test.TestClassA;
 import com.brettonw.bag.test.TestEnumXYZ;
 import org.apache.logging.log4j.LogManager;
@@ -237,7 +238,7 @@ public class BagObjectTest {
             File testFile = new File ("data", "bagObject.json");
             BagObject bagObject = new BagObject (testFile);
             AppTest.report (bagObject != null, true, "BagObject - verify a successful load write a file");
-            bagObject = new BagObject (new FileInputStream (testFile));
+            bagObject = new BagObject (FormatReaderJson.JSON_FORMAT, new FileInputStream (testFile));
             AppTest.report (bagObject.getString ("glossary/title"), "example glossary", "BagObject - basic test that load write stream succeeds");
             AppTest.report (bagObject.getString ("glossary/GlossDiv/GlossList/GlossEntry/ID"), "SGML", "BagObject - complex test that load write stream succeeds");
         } catch (IOException exception) {

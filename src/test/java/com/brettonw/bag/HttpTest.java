@@ -1,6 +1,7 @@
 package com.brettonw.bag;
 
 import com.brettonw.AppTest;
+import com.brettonw.bag.json.FormatReaderJson;
 import org.junit.Test;
 
 public class HttpTest {
@@ -11,16 +12,16 @@ public class HttpTest {
 
     @Test
     public void testGet () {
-        BagObject brettonw = Http.getForBagObject ("https://api.github.com/users/brettonw");
+        BagObject brettonw = Http.getForBagObject (FormatReaderJson.JSON_FORMAT, "https://api.github.com/users/brettonw");
         AppTest.report (brettonw.getString ("login"), "brettonw", "Got a valid BagObject");
 
-        BagArray repos = Http.getForBagArray ("https://api.github.com/users/brettonw/repos");
+        BagArray repos = Http.getForBagArray (FormatReaderJson.JSON_FORMAT, "https://api.github.com/users/brettonw/repos");
         AppTest.report (repos.getCount () > 0, true, "Got a valid BagArray");
     }
 
     @Test
     public void testPost () {
-        BagObject postResponseBagObject = Http.postForBagObject ("http://jsonplaceholder.typicode.com/posts/",
+        BagObject postResponseBagObject = Http.postForBagObject (FormatReaderJson.JSON_FORMAT, "http://jsonplaceholder.typicode.com/posts/",
                 new BagObject ()
                         .put ("login", "brettonw")
                         .put ("First Name", "Bretton")
@@ -28,7 +29,7 @@ public class HttpTest {
         );
         AppTest.report (postResponseBagObject.getString ("login"), "brettonw", "Got a valid BagObject");
 
-        BagArray postResponseBagArray = Http.postForBagArray ("http://jsonplaceholder.typicode.com/posts/",
+        BagArray postResponseBagArray = Http.postForBagArray (FormatReaderJson.JSON_FORMAT, "http://jsonplaceholder.typicode.com/posts/",
                 new BagArray ()
                         .add ("login")
                         .add ("brettonw")
@@ -42,13 +43,13 @@ public class HttpTest {
 
     @Test
     public void testBogusGet () {
-        BagObject bogus = Http.getForBagObject ("http://gojsonogle.com");
+        BagObject bogus = Http.getForBagObject (FormatReaderJson.JSON_FORMAT, "http://gojsonogle.com");
         AppTest.report (bogus, null, "Not a valid URL");
     }
 
     @Test
     public void testBogusPost () {
-        BagObject bogus = Http.postForBagObject ("http://gojsonogle.com", new BagObject ().put ("a", "b"));
+        BagObject bogus = Http.postForBagObject (FormatReaderJson.JSON_FORMAT, "http://gojsonogle.com", new BagObject ().put ("a", "b"));
         AppTest.report (bogus, null, "Not a valid URL");
     }
 }

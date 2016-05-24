@@ -169,9 +169,4 @@ public class FormatReaderJson extends FormatReader {
         }
         return value;
     }
-
-    // install me as the default JSON format reader
-    static {
-        registerFormatReader (JSON_FORMAT, false, FormatReaderJson::new);
-    }
 }

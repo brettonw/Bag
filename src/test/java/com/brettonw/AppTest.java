@@ -14,7 +14,7 @@ import org.junit.runners.Suite;
         KeyTest.class,
         HttpTest.class,
         SerializerTest.class,
-        FormatWriterJsonTest.class
+        FormatWriterTest.class
 })
 
 public class AppTest {

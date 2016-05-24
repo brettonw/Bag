@@ -56,9 +56,4 @@ public class FormatWriterJson extends FormatWriter {
         }
         return enclose(stringBuilder.toString(), SQUARE_BRACKETS);
     }
-
-    // install me as the default JSON format write
-    static {
-        registerFormatWriter (JSON_FORMAT, false, FormatWriterJson::new);
-    }
 }

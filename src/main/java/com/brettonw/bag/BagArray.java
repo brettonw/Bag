@@ -1,5 +1,7 @@
 package com.brettonw.bag;
 
+import com.brettonw.bag.json.FormatReaderJson;
+import com.brettonw.bag.json.FormatWriterJson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -43,7 +45,7 @@ public class BagArray extends Bag {
      */
     public BagArray (BagArray bagArray) {
         try {
-            init (bagArray.getCount (), new StringReader (bagArray.toString ()));
+            init (bagArray.getCount (), FormatReaderJson.JSON_FORMAT, new StringReader (bagArray.toString (FormatWriterJson.JSON_FORMAT)));
         } catch (Exception exception) {
             // NOTE this should never happen unless there is a bug we don't know about, and I can't
             // generate a test case to cover it, so it reports as a lack of coverage
@@ -56,15 +58,23 @@ public class BagArray extends Bag {
      * @throws ReadException if the parser fails and the array is left in an unusable state
      */
     public BagArray (String formattedString) throws IOException, ReadException {
-        init (START_SIZE, new StringReader (formattedString));
+        init (START_SIZE, FormatReaderJson.JSON_FORMAT, new StringReader (formattedString));
+    }
+
+    /**
+     * Create a new BagArray initialized from a formatted string
+     * @throws ReadException if the parser fails and the array is left in an unusable state
+     */
+    public BagArray (String format, String formattedString) throws IOException, ReadException {
+        init (START_SIZE, format, new StringReader (formattedString));
     }
 
     /**
      * Create a new BagArray initialized from a formatted string read out of an inputStream
      * @throws ReadException if the parser fails and the array is left in an unusable state
      */
-    public BagArray (InputStream formattedInputStream) throws IOException, ReadException {
-        init (START_SIZE, new InputStreamReader (formattedInputStream));
+    public BagArray (String format, InputStream formattedInputStream) throws IOException, ReadException {
+        init (START_SIZE, format, new InputStreamReader (formattedInputStream));
     }
 
     /**
@@ -72,7 +82,15 @@ public class BagArray extends Bag {
      * @throws ReadException if the parser fails and the array is left in an unusable state
      */
     public BagArray (File formattedFile) throws IOException, ReadException {
-        init (START_SIZE, new FileReader (formattedFile));
+        init (START_SIZE, FormatReader.validFileType (formattedFile, FormatWriterJson.JSON_FORMAT), new FileReader (formattedFile));
+    }
+
+    /**
+     * Create a new BagArray initialized from a formatted string read out of a file
+     * @throws ReadException if the parser fails and the array is left in an unusable state
+     */
+    public BagArray (String format, File formattedFile) throws IOException, ReadException {
+        init (START_SIZE, format, new FileReader (formattedFile));
     }
 
     private void init (int containerSize) {
@@ -80,9 +98,9 @@ public class BagArray extends Bag {
         container = new Object[Math.max (containerSize, 1)];
     }
 
-    private void init (int containerSize, Reader reader) throws IOException, ReadException {
+    private void init (int containerSize, String format, Reader reader) throws IOException, ReadException {
         init (containerSize);
-        if (FormatReader.read (this, FormatReader.DEFAULT_FORMAT, reader) == null) {
+        if (FormatReader.read (this, format, reader) == null) {
             throw new ReadException ();
         }
     }

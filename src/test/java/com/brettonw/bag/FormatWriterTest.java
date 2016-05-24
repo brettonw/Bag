@@ -6,7 +6,11 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-public class FormatWriterJsonTest {
+public class FormatWriterTest {
+
+    static {
+        new FormatWriterJson ();
+    }
     @Test
     public void testBadFormat () {
         BagObject bagObject = new BagObject ()
@@ -42,6 +46,5 @@ public class FormatWriterJsonTest {
         } catch (IOException e) {
             e.printStackTrace ();
         }
-
     }
 }

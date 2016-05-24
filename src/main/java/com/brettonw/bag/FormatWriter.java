@@ -5,8 +5,6 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 abstract public class FormatWriter {
-    public static final String DEFAULT_FORMAT = "default";
-
     protected static final String[] QUOTES = { "\"" };
 
     protected String enclose (String input, String[] bracket) {

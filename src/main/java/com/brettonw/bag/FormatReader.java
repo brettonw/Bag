@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Arrays;
@@ -12,8 +13,6 @@ import java.util.Map;
 import java.util.function.Function;
 
 abstract public class FormatReader {
-    public static final String DEFAULT_FORMAT = "default";
-
     private static final Logger log = LogManager.getLogger (FormatReader.class);
 
     protected int index;
@@ -23,17 +22,6 @@ abstract public class FormatReader {
     protected int lastLineIndex;
     protected boolean error;
 
-    private static String readInput (Reader input) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader (input);
-        StringBuilder stringBuilder = new StringBuilder ();
-        String line;
-        while ((line = bufferedReader.readLine ()) != null) {
-            stringBuilder.append (line).append ('\n');
-        }
-        bufferedReader.close ();
-        return stringBuilder.toString ();
-    }
-
     public FormatReader (String input) {
         this.input = input;
         inputLength = input.length ();
@@ -41,23 +29,6 @@ abstract public class FormatReader {
         lineNumber = 1;
         lastLineIndex = 0;
     }
-
-    /*
-    public FormatReader (String input) throws IOException {
-        Reader inputReader = new StringReader (input);
-        init (readInput (inputReader));
-    }
-
-    public FormatReader (InputStream inputStream) throws IOException {
-        Reader inputReader = new InputStreamReader (inputStream);
-        init (readInput (inputReader));
-    }
-
-    public FormatReader (File file) throws IOException {
-        Reader inputReader = new FileReader (file);
-        init (readInput (inputReader));
-    }
-    */
 
     protected boolean check () {
         return (! error) && (index < inputLength);
@@ -144,6 +115,28 @@ abstract public class FormatReader {
         if ((! replace) || (! formatReaders.containsKey(format))) {
             formatReaders.put(format, factory);
         }
+    }
+
+    protected static String getFileType (File file) {
+        String fileName = file.getName ();
+        int i = fileName.lastIndexOf('.');
+        return (i > 0) ? fileName.substring(i+1) : null;
+    }
+
+    public static String validFileType (File file, String notFound) {
+        String extension = getFileType (file);
+        return formatReaders.containsKey (extension) ? extension : notFound;
+    }
+
+    private static String readInput (Reader input) throws IOException {
+        BufferedReader bufferedReader = new BufferedReader (input);
+        StringBuilder stringBuilder = new StringBuilder ();
+        String line;
+        while ((line = bufferedReader.readLine ()) != null) {
+            stringBuilder.append (line).append ('\n');
+        }
+        bufferedReader.close ();
+        return stringBuilder.toString ();
     }
 
     public static BagArray read (BagArray bagArray, String format, Reader reader) throws IOException {

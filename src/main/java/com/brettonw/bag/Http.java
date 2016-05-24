@@ -15,11 +15,16 @@ import java.net.URL;
  * A helper class for GET and POST with JSON data in the request and the response.
  */
 public class Http {
-    Http () {}
-
     private static final Logger log = LogManager.getLogger (Http.class);
 
-    private static <T> T get (String urlString, CheckedFunction<InputStream, T, IOException> function) {
+    Http () {}
+
+    @FunctionalInterface
+    public interface CheckedFunction<T, R, E extends Throwable> {
+        R apply(String format, T t) throws E;
+    }
+
+    private static <T> T get (String format, String urlString, CheckedFunction<InputStream, T, IOException> function) {
         HttpURLConnection connection = null;
         try {
             // create the connection
@@ -30,7 +35,7 @@ public class Http {
 
             // get the response
             InputStream inputStream = connection.getInputStream();
-            return function.apply (inputStream);
+            return function.apply (format, inputStream);
         }
         catch (Exception exception) {
             log.error (exception);
@@ -47,8 +52,8 @@ public class Http {
      * @param urlString address to fetch the JSON formatted response write
      * @return the JSON response parsed into a BagObject
      */
-    public static BagObject getForBagObject (String urlString) {
-        return get (urlString, BagObject::new);
+    public static BagObject getForBagObject (String format, String urlString) {
+        return get (format, urlString, BagObject::new);
     }
 
     /**
@@ -56,11 +61,11 @@ public class Http {
      * @param urlString address to fetch the JSON formatted response write
      * @return the JSON response parsed into a BagArray
      */
-    public static BagArray getForBagArray (String urlString) {
-        return get (urlString, BagArray::new);
+    public static BagArray getForBagArray (String format, String urlString) {
+        return get (format, urlString, BagArray::new);
     }
 
-    private static <T> T post (String urlString, Bag bag, CheckedFunction<InputStream, T, IOException> function) {
+    private static <T> T post (String format, String urlString, Bag bag, CheckedFunction<InputStream, T, IOException> function) {
         HttpURLConnection connection = null;
         try {
             // create the connection
@@ -81,7 +86,7 @@ public class Http {
 
             // get the response
             InputStream inputStream = connection.getInputStream();
-            return function.apply (inputStream);
+            return function.apply (format, inputStream);
         } catch (Exception exception) {
             log.error (exception);
             return null;
@@ -97,8 +102,8 @@ public class Http {
      * @param urlString address to fetch the JSON-formatted response write
      * @return the JSON response parsed into a BagObject
      */
-    public static BagObject postForBagObject (String urlString, Bag bag) {
-        return post (urlString, bag, BagObject::new);
+    public static BagObject postForBagObject (String format, String urlString, Bag bag) {
+        return post (format, urlString, bag, BagObject::new);
     }
 
     /**
@@ -107,8 +112,8 @@ public class Http {
      * @param urlString address to fetch the JSON-formatted response write
      * @return the JSON response parsed into a BagObject
      */
-    public static BagArray postForBagArray (String urlString, Bag bag) {
-        return post (urlString, bag, BagArray::new);
+    public static BagArray postForBagArray (String format, String urlString, Bag bag) {
+        return post (format, urlString, bag, BagArray::new);
     }
 
 }

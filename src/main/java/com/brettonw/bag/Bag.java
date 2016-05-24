@@ -7,8 +7,6 @@ import org.apache.logging.log4j.util.Supplier;
 import java.util.function.Function;
 
 abstract class Bag {
-    private static String defaultFormat = FormatWriter.DEFAULT_FORMAT;
-
     Object objectify (Object value) {
         if (value != null) {
             Class type = value.getClass ();
@@ -216,8 +214,6 @@ abstract class Bag {
         return getParsed (key, Float::new, notFound);
     }
 
-    abstract public String toString (String format);
-
     @Override
     public boolean equals (Object object) {
         return (getClass ().equals (object.getClass ())) &&
@@ -229,18 +225,17 @@ abstract class Bag {
         return toString ().hashCode ();
     }
 
+    abstract public String toString (String format);
+
     @Override
     public String toString () {
-        return toString(defaultFormat);
+        // JSON is the default format
+        return toString(FormatWriterJson.JSON_FORMAT);
     }
 
-    public static void setDefaultFormat (String defaultFormat) {
-        Bag.defaultFormat = defaultFormat;
-    }
-
-    // JSON is the default format
+    // make sure we can read and/or write JSON formatted data
     static {
-        FormatWriter.registerFormatWriter (FormatWriter.DEFAULT_FORMAT, false, FormatWriterJson::new);
-        FormatReader.registerFormatReader (FormatReader.DEFAULT_FORMAT, false, FormatReaderJson::new);
+        FormatWriter.registerFormatWriter (FormatWriterJson.JSON_FORMAT, false, FormatWriterJson::new);
+        FormatReader.registerFormatReader (FormatReaderJson.JSON_FORMAT, false, FormatReaderJson::new);
     }
 }

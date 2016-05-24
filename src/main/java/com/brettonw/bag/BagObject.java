@@ -1,5 +1,7 @@
 package com.brettonw.bag;
 
+import com.brettonw.bag.json.FormatReaderJson;
+import com.brettonw.bag.json.FormatWriterJson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -49,7 +51,7 @@ public class BagObject extends Bag {
      */
     public BagObject (BagObject bagObject) {
         try {
-            init (bagObject.getCount (), new StringReader (bagObject.toString ()));
+            init (bagObject.getCount (), FormatReaderJson.JSON_FORMAT, new StringReader (bagObject.toString (FormatWriterJson.JSON_FORMAT)));
         } catch (IOException exception) {
             // NOTE this should never happen unless there is a bug we don't know about, and I can't
             // generate a test case to cover it, so it reports as a lack of coverage
@@ -62,15 +64,25 @@ public class BagObject extends Bag {
      * @throws ReadException if the parser fails and the object is left in an unusable state
      */
     public BagObject (String formattedString) throws IOException, ReadException {
-        init (DEFAULT_CONTAINER_SIZE, new StringReader (formattedString));
+        init (DEFAULT_CONTAINER_SIZE, FormatReaderJson.JSON_FORMAT, new StringReader (formattedString));
+    }
+
+    /**
+     * Create a new BagObject initialized from a formatted string
+     * @param format String name of the format to parse
+     * @throws ReadException if the parser fails and the object is left in an unusable state
+     */
+    public BagObject (String format, String formattedString) throws IOException, ReadException {
+        init (DEFAULT_CONTAINER_SIZE, format, new StringReader (formattedString));
     }
 
     /**
      * Create a new BagObject initialized from a formatted string read out of an inputStream
+     * @param format String name of the format to parse
      * @throws ReadException if the parser fails and the object is left in an unusable state
      */
-    public BagObject (InputStream formattedInputStream) throws IOException, ReadException {
-        init (DEFAULT_CONTAINER_SIZE, new InputStreamReader (formattedInputStream));
+    public BagObject (String format, InputStream formattedInputStream) throws IOException, ReadException {
+        init (DEFAULT_CONTAINER_SIZE, format, new InputStreamReader (formattedInputStream));
     }
 
     /**
@@ -78,7 +90,16 @@ public class BagObject extends Bag {
      * @throws ReadException if the parser fails and the object is left in an unusable state
      */
     public BagObject (File formattedFile) throws IOException, ReadException {
-        init (DEFAULT_CONTAINER_SIZE, new FileReader (formattedFile));
+        init (DEFAULT_CONTAINER_SIZE, FormatReader.validFileType (formattedFile, FormatReaderJson.JSON_FORMAT), new FileReader (formattedFile));
+    }
+
+    /**
+     * Create a new BagObject initialized from a formatted string read out of a file
+     * @param format String name of the format to parse
+     * @throws ReadException if the parser fails and the object is left in an unusable state
+     */
+    public BagObject (String format, File formattedFile) throws IOException, ReadException {
+        init (DEFAULT_CONTAINER_SIZE, format, new FileReader (formattedFile));
     }
 
     private void init (int containerSize) {
@@ -86,9 +107,9 @@ public class BagObject extends Bag {
         container = new Pair[Math.max (containerSize, 1)];
     }
 
-    private void init (int containerSize, Reader reader) throws IOException, ReadException {
+    private void init (int containerSize, String format, Reader reader) throws IOException, ReadException {
         init (containerSize);
-        if (FormatReader.read (this, FormatReader.DEFAULT_FORMAT, reader) == null) {
+        if (FormatReader.read (this, format, reader) == null) {
             throw new ReadException ();
         }
     }
