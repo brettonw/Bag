@@ -111,6 +111,7 @@ abstract public class FormatReader {
     private static final Map<String, Function<String, FormatReader>> formatReaders = new HashMap<> ();
 
     public static void registerFormatReader (String format, boolean replace, Function<String, FormatReader> factory) {
+        format = format.toLowerCase ();
         if ((! replace) || (! formatReaders.containsKey(format))) {
             formatReaders.put(format, factory);
         }
@@ -125,7 +126,7 @@ abstract public class FormatReader {
         // if there was a filename
         if (fileName != null) {
             int i = fileName.lastIndexOf('.');
-            String extension = (i > 0) ? fileName.substring (i + 1) : null;
+            String extension = (i > 0) ? fileName.substring (i + 1).toLowerCase () : null;
             if ((extension != null) && formatReaders.containsKey (extension)) {
                 return extension;
             }
@@ -154,6 +155,7 @@ abstract public class FormatReader {
 
     public static BagArray read (BagArray bagArray, String format, Reader reader) throws IOException {
         String input = readInput (reader);
+        format = format.toLowerCase ();
         if (formatReaders.containsKey(format)) {
             FormatReader formatReader = formatReaders.get(format).apply (input);
             return formatReader.read (bagArray);
@@ -163,6 +165,7 @@ abstract public class FormatReader {
 
     public static BagObject read (BagObject bagObject, String format, Reader reader) throws IOException {
         String input = readInput (reader);
+        format = format.toLowerCase ();
         if (formatReaders.containsKey(format)) {
             FormatReader formatReader = formatReaders.get(format).apply (input);
             return formatReader.read (bagObject);
