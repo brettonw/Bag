@@ -212,24 +212,20 @@ public class Serializer {
     }
 
     private static Object deserializeJavaObjectType (String typeString, Object object) throws ClassNotFoundException, IllegalAccessException, NoSuchMethodException, InstantiationException, InvocationTargetException {
-        Object target = null;
+        Object target;
 
         // get the type
         Class type = ClassLoader.getSystemClassLoader ().loadClass (typeString);
 
         // instantiate the object using the serialization interface, this should effectively create
         // the object without any initialization. we will do that next.
-        try {
             ReflectionFactory reflectionFactory = ReflectionFactory.getReflectionFactory ();
             Constructor objectConstructor = Object.class.getDeclaredConstructor ();
             Constructor constructor = reflectionFactory.newConstructorForSerialization (type, objectConstructor);
             target = constructor.newInstance ();
-        } catch (Exception exception) {
-            log.error (exception);
-        }
 
         // Wendy, is the water warm enough? Yes, Lisa. (Prince, RIP)
-        if (target != null) {
+
             // gather all of the fields declared; public, private, static, etc., then loop over them
             BagObject bagObject = (BagObject) object;
             Set<Field> fieldSet = new HashSet<> (Arrays.asList (type.getFields ()));
@@ -251,7 +247,6 @@ public class Serializer {
                     field.setAccessible (accessible);
                 }
             }
-        }
         return target;
     }
 
@@ -406,12 +401,12 @@ public class Serializer {
 
     /**
      * Reconstitute the given BagObject representation back to the object it represents.
-     * @param type
-     * @param bag
-     * @param <WorkingType>
-     * @return
+     * @param type the Class representing the type to reconstruct
+     * @param bag The input data to reconstruct, either a BagObject or BagArray
+     * @param <WorkingType> template parameter for the type to return
+     * @return the reconstituted object, or null if the reconstitution failed.
      */
-    public static <WorkingType> WorkingType fromBagObject (Class type, Bag bag) {
+    public static <WorkingType> WorkingType fromBag (Class type, Bag bag) {
         return (bag != null) ? (WorkingType) deserialize (type.getName (), bag) : null;
     }
 }

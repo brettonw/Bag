@@ -1,6 +1,5 @@
 package com.brettonw.bag;
 
-import com.brettonw.bag.json.FormatReaderJson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -18,8 +17,8 @@ abstract public class FormatReader {
     private static final Logger log = LogManager.getLogger (FormatReader.class);
 
     protected int index;
-    protected String input;
-    protected int inputLength;
+    protected final String input;
+    protected final int inputLength;
     protected int lineNumber;
     protected int lastLineIndex;
     protected boolean error;
@@ -121,7 +120,7 @@ abstract public class FormatReader {
             }
             log.error (input.substring (lastLineIndex, lineEnd));
 
-            // build the error message, by computing a carat line, and adding the error meesage to it
+            // build the error message, by computing a carat line, and adding the error message to it
             int errorIndex = index - lastLineIndex;
             char[] caratChars = new char[errorIndex + 2];
             Arrays.fill (caratChars, ' ');
@@ -135,12 +134,11 @@ abstract public class FormatReader {
         }
     }
 
-    abstract public boolean inputIsFormat (String input);
     abstract public BagArray read (BagArray bagArray);
     abstract public BagObject read (BagObject bagObject);
 
     // static type registration by name
-    private static Map<String, Function<String, FormatReader>> formatReaders = new HashMap<> ();
+    private static final Map<String, Function<String, FormatReader>> formatReaders = new HashMap<> ();
 
     public static void registerFormatReader (String format, boolean replace, Function<String, FormatReader> factory) {
         if ((! replace) || (! formatReaders.containsKey(format))) {
@@ -164,10 +162,5 @@ abstract public class FormatReader {
             return formatReader.read (bagObject);
         }
         return null;
-    }
-
-    // JSON is the default format
-    static {
-        registerFormatReader (DEFAULT_FORMAT, false, input -> new FormatReaderJson (input));
     }
 }

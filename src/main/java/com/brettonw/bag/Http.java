@@ -19,7 +19,7 @@ public class Http {
 
     private static final Logger log = LogManager.getLogger (Http.class);
 
-    private static <T> T get (String urlString, CheckedFunction<InputStream, Object, IOException> function) {
+    private static <T> T get (String urlString, CheckedFunction<InputStream, T, IOException> function) {
         HttpURLConnection connection = null;
         try {
             // create the connection
@@ -30,7 +30,7 @@ public class Http {
 
             // get the response
             InputStream inputStream = connection.getInputStream();
-            return (T) function.apply (inputStream);
+            return function.apply (inputStream);
         }
         catch (Exception exception) {
             log.error (exception);
@@ -48,7 +48,7 @@ public class Http {
      * @return the JSON response parsed into a BagObject
      */
     public static BagObject getForBagObject (String urlString) {
-        return get (urlString, inputStream -> new BagObject (inputStream));
+        return get (urlString, BagObject::new);
     }
 
     /**
@@ -57,10 +57,10 @@ public class Http {
      * @return the JSON response parsed into a BagArray
      */
     public static BagArray getForBagArray (String urlString) {
-        return get (urlString, inputStream -> new BagArray (inputStream));
+        return get (urlString, BagArray::new);
     }
 
-    public static <T> T post (String urlString, Bag bag, CheckedFunction<InputStream, Object, IOException> function) {
+    private static <T> T post (String urlString, Bag bag, CheckedFunction<InputStream, T, IOException> function) {
         HttpURLConnection connection = null;
         try {
             // create the connection
@@ -81,7 +81,7 @@ public class Http {
 
             // get the response
             InputStream inputStream = connection.getInputStream();
-            return (T) function.apply (inputStream);
+            return function.apply (inputStream);
         } catch (Exception exception) {
             log.error (exception);
             return null;
@@ -98,7 +98,7 @@ public class Http {
      * @return the JSON response parsed into a BagObject
      */
     public static BagObject postForBagObject (String urlString, Bag bag) {
-        return post (urlString, bag, inputStream -> new BagObject (inputStream));
+        return post (urlString, bag, BagObject::new);
     }
 
     /**
@@ -108,7 +108,7 @@ public class Http {
      * @return the JSON response parsed into a BagObject
      */
     public static BagArray postForBagArray (String urlString, Bag bag) {
-        return post (urlString, bag, inputStream -> new BagArray (inputStream));
+        return post (urlString, bag, BagArray::new);
     }
 
 }

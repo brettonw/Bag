@@ -33,13 +33,12 @@ public class FormatWriterJson extends FormatWriter {
         StringBuilder stringBuilder = new StringBuilder ();
         String separator = "";
         String keys[] = bagObject.keys();
-        for (int i = 0, end = keys.length; i < end; ++i) {
+        for (String key : keys) {
             stringBuilder
-                    .append(separator)
-                    .append(quote(keys[i]))
-                    .append(":")
-                    .append(getJsonString(bagObject.getObject(keys[i])));
-            Object object = bagObject.getObject(keys[i]);
+                    .append (separator)
+                    .append (quote (key))
+                    .append (":")
+                    .append (getJsonString (bagObject.getObject (key)));
             separator = ",";
         }
         return enclose(stringBuilder.toString(), CURLY_BRACKETS);
@@ -60,6 +59,6 @@ public class FormatWriterJson extends FormatWriter {
 
     // install me as the default JSON format write
     static {
-        registerFormatWriter (JSON_FORMAT, false, () -> new FormatWriterJson ());
+        registerFormatWriter (JSON_FORMAT, false, FormatWriterJson::new);
     }
 }

@@ -1,7 +1,5 @@
 package com.brettonw.bag;
 
-import com.brettonw.bag.json.FormatWriterJson;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -25,7 +23,7 @@ abstract public class FormatWriter {
     abstract public String write (BagArray bagArray);
 
     // static type registration by name
-    private static Map<String, FormatWriter> formatWriters = new HashMap<>();
+    private static final Map<String, FormatWriter> formatWriters = new HashMap<>();
 
     public static void registerFormatWriter (String format, boolean replace, Supplier<FormatWriter> supplier) {
         if ((! replace) || (! formatWriters.containsKey(format))) {
@@ -45,10 +43,5 @@ abstract public class FormatWriter {
             return formatWriters.get(format).write (bagArray);
         }
         return null;
-    }
-
-    // JSON is the default format
-    static {
-        FormatWriter.registerFormatWriter (DEFAULT_FORMAT, false, () -> new FormatWriterJson ());
     }
 }

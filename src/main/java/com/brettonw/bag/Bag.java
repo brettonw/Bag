@@ -1,5 +1,7 @@
 package com.brettonw.bag;
 
+import com.brettonw.bag.json.FormatReaderJson;
+import com.brettonw.bag.json.FormatWriterJson;
 import org.apache.logging.log4j.util.Supplier;
 
 import java.util.function.Function;
@@ -127,7 +129,7 @@ abstract class Bag {
      * @return The element as a Boolean, or notFound if the element is not found.
      */
     public Boolean getBoolean (String key, Supplier<Boolean> notFound) {
-        return getParsed (key, input -> new Boolean (input), notFound);
+        return getParsed (key, Boolean::new, notFound);
     }
 
     /**
@@ -148,7 +150,7 @@ abstract class Bag {
      * @return The element as a Long, or notFound if the element is not found.
      */
     public Long getLong (String key, Supplier<Long> notFound) {
-        return getParsed (key, input -> new Long (input), notFound);
+        return getParsed (key, Long::new, notFound);
     }
 
     /**
@@ -169,7 +171,7 @@ abstract class Bag {
      * @return The element as an Integer, or notFound if the element is not found.
      */
     public Integer getInteger (String key, Supplier<Integer> notFound) {
-        return getParsed (key, input -> new Integer (input), notFound);
+        return getParsed (key, Integer::new, notFound);
     }
 
     /**
@@ -190,7 +192,7 @@ abstract class Bag {
      * @return The element as a Double, or notFound if the element is not found.
      */
     public Double getDouble (String key, Supplier<Double> notFound) {
-        return getParsed (key, input -> new Double (input), notFound);
+        return getParsed (key, Double::new, notFound);
     }
 
     /**
@@ -211,14 +213,15 @@ abstract class Bag {
      * @return The element as a Float, or notFound if the element is not found.
      */
     public Float getFloat (String key, Supplier<Float> notFound) {
-        return getParsed (key, input -> new Float (input), notFound);
+        return getParsed (key, Float::new, notFound);
     }
 
     abstract public String toString (String format);
 
     @Override
     public boolean equals (Object object) {
-        return toString ().equals (object.toString ());
+        return (getClass ().equals (object.getClass ())) &&
+                toString ().equals (object.toString ());
     }
 
     @Override
@@ -233,5 +236,11 @@ abstract class Bag {
 
     public static void setDefaultFormat (String defaultFormat) {
         Bag.defaultFormat = defaultFormat;
+    }
+
+    // JSON is the default format
+    static {
+        FormatWriter.registerFormatWriter (FormatWriter.DEFAULT_FORMAT, false, FormatWriterJson::new);
+        FormatReader.registerFormatReader (FormatReader.DEFAULT_FORMAT, false, FormatReaderJson::new);
     }
 }

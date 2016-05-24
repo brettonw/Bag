@@ -19,11 +19,6 @@ public class FormatReaderJson extends FormatReader {
     }
 
     @Override
-    public boolean inputIsFormat (String input) {
-        return true;
-    }
-
-    @Override
     public BagArray read (BagArray bagArray) {
         // <Array> :: [ ] | [ <Elements> ]
         return (expect('[') && readElements (bagArray) && require(']')) ? bagArray : null;
@@ -177,6 +172,6 @@ public class FormatReaderJson extends FormatReader {
 
     // install me as the default JSON format reader
     static {
-        registerFormatReader (JSON_FORMAT, false, input -> new FormatReaderJson (input));
+        registerFormatReader (JSON_FORMAT, false, FormatReaderJson::new);
     }
 }

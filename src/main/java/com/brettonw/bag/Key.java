@@ -9,7 +9,7 @@ public final class Key {
     /**
      * Concatenate multiple string components to make a path
      * @param components the different levels of the hierarchy to index
-     * @return a String with the ponents in path form for indexing into a bag object
+     * @return a String with the components in path form for indexing into a bag object
      */
     public static String cat (Object... components) {
         StringBuilder stringBuilder = new StringBuilder ();
