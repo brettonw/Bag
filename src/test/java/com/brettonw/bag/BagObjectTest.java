@@ -11,7 +11,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class BagObjectTest {
     private static final Logger log = LogManager.getLogger (BagObject.class);
