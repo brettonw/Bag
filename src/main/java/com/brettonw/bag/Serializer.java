@@ -7,13 +7,7 @@ import sun.reflect.ReflectionFactory;
 import java.lang.reflect.*;
 import java.util.*;
 
-/**
- * A tool to convert data types to and from BagObjects for serialization. It is designed to support
- * primitives, Plain Old Java Object (POJO) classes, object classes with getters and setters,
- * arrays, and array or map-based containers of one of the previously mentioned types. It explicitly
- * supports BagObject and BagArray as well.
- */
-public final class Serializer {
+public class Serializer {
     private static final Logger log = LogManager.getLogger (Serializer.class);
 
     // the static interface
@@ -30,12 +24,37 @@ public final class Serializer {
     // whether or not to support multiple deserializer formats when the time comes.
     static final String SERIALIZER_VERSION_1 = "1.0";
     static final String SERIALIZER_VERSION_2 = "2";
-    static final String SERIALIZER_VERSION = SERIALIZER_VERSION_2;
+    static final String SERIALIZER_VERSION_3 = "3";
+    static final String SERIALIZER_VERSION = SERIALIZER_VERSION_3;
 
-    private static boolean isPrimitive (Class type) {
-        // an obvious check to do here is type.isPrimitive (), but that is never true because Java
-        // has boxed the primitives before they get here. So, we have to check for boxed primitives
-        // and strings as well
+    private static final Map<String, Class> BOXED_TYPES;
+    static {
+        BOXED_TYPES = new HashMap<> ();
+        BOXED_TYPES.put ("int", Integer.class);
+        BOXED_TYPES.put ("long", Long.class);
+        BOXED_TYPES.put ("short", Short.class);
+        BOXED_TYPES.put ("byte", Byte.class);
+        BOXED_TYPES.put ("char", Character.class);
+        BOXED_TYPES.put ("boolean", Boolean.class);
+        BOXED_TYPES.put ("float", Float.class);
+        BOXED_TYPES.put ("double", Double.class);
+    }
+
+    // different types of objects are handled differently by the serializer, this is roughly how we
+    // group those types
+    enum SerializationType {
+        PRIMITIVE,
+        ENUM,
+        BAG_OBJECT,
+        BAG_ARRAY,
+        JAVA_OBJECT,
+        COLLECTION,
+        MAP,
+        ARRAY
+    }
+
+    private static boolean isBoxedPrimitive (Class type) {
+        // boxed primitives and strings...
         switch (type.getName ()) {
             case "java.lang.Long": case "java.lang.Integer": case "java.lang.Short": case "java.lang.Byte":
             case "java.lang.Character":
@@ -48,8 +67,15 @@ public final class Serializer {
         // it wasn't any of those, return false;
         return false;
     }
+
+    private static Class getBoxedType (String typeString) throws ClassNotFoundException {
+        return BOXED_TYPES.containsKey (typeString)
+                ? BOXED_TYPES.get (typeString)
+                : ClassLoader.getSystemClassLoader ().loadClass (typeString);
+    }
+
     private static SerializationType serializationType (Class type) {
-        if (isPrimitive (type)) return SerializationType.PRIMITIVE;
+        if (type.isPrimitive () || isBoxedPrimitive (type)) return SerializationType.PRIMITIVE;
         if (type.isEnum ()) return SerializationType.ENUM;
         if (type.isArray ()) return SerializationType.ARRAY;
         if (Collection.class.isAssignableFrom (type)) return SerializationType.COLLECTION;
@@ -62,26 +88,14 @@ public final class Serializer {
     }
 
     private static SerializationType serializationType (String typeString) throws ClassNotFoundException {
-        if (typeString.charAt (0) == '[') {
-            return SerializationType.ARRAY;
-        }
-
-        ClassLoader classLoader = ClassLoader.getSystemClassLoader ();
-        Class type = classLoader.loadClass (typeString);
-        return serializationType (type);
+        return  (typeString.charAt (0) == '[')
+                ?  SerializationType.ARRAY
+                :  serializationType (getBoxedType (typeString));
     }
 
-    private static BagObject serializePrimitiveType (BagObject bagObject, Object object) {
-        return bagObject.put (VALUE_KEY, object);
-    }
-
-    private static BagObject serializeJavaEnumType (BagObject bagObject, Object object, Class type) {
-        return bagObject.put (VALUE_KEY, object.toString ());
-    }
-
-    private static BagObject serializeJavaObjectType (BagObject bagObject, Object object, Class type) {
+    private static BagObject serializeJavaObjectType (Object object, Class type) {
         // this bag object will hold the value(s) of the fields
-        BagObject value = new BagObject ();
+        BagObject bagObject = new BagObject ();
 
         // gather all of the fields declared; public, private, static, etc., then loop over them
         Set<Field> fieldSet = new HashSet<> (Arrays.asList (type.getFields ()));
@@ -99,7 +113,7 @@ public final class Serializer {
 
                 // get the name and type, and get the value to encode
                 try {
-                    value.put (field.getName (), serialize (field.get (object)));
+                    bagObject.put (field.getName (), serialize (field.get (object)));
                 } catch (IllegalAccessException exception) {
                     // NOTE this shouldn't happen, per the comments above, and is untestable for
                     // purpose of measuring coverage
@@ -111,50 +125,60 @@ public final class Serializer {
                 field.setAccessible (accessible);
             }
         }
-        return bagObject.put (VALUE_KEY, value);
+        return bagObject;
     }
 
-    private static BagObject serializeArrayType (BagObject bagObject, Object object) {
+    private static BagArray serializeArrayType (Object object) {
         int length = Array.getLength (object);
-        BagArray value = new BagArray (length);
+        BagArray bagArray = new BagArray (length);
         for (int i = 0; i < length; ++i) {
-            // at runtime, we don't know what the array type is, and frankly we don't care
-            value.add (serialize (Array.get (object, i)));
+            // serialized containers could use base classes as the container type specifier, so we
+            // have to instantiate each object individually
+            bagArray.add (serializeWithTypeAndValue (Array.get (object, i), false));
         }
-        return bagObject.put (VALUE_KEY, value);
+        return bagArray;
     }
 
-    private static BagObject serializeMapType (BagObject bagObject, Map object) {
+    private static BagArray serializeMapType (Map object) {
         Object[] keys = object.keySet ().toArray ();
-        BagArray value = new BagArray (keys.length);
+        BagArray bagArray = new BagArray (keys.length);
         for (Object key : keys) {
             Object item = object.get (key);
+            // serialized containers could use base classes as the container type specifier, so we
+            // have to instantiate each object individually
             BagObject pair = new BagObject (2)
-                    .put (KEY_KEY, serialize (key))
-                    .put (VALUE_KEY, serialize (item));
-            value.add (pair);
+                    .put (KEY_KEY, serializeWithTypeAndValue (key, false))
+                    .put (VALUE_KEY, serializeWithTypeAndValue (item, false));
+            bagArray.add (pair);
         }
-        return bagObject.put (VALUE_KEY, value);
+        return bagArray;
     }
 
-    static BagObject serialize (Object object) {
+    static Object serialize (Object object) {
         // fill out the header of the encapsulating bag
         Class type = object.getClass ();
-        BagObject bagObject = new BagObject (2)
-                .put (TYPE_KEY, type.getName ());
 
         // the next step depends on the actual type of what's being serialized
         switch (serializationType (type)) {
-            case PRIMITIVE: bagObject = serializePrimitiveType (bagObject, object); break;
-            case ENUM: bagObject = serializeJavaEnumType (bagObject, object, type); break;
-            case BAG_OBJECT: bagObject = serializePrimitiveType (bagObject, object); break;
-            case BAG_ARRAY: bagObject = serializePrimitiveType (bagObject, object); break;
-            case JAVA_OBJECT: bagObject = serializeJavaObjectType (bagObject, object, type); break;
-            case COLLECTION: bagObject = serializeArrayType (bagObject, ((Collection) object).toArray ()); break;
-            case MAP: bagObject = serializeMapType (bagObject, (Map) object); break;
-            case ARRAY: bagObject = serializeArrayType (bagObject, object); break;
+            case PRIMITIVE: return object;
+            case ENUM: return object.toString ();
+            case BAG_OBJECT:  case BAG_ARRAY: return object;
+            case JAVA_OBJECT: return serializeJavaObjectType (object, type);
+            case COLLECTION: return serializeArrayType (((Collection) object).toArray ());
+            case MAP: return serializeMapType ((Map) object);
+            case ARRAY: return serializeArrayType (object);
         }
-        return bagObject;
+        return null;
+    }
+
+    private static BagObject serializeWithTypeAndValue (Object object, boolean emitVersion) {
+        if (object != null) {
+            // build an encapsulation for the serializer
+            return (emitVersion ? new BagObject (3).put (VERSION_KEY, SERIALIZER_VERSION) : new BagObject (2))
+                    .put (TYPE_KEY, object.getClass ().getName ())
+                    .put (VALUE_KEY, serialize (object));
+        }
+        return null;
     }
 
     /**
@@ -168,36 +192,30 @@ public final class Serializer {
      * @return A BagObject encapsulation of the target object, or null if the conversion failed.
      */
     public static BagObject toBagObject (Object object) {
-        // fill out the header of the encapsulating bag
-        return (object != null)
-                ? new BagObject (2)
-                .put (VERSION_KEY, SERIALIZER_VERSION)
-                .put (VALUE_KEY, serialize (object))
-                : null;
+        return serializeWithTypeAndValue (object, true);
     }
 
-    @SuppressWarnings (value="unchecked")
-    private static Object deserializePrimitiveType (BagObject bagObject) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
-        String valueString = bagObject.getString (VALUE_KEY);
-        Class type = ClassLoader.getSystemClassLoader ().loadClass (bagObject.getString (TYPE_KEY));
+    private static Object deserializePrimitiveType (String typeString, Object object) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
+        String string = (String) object;
+        Class type = getBoxedType (typeString);
 
         // Character types don't have a constructor from a String, so we have to handle that as a
         // special case. Fingers crossed we don't find any others
         return (type.isAssignableFrom (Character.class))
-                ? type.getConstructor (char.class).newInstance (valueString.charAt (0))
-                : type.getConstructor (String.class).newInstance (valueString);
+                ? type.getConstructor (char.class).newInstance (string.charAt (0))
+                : type.getConstructor (String.class).newInstance (string);
     }
 
-    private static Object deserializeJavaEnumType (BagObject bagObject) throws ClassNotFoundException {
-        Class type = ClassLoader.getSystemClassLoader ().loadClass (bagObject.getString (TYPE_KEY));
-        return Enum.valueOf (type, bagObject.getString (VALUE_KEY));
+    private static Object deserializeJavaEnumType (String typeString, Object object) throws ClassNotFoundException {
+        Class type = ClassLoader.getSystemClassLoader ().loadClass (typeString);
+        return Enum.valueOf (type, (String) object);
     }
 
-    private static Object deserializeJavaObjectType (BagObject bagObject) throws ClassNotFoundException, IllegalAccessException, NoSuchMethodException, InstantiationException, InvocationTargetException {
+    private static Object deserializeJavaObjectType (String typeString, Object object) throws ClassNotFoundException, IllegalAccessException, NoSuchMethodException, InstantiationException, InvocationTargetException {
         Object target = null;
 
         // get the type
-        Class type = ClassLoader.getSystemClassLoader ().loadClass (bagObject.getString (TYPE_KEY));
+        Class type = ClassLoader.getSystemClassLoader ().loadClass (typeString);
 
         // instantiate the object using the serialization interface, this should effectively create
         // the object without any initialization. we will do that next.
@@ -213,12 +231,12 @@ public final class Serializer {
         // Wendy, is the water warm enough? Yes, Lisa. (Prince, RIP)
         if (target != null) {
             // gather all of the fields declared; public, private, static, etc., then loop over them
-            BagObject value = bagObject.getBagObject (VALUE_KEY);
+            BagObject bagObject = (BagObject) object;
             Set<Field> fieldSet = new HashSet<> (Arrays.asList (type.getFields ()));
             fieldSet.addAll (Arrays.asList (type.getDeclaredFields ()));
             for (Field field : fieldSet) {
                 // only populate this field if we serialized it
-                if (value.has (field.getName ())) {
+                if (bagObject.has (field.getName ())) {
                     // force accessibility for serialization, as above... this should prevent the
                     // IllegalAccessException from ever happening.
                     boolean accessible = field.isAccessible ();
@@ -226,7 +244,7 @@ public final class Serializer {
 
                     // get the name and type, and set the value from the encode value
                     //log.trace ("Add " + field.getName () + " as " + field.getType ().getName ());
-                    field.set (target, deserialize (value.getBagObject (field.getName ())));
+                    field.set (target, deserialize (field.getType ().getName (), bagObject.getObject (field.getName ())));
 
                     // restore the accessibility - not 100% sure this is necessary, better be safe
                     // than sorry, right?
@@ -237,25 +255,25 @@ public final class Serializer {
         return target;
     }
 
-    @SuppressWarnings (value="unchecked")
-    private static Object deserializeCollectionType (BagObject bagObject) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        Class type = ClassLoader.getSystemClassLoader ().loadClass (bagObject.getString (TYPE_KEY));
+    private static Object deserializeCollectionType (String typeString, Object object) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        Class type = ClassLoader.getSystemClassLoader ().loadClass (typeString);
         Collection target = (Collection) type.newInstance ();
-        BagArray value = bagObject.getBagArray (VALUE_KEY);
-        for (int i = 0, end = value.getCount (); i < end; ++i) {
-            target.add (deserialize (value.getBagObject (i)));
+        BagArray bagArray = (BagArray) object;
+        for (int i = 0, end = bagArray.getCount (); i < end; ++i) {
+            target.add (deserializeWithTypeAndValue (bagArray.getBagObject (i), false));
         }
         return target;
     }
 
-    @SuppressWarnings (value="unchecked")
-    private static Object deserializeMapType (BagObject bagObject) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        Class type = ClassLoader.getSystemClassLoader ().loadClass (bagObject.getString (TYPE_KEY));
+    private static Object deserializeMapType (String typeString, Object object) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        Class type = ClassLoader.getSystemClassLoader ().loadClass (typeString);
         Map target = (Map) type.newInstance ();
-        BagArray value = bagObject.getBagArray (VALUE_KEY);
-        for (int i = 0, end = value.getCount (); i < end; ++i) {
-            BagObject entry = value.getBagObject (i);
-            target.put (deserialize (entry.getBagObject (KEY_KEY)), deserialize (entry.getBagObject (VALUE_KEY)));
+        BagArray bagArray = (BagArray) object;
+        for (int i = 0, end = bagArray.getCount (); i < end; ++i) {
+            BagObject entry = bagArray.getBagObject (i);
+            Object key = deserializeWithTypeAndValue (entry.getBagObject (KEY_KEY), false);
+            Object value = deserializeWithTypeAndValue (entry.getBagObject (VALUE_KEY), false);
+            target.put (key, value);
         }
         return target;
     }
@@ -296,73 +314,82 @@ public final class Serializer {
         throw new ClassNotFoundException(typeName);
     }
 
-    private static int[] getArraySizes (BagObject bagObject) {
+    private static int[] getArraySizes (String typeString, BagArray bagArray) {
         // figure the array dimension
-        String typeString = bagObject.getString (TYPE_KEY);
         int dimension = 0;
         while (typeString.charAt (dimension) == '[') { ++dimension; }
 
         // create and populate the sizes array
         int sizes[] = new int[dimension];
         for (int i = 0; i < dimension; ++i) {
-            BagArray value = bagObject.getBagArray (VALUE_KEY);
-            sizes[i] = value.getCount ();
-            bagObject = value.getBagObject (0);
+            sizes[i] = bagArray.getCount ();
+            bagArray = bagArray.getBagObject (0).getBagArray (VALUE_KEY);
         }
 
         // return the result
         return sizes;
     }
 
-    private static void populateArray(Object target, BagObject bagObject) {
-        String classString = bagObject.getString (TYPE_KEY);
-        BagArray values = bagObject.getBagArray (VALUE_KEY);
-        for (int i = 0, end = values.getCount (); i < end; ++i) {
-            if (classString.charAt (1) == '[') {
-                // we should recur for each value
-                Object newTarget = Array.get (target, i);
-                BagObject newBagObject = values.getBagObject (i);
-                populateArray (newTarget, newBagObject);
-            } else {
-                Array.set (target, i, deserialize (values.getBagObject (i)));
+    private static void populateArray(int x, int[] arraySizes, Object target, BagArray bagArray) {
+        if (x < (arraySizes.length - 1)) {
+            // we should recur for each value to populate a sub-array
+            for (int i = 0, end = arraySizes[x]; i < end; ++i) {
+                Object nextTarget = Array.get (target, i);
+                BagObject bagObject = bagArray.getBagObject (i);
+                populateArray (x + 1, arraySizes, nextTarget, bagObject.getBagArray (VALUE_KEY));
+            }
+        } else {
+            // we should set each value
+            for (int i = 0, end = arraySizes[x]; i < end; ++i) {
+                Array.set (target, i, deserializeWithTypeAndValue (bagArray.getBagObject (i), false));
             }
         }
     }
 
-    private static Object deserializeArrayType (BagObject bagObject) throws ClassNotFoundException {
-        int[] arraySizes = getArraySizes (bagObject);
-        Class type = getArrayType (bagObject.getString (TYPE_KEY));
+    private static Object deserializeArrayType (String typeString, Object object) throws ClassNotFoundException {
+        BagArray bagArray = (BagArray) object;
+        int[] arraySizes = getArraySizes (typeString, bagArray);
+        Class type = getArrayType (typeString);
         Object target = Array.newInstance (type, arraySizes);
-        populateArray (target, bagObject);
+        populateArray (0, arraySizes, target, bagArray);
         return target;
     }
 
-    private static boolean checkVersion (String got) throws BadVersionException {
-        if (! got.equals (SERIALIZER_VERSION)) {
-            throw new BadVersionException (got, SERIALIZER_VERSION);
+    private static boolean checkVersion (boolean expectVersion, BagObject bagObject) throws BadVersionException {
+        if (expectVersion) {
+            String version = bagObject.getString (VERSION_KEY);
+            if (!SERIALIZER_VERSION.equals (version)) {
+                throw new BadVersionException (version, SERIALIZER_VERSION);
+            }
         }
         return true;
     }
 
-    static Object deserialize (BagObject bagObject) {
+    static Object deserialize (String typeString, Object object) {
         Object  result = null;
         try {
-            switch (serializationType (bagObject.getString (TYPE_KEY))) {
-                case PRIMITIVE: result = deserializePrimitiveType (bagObject); break;
-                case ENUM: result = deserializeJavaEnumType (bagObject); break;
-                case BAG_OBJECT: result = bagObject.getBagObject (VALUE_KEY); break;
-                case BAG_ARRAY: result = bagObject.getBagArray (VALUE_KEY); break;
-                case JAVA_OBJECT: result = deserializeJavaObjectType (bagObject); break;
-                case COLLECTION: result = deserializeCollectionType (bagObject); break;
-                case MAP: result = deserializeMapType (bagObject); break;
-                case ARRAY: result = deserializeArrayType (bagObject); break;
+            switch (serializationType (typeString)) {
+                case PRIMITIVE: result = deserializePrimitiveType (typeString, object); break;
+                case ENUM: result = deserializeJavaEnumType (typeString, object); break;
+                case BAG_OBJECT:
+                case BAG_ARRAY: result = object; break;
+                case JAVA_OBJECT: result = deserializeJavaObjectType (typeString, object); break;
+                case COLLECTION: result = deserializeCollectionType (typeString, object); break;
+                case MAP: result = deserializeMapType (typeString, object); break;
+                case ARRAY: result = deserializeArrayType (typeString, object); break;
             }
-        }
-        catch (Exception exception) {
+        } catch (Exception exception) {
             log.error (exception);
         }
         return result;
     }
+
+    private static Object deserializeWithTypeAndValue (BagObject bagObject, boolean expectVersion) {
+        return ((bagObject != null) && checkVersion (expectVersion, bagObject))
+                ? deserialize (bagObject.getString (TYPE_KEY), bagObject.getObject (VALUE_KEY))
+                : null;
+    }
+
     /**
      * Reconstitute the given BagObject representation back to the object it represents.
      *
@@ -374,8 +401,17 @@ public final class Serializer {
     public static <WorkingType> WorkingType fromBagObject (BagObject bagObject) {
         // we expect a future change might use a different approach to deserialization, so we
         // check to be sure this is the version we are working to
-        return ((bagObject != null) && checkVersion (bagObject.getString (VERSION_KEY)))
-                ? (WorkingType) deserialize (bagObject.getBagObject (VALUE_KEY))
-                : null;
+        return (WorkingType) deserializeWithTypeAndValue (bagObject, true);
+    }
+
+    /**
+     * Reconstitute the given BagObject representation back to the object it represents.
+     * @param type
+     * @param bag
+     * @param <WorkingType>
+     * @return
+     */
+    public static <WorkingType> WorkingType fromBagObject (Class type, Bag bag) {
+        return (bag != null) ? (WorkingType) deserialize (type.getName (), bag) : null;
     }
 }

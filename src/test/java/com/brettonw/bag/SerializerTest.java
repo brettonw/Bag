@@ -14,7 +14,6 @@ import java.util.HashMap;
 
 import static org.junit.Assert.assertArrayEquals;
 
-
 public class SerializerTest {
     private static final Logger log = LogManager.getLogger (SerializerTest.class);
 
@@ -142,7 +141,7 @@ public class SerializerTest {
 
     @Test
     public void testNonPojo() {
-        TestClassC  testClassC = new TestClassC (1, 2L, 3.0f, 10, 20L, 30.0f);
+        TestClassC testClassC = new TestClassC (1, 2L, 3.0f, 10, 20L, 30.0f);
         BagObject bagObjectC = Serializer.toBagObject (testClassC);
         log.info (bagObjectC.toString ());
         TestClassC  reconClassC = Serializer.fromBagObject (bagObjectC);
@@ -287,7 +286,7 @@ public class SerializerTest {
     @Test
     public void testBadConstructorHandling () {
         // deal with a type that has a no default constructor and no registered extension
-        TestClassD  d = new TestClassD ("Hello");
+        TestClassD d = new TestClassD ("Hello");
         BagObject bagObject = Serializer.toBagObject (d);
         TestClassD xxx = Serializer.fromBagObject (bagObject);
         AppTest.report (d != xxx, true, "Properly fail on a type without a default constructor or registered extension");
@@ -295,7 +294,7 @@ public class SerializerTest {
 
     @Test
     public void testClassE () {
-        TestClassE  d = new TestClassE ("Hello");
+        TestClassE d = new TestClassE ("Hello");
         BagObject bagObject = Serializer.toBagObject (d);
         TestClassE xxx = Serializer.fromBagObject (bagObject);
         AppTest.report (d, xxx, "Properly handle a serialized typen");
@@ -307,5 +306,13 @@ public class SerializerTest {
         AppTest.report (bagObject, null, "Serialize null results in null");
         Object object = Serializer.fromBagObject (null);
         AppTest.report (object, null, "Deserialize null results in null");
+    }
+
+    @Test
+    public void testSimpleSerializer () {
+        BagObject testClassC = new BagObject ()
+                .put ("a", 1).put ("b", 2).put ("c", 3.0).put ("d", 10).put ("e", 20).put ("f", 30.0).put ("g", 30);
+        TestClassC reconC = Serializer.fromBagObject (TestClassC.class, testClassC);
+        AppTest.report (reconC.getF (), testClassC.getFloat ("f"), "Simple deserialization - f");
     }
 }

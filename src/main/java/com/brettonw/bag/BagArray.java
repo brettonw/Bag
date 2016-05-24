@@ -101,7 +101,7 @@ public class BagArray extends Bag {
 
     private void grow (int gapIndex) {
         // save the existing container
-        Object src[] = container;
+        Object[] src = container;
 
         // compute the number of values that will have to move, and from it, the new count - and
         // therefore the new size needed to include all of the elements of the array. the cases are:
@@ -236,7 +236,7 @@ public class BagArray extends Bag {
         // separate the key into path components, the "local" key value is the first component, so
         // use that to conduct the search. We are only interested in values that indicate the search
         // found the requested key
-        String path[] = Key.split (key);
+        String[] path = Key.split (key);
         int index = keyToIndex (path[0]);
         if ((index >= 0) && (index < count)) {
             // grab the found element... if the path was only one element long, this is the element

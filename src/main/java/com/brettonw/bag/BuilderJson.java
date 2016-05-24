@@ -21,6 +21,9 @@ public class BuilderJson extends Builder {
         return "null";
     }
 
+    static final String[] CURLY_BRACKETS = { "{", "}" };
+    static final String[] SQUARE_BRACKETS = { "[", "]" };
+
     public static String from (BagObject bagObject) {
         StringBuilder stringBuilder = new StringBuilder ();
 

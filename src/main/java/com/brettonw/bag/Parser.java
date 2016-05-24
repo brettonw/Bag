@@ -113,7 +113,7 @@ abstract class Parser {
 
             // build the error message, by computing a carat line, and adding the error meesage to it
             int errorIndex = index - lastLineIndex;
-            char caratChars[] = new char[errorIndex + 2];
+            char[] caratChars = new char[errorIndex + 2];
             Arrays.fill (caratChars, ' ');
             caratChars[errorIndex] = '^';
             String carat = new String (caratChars) + errorMessage;

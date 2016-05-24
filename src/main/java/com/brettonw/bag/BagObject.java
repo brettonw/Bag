@@ -108,7 +108,7 @@ public class BagObject extends Bag {
     }
 
     private void grow (int gapIndex) {
-        Pair src[] = container;
+        Pair[] src = container;
         if (count == container.length) {
             // if the array is smaller than the cap then double its size, otherwise just add the block
             int newSize = (count > DOUBLING_CAP) ? (count + DOUBLING_CAP) : (count * 2);
@@ -181,7 +181,7 @@ public class BagObject extends Bag {
         // separate the key into path components, the "local" key value is the first component, so
         // use that to conduct the search. We are only interested in values that indicate the search
         // found the requested key
-        String path[] = Key.split (key);
+        String[] path = Key.split (key);
         int index = binarySearch (path[0]);
         if (index >= 0) {
             // grab the found element... if the path was only one element long, this is the element
@@ -221,7 +221,7 @@ public class BagObject extends Bag {
             // separate the key into path components, the "local" key value is the first component,
             // so use that to conduct the search. If there is an element there, we want to get it,
             // otherwise we want to create it.
-            String path[] = Key.split (key);
+            String[] path = Key.split (key);
             Pair pair = getOrAddPair (path[0]);
             if (path.length == 1) {
                 // this was the only key in the path, so it's the end of the line, store the value
@@ -263,7 +263,7 @@ public class BagObject extends Bag {
         // separate the key into path components, the "local" key value is the first component,
         // so use that to conduct the search. If there is an element there, we want to get it,
         // otherwise we want to create it.
-        String path[] = Key.split (key);
+        String[] path = Key.split (key);
         Pair pair = getOrAddPair (path[0]);
         if (path.length == 1) {
             // this is the end of the line, so we want to store the requested object
@@ -327,7 +327,7 @@ public class BagObject extends Bag {
      * @return The BagObject, so that operations can be chained together.
      */
     public BagObject remove (String key) {
-        String path[] = Key.split (key);
+        String[] path = Key.split (key);
         int index = binarySearch (path[0]);
         if (index >= 0) {
             if (path.length == 1) {
@@ -352,7 +352,7 @@ public class BagObject extends Bag {
      * values are not stored (design decision), so this equivalent to checking for null.
      */
     public boolean has (String key) {
-        String path[] = Key.split (key);
+        String[] path = Key.split (key);
         int index = binarySearch (path[0]);
         try {
             return (index >= 0) &&
@@ -371,7 +371,7 @@ public class BagObject extends Bag {
      * @return The keys in the underlying map as an array of Strings.
      */
     public String[] keys () {
-        String keys[] = new String[count];
+        String[] keys = new String[count];
         for (int i = 0; i < count; ++i) {
             keys[i] = container[i].key;
         }
