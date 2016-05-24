@@ -7,8 +7,13 @@ import java.io.IOException;
 
 public class BuilderJsonTest {
     @Test
-    public void testNew () {
-        new BuilderJson ();
+    public void testBadFormat () {
+        BagObject bagObject = new BagObject ()
+                .put ("x", "y");
+        String output = Builder.from (bagObject, "Xxx_format");
+        BagArray bagArray = new BagArray ()
+                .add (bagObject);
+        output = Builder.from (bagArray, "Xyz_format");
     }
 
     @Test

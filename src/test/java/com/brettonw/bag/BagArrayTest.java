@@ -188,5 +188,6 @@ public class BagArrayTest {
         AppTest.report (bagObject.getString ("a/#first/x"), "y", "Hierarchical indexing of arrays using strings - 1");
         AppTest.report (bagObject.getString ("a/#last/x"), "y", "Hierarchical indexing of arrays using strings - 2");
         AppTest.report (bagObject.getString ("a/0/x"), "y", "Hierarchical indexing of arrays using strings - 3");
+        AppTest.report (bagObject.getString ("a/100/x"), null, "Hierarchical indexing of arrays using strings - 4");
     }
 }

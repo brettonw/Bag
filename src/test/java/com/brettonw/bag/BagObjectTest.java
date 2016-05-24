@@ -359,4 +359,11 @@ public class BagObjectTest {
             AppTest.report (true, false, "Copy of empty object should succeed");
         }
     }
+
+    @Test
+    public void testHashCode () {
+        BagObject bagObject = new BagObject ().put ("x", "abcdegoldfish");
+        int hash = bagObject.hashCode ();
+        AppTest.report (hash != 0, true, "test hash code (" + hash + ")");
+    }
 }
