@@ -68,6 +68,14 @@ public class BagArray extends Bag {
      * Create a new BagArray initialized from a formatted string read out of an inputStream
      * @throws ReadException if the parser fails and the array is left in an unusable state
      */
+    public BagArray (InputStream formattedInputStream) throws IOException, ReadException {
+        init (START_SIZE, null, null, new InputStreamReader (formattedInputStream));
+    }
+
+    /**
+     * Create a new BagArray initialized from a formatted string read out of an inputStream
+     * @throws ReadException if the parser fails and the array is left in an unusable state
+     */
     public BagArray (String format, InputStream formattedInputStream) throws IOException, ReadException {
         init (START_SIZE, format, null, new InputStreamReader (formattedInputStream));
     }
@@ -226,7 +234,7 @@ public class BagArray extends Bag {
         switch (key) {
             case "#first": return 0;
             case "#last": return count - 1;
-            case "#add": return count;
+            //case "#add": return count;
             default: return Integer.parseInt (key);
         }
     }

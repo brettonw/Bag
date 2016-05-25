@@ -20,6 +20,9 @@ public class FormatReaderJson extends FormatReader {
 
     @Override
     public BagArray read (BagArray bagArray) {
+        if (bagArray == null) {
+            bagArray = new BagArray ();
+        }
         // <Array> :: [ ] | [ <Elements> ]
         return (expect('[') && readElements (bagArray) && require(']')) ? bagArray : null;
     }
@@ -55,6 +58,9 @@ public class FormatReaderJson extends FormatReader {
 
     @Override
     public BagObject read (BagObject bagObject) {
+        if (bagObject == null) {
+            bagObject = new BagObject ();
+        }
         // <Object> ::= { } | { <Members> }
         return (expect('{') && readMembers (bagObject) && require('}')) ? bagObject : null;
     }

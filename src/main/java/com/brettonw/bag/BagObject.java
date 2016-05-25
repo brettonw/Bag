@@ -72,6 +72,14 @@ public class BagObject extends Bag {
 
     /**
      * Create a new BagObject initialized from a formatted string read out of an inputStream
+     * @throws ReadException if the parser fails and the object is left in an unusable state
+     */
+    public BagObject (InputStream formattedInputStream) throws IOException, ReadException {
+        init (DEFAULT_CONTAINER_SIZE, null, null, new InputStreamReader (formattedInputStream));
+    }
+
+    /**
+     * Create a new BagObject initialized from a formatted string read out of an inputStream
      * @param format String name of the format to parse
      * @throws ReadException if the parser fails and the object is left in an unusable state
      */

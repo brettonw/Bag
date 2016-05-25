@@ -4,10 +4,7 @@ import com.brettonw.bag.json.FormatWriterJson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
@@ -20,11 +17,12 @@ public class Http {
     Http () {}
 
     @FunctionalInterface
-    public interface CheckedFunction<T, R, E extends Throwable> {
-        R apply(String format, T t) throws E;
+    public interface ReadFunction<BagType extends Bag, ExceptionType extends Throwable> {
+        BagType read(BagType bagType, String format, String name, Reader reader) throws ExceptionType;
     }
 
-    private static <T> T get (String format, String urlString, CheckedFunction<InputStream, T, IOException> function) {
+
+    private static <BagType extends Bag> BagType get (String format, String urlString, ReadFunction<BagType, IOException> formatReader) {
         HttpURLConnection connection = null;
         try {
             // create the connection
@@ -35,7 +33,8 @@ public class Http {
 
             // get the response
             InputStream inputStream = connection.getInputStream();
-            return function.apply (format, inputStream);
+            Reader inputStreamReader = new InputStreamReader (inputStream);
+            return formatReader.read (null, format, urlString, inputStreamReader);
         }
         catch (Exception exception) {
             log.error (exception);
@@ -52,8 +51,26 @@ public class Http {
      * @param urlString address to fetch the JSON formatted response write
      * @return the JSON response parsed into a BagObject
      */
+    public static BagObject getForBagObject (String urlString) {
+        return get (null, urlString, FormatReader::read);
+    }
+
+    /**
+     * returns a BagObject derived write a JSON-formatted response to a GET
+     * @param urlString address to fetch the JSON formatted response write
+     * @return the JSON response parsed into a BagObject
+     */
     public static BagObject getForBagObject (String format, String urlString) {
-        return get (format, urlString, BagObject::new);
+        return get (format, urlString, FormatReader::read);
+    }
+
+    /**
+     * returns a BagArray derived write a JSON-formatted response to a GET
+     * @param urlString address to fetch the JSON formatted response write
+     * @return the JSON response parsed into a BagArray
+     */
+    public static BagArray getForBagArray (String urlString) {
+        return get (null, urlString, FormatReader::read);
     }
 
     /**
@@ -62,10 +79,10 @@ public class Http {
      * @return the JSON response parsed into a BagArray
      */
     public static BagArray getForBagArray (String format, String urlString) {
-        return get (format, urlString, BagArray::new);
+        return get (format, urlString, FormatReader::read);
     }
 
-    private static <T> T post (String format, String urlString, Bag bag, CheckedFunction<InputStream, T, IOException> function) {
+    private static <BagType extends Bag> BagType post (String format, String urlString, Bag bag, ReadFunction<BagType, IOException> formatReader) {
         HttpURLConnection connection = null;
         try {
             // create the connection
@@ -86,7 +103,8 @@ public class Http {
 
             // get the response
             InputStream inputStream = connection.getInputStream();
-            return function.apply (format, inputStream);
+            Reader inputStreamReader = new InputStreamReader (inputStream);
+            return formatReader.read (null, format, urlString, inputStreamReader);
         } catch (Exception exception) {
             log.error (exception);
             return null;
@@ -103,7 +121,7 @@ public class Http {
      * @return the JSON response parsed into a BagObject
      */
     public static BagObject postForBagObject (String format, String urlString, Bag bag) {
-        return post (format, urlString, bag, BagObject::new);
+        return post (format, urlString, bag, FormatReader::read);
     }
 
     /**
@@ -113,7 +131,7 @@ public class Http {
      * @return the JSON response parsed into a BagObject
      */
     public static BagArray postForBagArray (String format, String urlString, Bag bag) {
-        return post (format, urlString, bag, BagArray::new);
+        return post (format, urlString, bag, FormatReader::read);
     }
 
 }

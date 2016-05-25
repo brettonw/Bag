@@ -120,7 +120,10 @@ abstract public class FormatReader {
     public static String deduceFormat (String format, String name, String input) {
         // did the user tell us? if so, go with it...
         if (format != null) {
-            return format.toLowerCase ();
+            format = format.toLowerCase ();
+            if (formatReaders.containsKey (format)) {
+                return format;
+            }
         }
 
         // if there was a filename or url...
@@ -138,6 +141,7 @@ abstract public class FormatReader {
         }
 
         // look at the input, and see if we can deduce the input type
+        // XXX TODO
 
         return null;
     }

@@ -2,6 +2,7 @@ package com.brettonw.bag;
 
 import com.brettonw.AppTest;
 import com.brettonw.bag.json.FormatReaderJson;
+import com.brettonw.bag.json.FormatWriterJson;
 import org.junit.Test;
 
 import java.io.File;
@@ -138,10 +139,18 @@ public class BagArrayTest {
     public void testRegressionCase() {
         try {
             File testFile = new File ("data", "UCS_Satellite_Database_2-1-14.json");
-            BagArray bagArray = new BagArray (testFile);
+            BagArray bagArray = new BagArray (FormatReaderJson.JSON_FORMAT, testFile);
             AppTest.report (bagArray != null, true, "BagArray - Regression Test 1");
-            bagArray = new BagArray (FormatReaderJson.JSON_FORMAT, new FileInputStream (testFile));
+            bagArray = new BagArray (testFile);
             AppTest.report (bagArray != null, true, "BagArray - Regression Test 2");
+            bagArray = new BagArray (FormatReaderJson.JSON_FORMAT, new FileInputStream (testFile));
+            AppTest.report (bagArray != null, true, "BagArray - Regression Test 3");
+            bagArray = new BagArray (new FileInputStream (testFile));
+            AppTest.report (bagArray != null, true, "BagArray - Regression Test 4");
+
+            String string = bagArray.toString (FormatWriterJson.JSON_FORMAT);
+            bagArray = new BagArray (FormatReaderJson.JSON_FORMAT, string);
+            AppTest.report (bagArray != null, true, "BagArray - Regression Test 4");
         } catch (Exception exception) {
             AppTest.report (false, true, "BagArray - Regression Test 1 - Exception failure");
         }

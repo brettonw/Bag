@@ -12,11 +12,17 @@ public class HttpTest {
 
     @Test
     public void testGet () {
-        BagObject brettonw = Http.getForBagObject (FormatReaderJson.JSON_FORMAT, "https://api.github.com/users/brettonw");
-        AppTest.report (brettonw.getString ("login"), "brettonw", "Got a valid BagObject");
+        BagObject brettonw = Http.getForBagObject ("https://api.github.com/users/brettonw");
+        AppTest.report (brettonw.getString ("login"), "brettonw", "Got a valid BagObject - 1");
 
-        BagArray repos = Http.getForBagArray (FormatReaderJson.JSON_FORMAT, "https://api.github.com/users/brettonw/repos");
-        AppTest.report (repos.getCount () > 0, true, "Got a valid BagArray");
+        brettonw = Http.getForBagObject (FormatReaderJson.JSON_FORMAT, "https://api.github.com/users/brettonw");
+        AppTest.report (brettonw.getString ("login"), "brettonw", "Got a valid BagObject - 2");
+
+        BagArray repos = Http.getForBagArray ("https://api.github.com/users/brettonw/repos");
+        AppTest.report (repos.getCount () > 0, true, "Got a valid BagArray - 1");
+
+        repos = Http.getForBagArray (FormatReaderJson.JSON_FORMAT, "https://api.github.com/users/brettonw/repos");
+        AppTest.report (repos.getCount () > 0, true, "Got a valid BagArray - 2");
     }
 
     @Test
@@ -27,18 +33,37 @@ public class HttpTest {
                         .put ("First Name", "Bretton")
                         .put ("Last Name", "Wade")
         );
-        AppTest.report (postResponseBagObject.getString ("login"), "brettonw", "Got a valid BagObject");
+        AppTest.report (postResponseBagObject.getString ("login"), "brettonw", "Got a valid BagObject - 1");
+
+        postResponseBagObject = Http.postForBagObject (FormatReaderJson.JSON_FORMAT, "http://jsonplaceholder.typicode.com/posts/",
+                new BagObject ()
+                        .put ("login", "brettonw")
+                        .put ("First Name", "Bretton")
+                        .put ("Last Name", "Wade")
+        );
+        AppTest.report (postResponseBagObject.getString ("login"), "brettonw", "Got a valid BagObject - 2");
 
         BagArray postResponseBagArray = Http.postForBagArray (FormatReaderJson.JSON_FORMAT, "http://jsonplaceholder.typicode.com/posts/",
                 new BagArray ()
                         .add ("login")
                         .add ("brettonw")
                         .add ("First Name")
-                        .add("Bretton")
+                        .add ("Bretton")
                         .add ("Last Name")
-                        .add("Wade")
+                        .add ("Wade")
         );
-        AppTest.report (postResponseBagArray.getString (1), "brettonw", "Got a valid BagArray");
+        AppTest.report (postResponseBagArray.getString (1), "brettonw", "Got a valid BagArray - 1");
+
+        postResponseBagArray = Http.postForBagArray (FormatReaderJson.JSON_FORMAT, "http://jsonplaceholder.typicode.com/posts/",
+                new BagArray ()
+                        .add ("login")
+                        .add ("brettonw")
+                        .add ("First Name")
+                        .add ("Bretton")
+                        .add ("Last Name")
+                        .add ("Wade")
+        );
+        AppTest.report (postResponseBagArray.getString (1), "brettonw", "Got a valid BagArray - 2");
     }
 
     @Test
