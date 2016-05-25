@@ -40,6 +40,7 @@ public class BagArrayTest {
 
     @Test
     public void testCopyConstructor() {
+        try {
         // a first basic test
         BagArray bagArray = new BagArray ()
                 .add ("abdefg")
@@ -51,6 +52,9 @@ public class BagArrayTest {
 
         BagArray duplicate = new BagArray (bagArray);
         AppTest.report (bagArray, duplicate, "BagArray - deep copy should succeed and be equal to the original");
+        } catch (IOException exception) {
+            AppTest.report (false, true, "An exception is a failure case");
+        }
     }
 
     @Test

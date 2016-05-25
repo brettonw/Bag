@@ -117,59 +117,57 @@ abstract public class FormatReader {
         }
     }
 
-    public static String deduceFormat (String format, String fileName, String notFound) {
+    public static String deduceFormat (String format, String name, String input) {
         // did the user tell us? if so, go with it...
         if (format != null) {
-            return format;
+            return format.toLowerCase ();
         }
 
-        // if there was a filename
-        if (fileName != null) {
-            int i = fileName.lastIndexOf('.');
-            String extension = (i > 0) ? fileName.substring (i + 1).toLowerCase () : null;
+        // if there was a filename or url...
+        if (name != null) {
+            int i = name.lastIndexOf('.');
+            String extension = (i > 0) ? name.substring (i + 1).toLowerCase () : null;
             if ((extension != null) && formatReaders.containsKey (extension)) {
                 return extension;
             }
         }
 
-        // ok, what if there is only one file reader (probably a normal case)
+        // ok, what if there is only one registered reader (probably a normal case)
         if (formatReaders.size () == 1) {
             return (String) formatReaders.keySet ().toArray ()[0];
         }
 
-        // if we had the input, we could maybe query on that...
+        // look at the input, and see if we can deduce the input type
 
-        return notFound;
+        return null;
     }
 
-    private static String readInput (Reader input) throws IOException {
-        BufferedReader bufferedReader = new BufferedReader (input);
+    private static FormatReader getFormatReader (String format, String name, Reader reader) throws IOException {
+        // read the input into the source string we will use
+        BufferedReader bufferedReader = new BufferedReader (reader);
         StringBuilder stringBuilder = new StringBuilder ();
         String line;
         while ((line = bufferedReader.readLine ()) != null) {
             stringBuilder.append (line).append ('\n');
         }
         bufferedReader.close ();
-        return stringBuilder.toString ();
-    }
+        String input = stringBuilder.toString ();
 
-    public static BagArray read (BagArray bagArray, String format, Reader reader) throws IOException {
-        String input = readInput (reader);
-        format = format.toLowerCase ();
-        if (formatReaders.containsKey(format)) {
-            FormatReader formatReader = formatReaders.get(format).apply (input);
-            return formatReader.read (bagArray);
+        // deduce the format, and create the format reader
+        format = deduceFormat (format, name, input);
+        if ((format != null) && formatReaders.containsKey(format)) {
+            return formatReaders.get(format).apply (input);
         }
         return null;
     }
 
-    public static BagObject read (BagObject bagObject, String format, Reader reader) throws IOException {
-        String input = readInput (reader);
-        format = format.toLowerCase ();
-        if (formatReaders.containsKey(format)) {
-            FormatReader formatReader = formatReaders.get(format).apply (input);
-            return formatReader.read (bagObject);
-        }
-        return null;
+    public static BagArray read (BagArray bagArray, String format, String name, Reader reader) throws IOException {
+        FormatReader formatReader = getFormatReader (format, name, reader);
+        return (formatReader != null) ? formatReader.read (bagArray) : null;
+    }
+
+    public static BagObject read (BagObject bagObject, String format, String name, Reader reader) throws IOException {
+        FormatReader formatReader = getFormatReader (format, name, reader);
+        return (formatReader != null) ? formatReader.read (bagObject) : null;
     }
 }

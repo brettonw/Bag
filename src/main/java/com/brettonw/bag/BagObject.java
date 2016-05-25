@@ -1,6 +1,5 @@
 package com.brettonw.bag;
 
-import com.brettonw.bag.json.FormatReaderJson;
 import com.brettonw.bag.json.FormatWriterJson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -49,14 +48,9 @@ public class BagObject extends Bag {
     /**
      * Create a new BagObject as deep copy of another BagObject
      */
-    public BagObject (BagObject bagObject) {
-        try {
-            init (bagObject.getCount (), FormatReaderJson.JSON_FORMAT, new StringReader (bagObject.toString (FormatWriterJson.JSON_FORMAT)));
-        } catch (IOException exception) {
-            // NOTE this should never happen unless there is a bug we don't know about, and I can't
-            // generate a test case to cover it, so it reports as a lack of coverage
-            log.error (exception);
-        }
+    public BagObject (BagObject bagObject) throws IOException, ReadException {
+        Reader reader = new StringReader (bagObject.toString (FormatWriterJson.JSON_FORMAT));
+        init (bagObject.getCount (), null, null, reader);
     }
 
     /**
@@ -64,7 +58,7 @@ public class BagObject extends Bag {
      * @throws ReadException if the parser fails and the object is left in an unusable state
      */
     public BagObject (String formattedString) throws IOException, ReadException {
-        init (DEFAULT_CONTAINER_SIZE, FormatReader.deduceFormat (null, null, FormatReaderJson.JSON_FORMAT), new StringReader (formattedString));
+        init (DEFAULT_CONTAINER_SIZE, null, null, new StringReader (formattedString));
     }
 
     /**
@@ -73,7 +67,7 @@ public class BagObject extends Bag {
      * @throws ReadException if the parser fails and the object is left in an unusable state
      */
     public BagObject (String format, String formattedString) throws IOException, ReadException {
-        init (DEFAULT_CONTAINER_SIZE, FormatReader.deduceFormat (format, null, FormatReaderJson.JSON_FORMAT), new StringReader (formattedString));
+        init (DEFAULT_CONTAINER_SIZE, format, null, new StringReader (formattedString));
     }
 
     /**
@@ -82,7 +76,7 @@ public class BagObject extends Bag {
      * @throws ReadException if the parser fails and the object is left in an unusable state
      */
     public BagObject (String format, InputStream formattedInputStream) throws IOException, ReadException {
-        init (DEFAULT_CONTAINER_SIZE, FormatReader.deduceFormat (format, null, FormatReaderJson.JSON_FORMAT), new InputStreamReader (formattedInputStream));
+        init (DEFAULT_CONTAINER_SIZE, format, null, new InputStreamReader (formattedInputStream));
     }
 
     /**
@@ -90,7 +84,7 @@ public class BagObject extends Bag {
      * @throws ReadException if the parser fails and the object is left in an unusable state
      */
     public BagObject (File formattedFile) throws IOException, ReadException {
-        init (DEFAULT_CONTAINER_SIZE, FormatReader.deduceFormat (null, formattedFile.getName (), FormatReaderJson.JSON_FORMAT), new FileReader (formattedFile));
+        init (DEFAULT_CONTAINER_SIZE, null, formattedFile.getName (), new FileReader (formattedFile));
     }
 
     /**
@@ -99,7 +93,7 @@ public class BagObject extends Bag {
      * @throws ReadException if the parser fails and the object is left in an unusable state
      */
     public BagObject (String format, File formattedFile) throws IOException, ReadException {
-        init (DEFAULT_CONTAINER_SIZE, FormatReader.deduceFormat (format, formattedFile.getName (), FormatReaderJson.JSON_FORMAT), new FileReader (formattedFile));
+        init (DEFAULT_CONTAINER_SIZE, format, formattedFile.getName (), new FileReader (formattedFile));
     }
 
     private void init (int containerSize) {
@@ -107,9 +101,9 @@ public class BagObject extends Bag {
         container = new Pair[Math.max (containerSize, 1)];
     }
 
-    private void init (int containerSize, String format, Reader reader) throws IOException, ReadException {
+    private void init (int containerSize, String format, String name, Reader reader) throws IOException, ReadException {
         init (containerSize);
-        if (FormatReader.read (this, format, reader) == null) {
+        if (FormatReader.read (this, format, name, reader) == null) {
             throw new ReadException ();
         }
     }

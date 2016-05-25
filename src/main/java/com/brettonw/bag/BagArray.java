@@ -43,14 +43,9 @@ public class BagArray extends Bag {
     /**
      * Create a new BagArray as deep copy of another BagArray
      */
-    public BagArray (BagArray bagArray) {
-        try {
-            init (bagArray.getCount (), FormatReaderJson.JSON_FORMAT, new StringReader (bagArray.toString (FormatWriterJson.JSON_FORMAT)));
-        } catch (Exception exception) {
-            // NOTE this should never happen unless there is a bug we don't know about, and I can't
-            // generate a test case to cover it, so it reports as a lack of coverage
-            log.error (exception);
-        }
+    public BagArray (BagArray bagArray) throws IOException, ReadException {
+            Reader reader = new StringReader (bagArray.toString (FormatWriterJson.JSON_FORMAT));
+            init (bagArray.getCount (), FormatReaderJson.JSON_FORMAT, null, reader);
     }
 
     /**
@@ -58,7 +53,7 @@ public class BagArray extends Bag {
      * @throws ReadException if the parser fails and the array is left in an unusable state
      */
     public BagArray (String formattedString) throws IOException, ReadException {
-        init (START_SIZE, FormatReader.deduceFormat (null, null, FormatReaderJson.JSON_FORMAT), new StringReader (formattedString));
+        init (START_SIZE, null, null, new StringReader (formattedString));
     }
 
     /**
@@ -66,7 +61,7 @@ public class BagArray extends Bag {
      * @throws ReadException if the parser fails and the array is left in an unusable state
      */
     public BagArray (String format, String formattedString) throws IOException, ReadException {
-        init (START_SIZE, FormatReader.deduceFormat (format, null, FormatReaderJson.JSON_FORMAT), new StringReader (formattedString));
+        init (START_SIZE, format, null, new StringReader (formattedString));
     }
 
     /**
@@ -74,7 +69,7 @@ public class BagArray extends Bag {
      * @throws ReadException if the parser fails and the array is left in an unusable state
      */
     public BagArray (String format, InputStream formattedInputStream) throws IOException, ReadException {
-        init (START_SIZE, FormatReader.deduceFormat (format, null, FormatReaderJson.JSON_FORMAT), new InputStreamReader (formattedInputStream));
+        init (START_SIZE, format, null, new InputStreamReader (formattedInputStream));
     }
 
     /**
@@ -82,7 +77,7 @@ public class BagArray extends Bag {
      * @throws ReadException if the parser fails and the array is left in an unusable state
      */
     public BagArray (File formattedFile) throws IOException, ReadException {
-        init (START_SIZE, FormatReader.deduceFormat (null, formattedFile.getName (), FormatReaderJson.JSON_FORMAT), new FileReader (formattedFile));
+        init (START_SIZE, null, formattedFile.getName (), new FileReader (formattedFile));
     }
 
     /**
@@ -90,7 +85,7 @@ public class BagArray extends Bag {
      * @throws ReadException if the parser fails and the array is left in an unusable state
      */
     public BagArray (String format, File formattedFile) throws IOException, ReadException {
-        init (START_SIZE, FormatReader.deduceFormat (format, formattedFile.getName (), FormatReaderJson.JSON_FORMAT), new FileReader (formattedFile));
+        init (START_SIZE, format, formattedFile.getName (), new FileReader (formattedFile));
     }
 
     private void init (int containerSize) {
@@ -98,9 +93,9 @@ public class BagArray extends Bag {
         container = new Object[Math.max (containerSize, 1)];
     }
 
-    private void init (int containerSize, String format, Reader reader) throws IOException, ReadException {
+    private void init (int containerSize, String format, String name, Reader reader) throws IOException, ReadException {
         init (containerSize);
-        if (FormatReader.read (this, format, reader) == null) {
+        if (FormatReader.read (this, format, name, reader) == null) {
             throw new ReadException ();
         }
     }
