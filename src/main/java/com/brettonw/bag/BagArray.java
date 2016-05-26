@@ -7,6 +7,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
+import java.util.Arrays;
 
 /**
  * A collection of text-based values stored in a zero-based indexed array.
@@ -45,8 +46,8 @@ public class BagArray extends Bag implements Selectable<BagArray> {
      * Create a new BagArray as deep copy of another BagArray
      */
     public BagArray (BagArray bagArray) throws IOException, ReadException {
-            Reader reader = new StringReader (bagArray.toString (FormatWriterJson.JSON_FORMAT));
-            init (bagArray.getCount (), FormatReaderJson.JSON_FORMAT, null, reader);
+        Reader reader = new StringReader (bagArray.toString (FormatWriterJson.JSON_FORMAT));
+        init (bagArray.getCount (), FormatReaderJson.JSON_FORMAT, null, reader);
     }
 
     /**
@@ -392,8 +393,88 @@ public class BagArray extends Bag implements Selectable<BagArray> {
         return this;
     }
 
+    /**
+     *
+     * @param sortKeys array of sort keys like [ { "key":"key1" }, { "key":"key2", "type":"alphabetic"}, { "key":"key2", "type":"numeric", "order":"ascending"} ]
+     * @return
+     */
     public BagArray sort (BagArray sortKeys) {
-        // XXX TODO
+        // if no sortKey is provided, set up a default sortKey with null key and default type and
+        // order, so we can proceed
+        if (sortKeys == null) {
+            sortKeys = new BagArray ();
+        }
+        if (sortKeys.getCount () == 0) {
+            sortKeys.add (new BagObject ());
+        }
+
+        // create the sort keys as a native type since we'll be referencing it a lot
+        SortKey[] keys = new SortKey[sortKeys.getCount ()];
+        for (int i = 0, end = sortKeys.getCount (); i < end; ++i) {
+            keys[i] = new SortKey (sortKeys.getBagObject (i));
+        }
+
+        // if there is no key
+        if (keys[0].key == null) {
+            // we'll treat the array as strings or bare value, and just sort it
+            switch (keys[0].type) {
+                case ALPHABETIC:
+                    switch (keys[0].order) {
+                        case ASCENDING:
+                            Arrays.sort (container, 0, count, (Object a, Object b) -> { return ((String) a).compareTo ((String) b); } );
+                            break;
+                        case DESCENDING:
+                            Arrays.sort (container, 0, count, (Object a, Object b) -> { return ((String) b).compareTo ((String) a); } );
+                            break;
+                    }
+                    break;
+                case NUMERIC:
+                    switch (keys[0].order) {
+                        case ASCENDING:
+                            Arrays.sort (container, 0, count, (Object a, Object b) -> { return (new Double ((String) a).compareTo (new Double ((String) b))); } );
+                            break;
+                        case DESCENDING:
+                            Arrays.sort (container, 0, count, (Object a, Object b) -> { return (new Double ((String) b).compareTo (new Double ((String) a))); } );
+                            break;
+                    }
+                    break;
+            }
+        } else {
+            // we'll sort using the keys hierarchically...
+            Arrays.sort (container, 0, count, (Object a, Object b) -> {
+                for (int i = 0, end = keys.length; i < end; ++i) {
+                    Object objectA = (a != null) ? ((Bag) a).getObject (keys[i].key) : null;
+                    Object objectB = (b != null) ? ((Bag) b).getObject (keys[i].key) : null;
+                    int cmp = 0;
+
+                    switch (keys[i].type) {
+                        case ALPHABETIC:
+                            switch (keys[i].order) {
+                                case ASCENDING:
+                                    cmp = ((String) objectA).compareTo ((String) objectB);
+                                    break;
+                                case DESCENDING:
+                                    cmp = ((String) objectB).compareTo ((String) objectA);
+                                    break;
+                            }
+                            break;
+                        case NUMERIC:
+                            switch (keys[i].order) {
+                                case ASCENDING:
+                                    cmp = (new Double ((String) objectA).compareTo (new Double ((String) objectB)));
+                                case DESCENDING:
+                                    cmp = (new Double ((String) objectB).compareTo (new Double ((String) objectA)));
+                            }
+                            break;
+                    }
+
+                    if (cmp != 0) {
+                        return cmp;
+                    }
+                }
+                return 0;
+            } );
+        }
         return this;
     }
 
@@ -410,13 +491,9 @@ public class BagArray extends Bag implements Selectable<BagArray> {
 
         // loop over all of the objects
         for (Object object : container) {
-            // loop over all of the conditions in the 'match' object to determine if the current
-            // object should be accepted
-
-            // it's a bag type and can be queried using 'getObject'
             if (object instanceof Bag) {
-                Bag bag = (Bag) object;
                 // try to match the 'match' clause
+                Bag bag = (Bag) object;
                 boolean matches = (match == null) || bag.match (match);
                 if (matches) {
                     // select the desired parts

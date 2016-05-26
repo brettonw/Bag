@@ -212,13 +212,18 @@ public class BagArrayTest {
     }
 
     @Test
-    public void testQuery () {
+    public void testQueryAndSort () {
         try {
             File testFile = new File ("data", "UCS_Satellite_Database_2-1-14.json");
             BagArray bagArray = new BagArray (testFile);
             BooleanExpr equality = Exprs.equality ("Country of Operator/Owner", "USA");
-            BagArray queried = bagArray.query (equality, new BagArray().add ("Current Official Name of Satellite"));
+            BagArray queried = bagArray.query (equality, new BagArray().add ("Current Official Name of Satellite").add ("Country of Operator/Owner"));
             AppTest.report (queried.getCount () > 0, true, "Queried Array returned some results");
+            AppTest.report (queried.getString ("53/Country of Operator/Owner"), "USA", "Query results for #53 should match the query");
+
+            // now try sorting
+            queried.sort (new BagArray ().add (new BagObject ().put (SortKey.KEY, "Current Official Name of Satellite")));
+            AppTest.report (queried.getString ("36/Country of Operator/Owner"), "USA", "Query results for #36 should match the query");
         } catch (Exception exception) {
             log.error (exception);
             exception.printStackTrace ();
