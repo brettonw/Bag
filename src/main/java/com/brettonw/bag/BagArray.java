@@ -1,5 +1,6 @@
 package com.brettonw.bag;
 
+import com.brettonw.bag.expr.BooleanExpr;
 import com.brettonw.bag.json.FormatReaderJson;
 import com.brettonw.bag.json.FormatWriterJson;
 import org.apache.logging.log4j.LogManager;
@@ -14,7 +15,7 @@ import java.io.*;
  * efficiently with dynamic storage of very large numbers of elements (more than 1,000s). It will
  * work, but we have not chosen to focus on this as a potential use-case.
  */
-public class BagArray extends Bag {
+public class BagArray extends Bag implements Selectable<BagArray> {
     private static final Logger log = LogManager.getLogger (BagArray.class);
 
     private static final int START_SIZE = 1;
@@ -373,5 +374,62 @@ public class BagArray extends Bag {
     @Override
     public String toString (String format) {
         return FormatWriter.write (this, format);
+    }
+
+    @Override
+    public BagArray select (BagArray select) {
+        if ((select != null) && (select.getCount () > 0)) {
+            BagArray bagArray = new BagArray ();
+            for (int i = 0, end = select.getCount (); i < end; ++i) {
+                Integer index = select.getInteger (i);
+                if (index != null) {
+                    Object object = getObject (index);
+                    bagArray.add (object);
+                }
+            }
+            return bagArray;
+        }
+        return this;
+    }
+
+    public BagArray sort (BagArray sortKeys) {
+        // XXX TODO
+        return this;
+    }
+
+    /**
+     *
+     * @param match a BooleanExpr describing the match criteria
+     * @param selectKeys a BagArray of the key names to extract
+     * @return
+     */
+    public BagArray query (BooleanExpr match, BagArray selectKeys) {
+        // create the destination
+
+        BagArray bagArray = new BagArray ();
+
+        // loop over all of the objects
+        for (Object object : container) {
+            // loop over all of the conditions in the 'match' object to determine if the current
+            // object should be accepted
+
+            // it's a bag type and can be queried using 'getObject'
+            if (object instanceof Bag) {
+                Bag bag = (Bag) object;
+                // try to match the 'match' clause
+                boolean matches = (match == null) || bag.match (match);
+                if (matches) {
+                    // select the desired parts
+                    object = ((Selectable) bag).select (selectKeys);
+                    bagArray.add (object);
+                }
+            } else if (object instanceof String){
+                // XXX TODO
+                // it's a string, 'match' needs to be { field:"*",... } or not have field
+            } else {
+                // skip it, don't know what it is
+            }
+        }
+        return bagArray;
     }
 }

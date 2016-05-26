@@ -21,6 +21,10 @@ abstract public class FormatReader {
     protected int lastLineIndex;
     protected boolean error;
 
+    /**
+     *
+     * @param input
+     */
     public FormatReader (String input) {
         this.input = input;
         inputLength = input.length ();
@@ -29,6 +33,10 @@ abstract public class FormatReader {
         lastLineIndex = 0;
     }
 
+    /**
+     *
+     * @return
+     */
     protected boolean check () {
         return (! error) && (index < inputLength);
     }
@@ -53,6 +61,11 @@ abstract public class FormatReader {
         }
     }
 
+    /**
+     *
+     * @param c
+     * @return
+     */
     protected boolean expect(char c) {
         consumeWhiteSpace ();
 
@@ -64,10 +77,21 @@ abstract public class FormatReader {
         return false;
     }
 
+    /**
+     *
+     * @param c
+     * @return
+     */
     protected boolean require(char c) {
         return require (expect (c), "'" + c + "'");
     }
 
+    /**
+     *
+     * @param condition
+     * @param explanation
+     * @return
+     */
     protected boolean require (boolean condition, String explanation) {
         if (! condition) {
             onReadError (explanation + " REQUIRED");
@@ -75,6 +99,10 @@ abstract public class FormatReader {
         return condition;
     }
 
+    /**
+     *
+     * @param errorMessage
+     */
     protected void onReadError (String errorMessage) {
 
         // log the messages, we only need to output the line if this is the first time the error is
@@ -104,12 +132,29 @@ abstract public class FormatReader {
         }
     }
 
+    /**
+     *
+     * @param bagArray
+     * @return
+     */
     abstract public BagArray read (BagArray bagArray);
+
+    /**
+     *
+     * @param bagObject
+     * @return
+     */
     abstract public BagObject read (BagObject bagObject);
 
     // static type registration by name
     private static final Map<String, Function<String, FormatReader>> formatReaders = new HashMap<> ();
 
+    /**
+     *
+     * @param format
+     * @param replace
+     * @param factory
+     */
     public static void registerFormatReader (String format, boolean replace, Function<String, FormatReader> factory) {
         format = format.toLowerCase ();
         if ((! replace) || (! formatReaders.containsKey(format))) {
@@ -117,7 +162,7 @@ abstract public class FormatReader {
         }
     }
 
-    public static String deduceFormat (String format, String name, String input) {
+    private static String deduceFormat (String format, String name, String input) {
         // did the user tell us? if so, go with it...
         if (format != null) {
             format = format.toLowerCase ();
@@ -165,11 +210,29 @@ abstract public class FormatReader {
         return null;
     }
 
+    /**
+     *
+     * @param bagArray
+     * @param format
+     * @param name
+     * @param reader
+     * @return
+     * @throws IOException
+     */
     public static BagArray read (BagArray bagArray, String format, String name, Reader reader) throws IOException {
         FormatReader formatReader = getFormatReader (format, name, reader);
         return (formatReader != null) ? formatReader.read (bagArray) : null;
     }
 
+    /**
+     *
+     * @param bagObject
+     * @param format
+     * @param name
+     * @param reader
+     * @return
+     * @throws IOException
+     */
     public static BagObject read (BagObject bagObject, String format, String name, Reader reader) throws IOException {
         FormatReader formatReader = getFormatReader (format, name, reader);
         return (formatReader != null) ? formatReader.read (bagObject) : null;

@@ -9,7 +9,7 @@ import java.io.*;
 /**
  * A collection of text-based values store in key/value pairs (maintained in a sorted array).
  */
-public class BagObject extends Bag {
+public class BagObject extends Bag implements Selectable<BagObject> {
     private static final Logger log = LogManager.getLogger (BagObject.class);
 
     private static final int DEFAULT_CONTAINER_SIZE = 1;
@@ -400,5 +400,23 @@ public class BagObject extends Bag {
     @Override
     public String toString (String format) {
         return FormatWriter.write (this, format);
+    }
+
+    @Override
+    public BagObject select (BagArray select) {
+        if ((select != null) && (select.getCount () > 0)) {
+            BagObject bagObject = new BagObject ();
+            for (int i = 0, end = select.getCount (); i < end; ++i) {
+                String key = select.getString (i);
+                if (key != null) {
+                    Object object = getObject (key);
+                    if (object != null) {
+                        bagObject.put (key, object);
+                    }
+                }
+            }
+            return bagObject;
+        }
+        return this;
     }
 }

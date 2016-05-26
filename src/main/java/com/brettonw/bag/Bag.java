@@ -1,13 +1,13 @@
 package com.brettonw.bag;
 
+import com.brettonw.bag.expr.BooleanExpr;
 import com.brettonw.bag.json.FormatReaderJson;
 import com.brettonw.bag.json.FormatWriterJson;
 import org.apache.logging.log4j.util.Supplier;
 
-import java.io.File;
 import java.util.function.Function;
 
-abstract class Bag {
+abstract public class Bag {
     Object objectify (Object value) {
         if (value != null) {
             Class type = value.getClass ();
@@ -37,7 +37,27 @@ abstract class Bag {
         return null;
     }
 
+    /**
+     *
+     * @param key
+     * @return
+     */
     abstract public Object getObject (String key);
+
+    /**
+     * Returns true if the Selectable matches the 'match' criteria
+     * @param booleanExpr a BooleanExpr containing criteria, it specifies an operator and its arguments:
+     *              { "operator":"=", "left":{ "key", "fieldName" }, "right":{ "value":100 } }
+     *              { "operator":">", "left":{ "key", "fieldName2" }, "right":{ "key":"fieldName3" } }
+     *              { "operator":"and", "left":{ "key", "fieldName" }, "right":{ "key":"fieldName2" } }
+     * @return
+     */
+    public boolean match (BooleanExpr booleanExpr) {
+        if (booleanExpr != null) {
+            return booleanExpr.evaluateIsTrue (this);
+        }
+        return true;
+    }
 
     /**
      * Retrieve a mapped element and return it as a String.
@@ -215,6 +235,11 @@ abstract class Bag {
         return getParsed (key, Float::new, notFound);
     }
 
+    /**
+     *
+     * @param object
+     * @return
+     */
     @Override
     public boolean equals (Object object) {
         return (getClass ().equals (object.getClass ())) &&
@@ -226,6 +251,11 @@ abstract class Bag {
         return toString ().hashCode ();
     }
 
+    /**
+     *
+     * @param format
+     * @return
+     */
     abstract public String toString (String format);
 
     @Override

@@ -17,7 +17,7 @@ public class Http {
     Http () {}
 
     @FunctionalInterface
-    public interface ReadFunction<BagType extends Bag, ExceptionType extends Throwable> {
+    interface ReadFunction<BagType extends Bag, ExceptionType extends Throwable> {
         BagType read(BagType bagType, String format, String name, Reader reader) throws ExceptionType;
     }
 

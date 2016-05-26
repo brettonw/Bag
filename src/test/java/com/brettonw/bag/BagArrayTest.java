@@ -1,8 +1,12 @@
 package com.brettonw.bag;
 
 import com.brettonw.AppTest;
+import com.brettonw.bag.expr.BooleanExpr;
+import com.brettonw.bag.expr.Exprs;
 import com.brettonw.bag.json.FormatReaderJson;
 import com.brettonw.bag.json.FormatWriterJson;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.Test;
 
 import java.io.File;
@@ -12,6 +16,8 @@ import java.io.IOException;
 import static org.junit.Assert.assertEquals;
 
 public class BagArrayTest {
+    private static final Logger log = LogManager.getLogger (BagArrayTest.class);
+
     @Test
     public void testBagArray() {
         try {
@@ -203,5 +209,20 @@ public class BagArrayTest {
         AppTest.report (bagObject.getString ("a/#last/x"), "y", "Hierarchical indexing of arrays using strings - 2");
         AppTest.report (bagObject.getString ("a/0/x"), "y", "Hierarchical indexing of arrays using strings - 3");
         AppTest.report (bagObject.getString ("a/100/x"), null, "Hierarchical indexing of arrays using strings - 4");
+    }
+
+    @Test
+    public void testQuery () {
+        try {
+            File testFile = new File ("data", "UCS_Satellite_Database_2-1-14.json");
+            BagArray bagArray = new BagArray (testFile);
+            BooleanExpr equality = Exprs.equality ("Country of Operator/Owner", "USA");
+            BagArray queried = bagArray.query (equality, new BagArray().add ("Current Official Name of Satellite"));
+            AppTest.report (queried.getCount () > 0, true, "Queried Array returned some results");
+        } catch (Exception exception) {
+            log.error (exception);
+            exception.printStackTrace ();
+            AppTest.report (true, false, "Query of array should succeed");
+        }
     }
 }
