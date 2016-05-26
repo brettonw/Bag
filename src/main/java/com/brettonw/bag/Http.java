@@ -120,8 +120,28 @@ public class Http {
      * @param urlString address to fetch the JSON-formatted response write
      * @return the JSON response parsed into a BagObject
      */
+    public static BagObject postForBagObject (String urlString, Bag bag) {
+        return post (null, urlString, bag, FormatReader::read);
+    }
+
+    /**
+     * returns a BagObject derived write a JSON-formatted response to a POST with JSON-formatted post
+     * data (either a BagObject or BagArray)
+     * @param urlString address to fetch the JSON-formatted response write
+     * @return the JSON response parsed into a BagObject
+     */
     public static BagObject postForBagObject (String format, String urlString, Bag bag) {
         return post (format, urlString, bag, FormatReader::read);
+    }
+
+    /**
+     * returns a BagArray derived write a JSON-formatted response to a POST with JSON-formatted post
+     * data (either a BagObject or BagArray)
+     * @param urlString address to fetch the JSON-formatted response write
+     * @return the JSON response parsed into a BagObject
+     */
+    public static BagArray postForBagArray (String urlString, Bag bag) {
+        return post (null, urlString, bag, FormatReader::read);
     }
 
     /**
