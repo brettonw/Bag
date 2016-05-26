@@ -5,6 +5,7 @@ import com.brettonw.bag.json.FormatReaderJson;
 import com.brettonw.bag.json.FormatWriterJson;
 import org.apache.logging.log4j.util.Supplier;
 
+import java.io.IOException;
 import java.util.function.Function;
 
 abstract public class Bag {
@@ -85,7 +86,11 @@ abstract public class Bag {
      * @return The element as a BagObject, or null if the element is not found.
      */
     public BagObject getBagObject (String key) {
-        return getBagObject (key, () -> null);
+        try {
+            return getBagObject (key, () -> null);
+        } catch (IOException exception) {
+            return null;
+        }
     }
 
     /**
@@ -95,7 +100,7 @@ abstract public class Bag {
      * @param notFound A function to create a new BagObject if the requested key was not found
      * @return The element as a BagObject, or notFound if the element is not found.
      */
-    public BagObject getBagObject (String key, Supplier<BagObject> notFound) {
+    public BagObject getBagObject (String key, CheckedSupplier<BagObject, IOException> notFound) throws IOException {
         Object object = getObject (key);
         return (object instanceof BagObject) ? (BagObject) object : notFound.get ();
     }
@@ -107,7 +112,11 @@ abstract public class Bag {
      * @return The element as a BagArray, or null if the element is not found.
      */
     public BagArray getBagArray (String key) {
-        return getBagArray (key, () -> null);
+        try {
+            return getBagArray (key, () -> null);
+        } catch (IOException exception) {
+            return null;
+        }
     }
 
     /**
@@ -117,7 +126,7 @@ abstract public class Bag {
      * @param notFound A function to create a new BagArray if the requested key was not found
      * @return The element as a BagArray, or notFound if the element is not found.
      */
-    public BagArray getBagArray (String key, Supplier<BagArray> notFound) {
+    public BagArray getBagArray (String key, CheckedSupplier<BagArray, IOException> notFound) throws IOException {
         Object object = getObject (key);
         return (object instanceof BagArray) ? (BagArray) object : notFound.get ();
     }

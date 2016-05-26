@@ -188,7 +188,6 @@ public class BagObjectTest {
         } catch (IOException exception) {
             AppTest.report (false, true, "An exception is a failure case");
         }
-
     }
 
     @Test
@@ -375,5 +374,13 @@ public class BagObjectTest {
         BagObject bagObject = new BagObject ().put ("x", "abcdegoldfish");
         int hash = bagObject.hashCode ();
         AppTest.report (hash != 0, true, "test hash code (" + hash + ")");
+    }
+
+    @Test
+    public void testGetWithDefaultStringConstructor () throws IOException {
+        BagObject bagObject = new BagObject ().put ("x", "y");
+        BagObject bagObject2 = new BagObject ().put ("m", "n");
+        BagObject fetched = bagObject.getBagObject ("q", () -> new BagObject (bagObject2));
+        AppTest.report (fetched.getString ("m"), "n", "CheckedSupplier doesn't throw");
     }
 }
