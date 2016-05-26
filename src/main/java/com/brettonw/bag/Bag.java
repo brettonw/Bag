@@ -46,10 +46,7 @@ abstract public class Bag {
 
     /**
      * Returns true if the Selectable matches the 'match' criteria
-     * @param booleanExpr a BooleanExpr containing criteria, it specifies an operator and its arguments:
-     *              { "operator":"=", "left":{ "key", "fieldName" }, "right":{ "value":100 } }
-     *              { "operator":">", "left":{ "key", "fieldName2" }, "right":{ "key":"fieldName3" } }
-     *              { "operator":"and", "left":{ "key", "fieldName" }, "right":{ "key":"fieldName2" } }
+     * @param booleanExpr a BooleanExpr containing criteria:
      * @return
      */
     public boolean match (BooleanExpr booleanExpr) {
