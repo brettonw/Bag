@@ -236,7 +236,7 @@ public class BagArrayTest {
         try {
             File testFile = new File ("data", "spark-applications.json");
             BagArray bagArray = new BagArray (testFile);
-            BagArray queried = bagArray.query (Exprs.equality ("attempts/#last/completed", false), null);
+            BagArray queried = bagArray.query (Exprs.equality ("attempts/#last/completed", true), null);
             AppTest.report (queried.getCount () > 0, true, "Verify good load from sample file with query");
 
         } catch (IOException exception) {
