@@ -8,9 +8,10 @@ public class Equality extends BooleanExpr {
 
     private Expr left;
     private Expr right;
+
     public Equality (BagObject expr) {
-        left = Exprs.get (expr.getObject (Exprs.LEFT));
-        right = Exprs.get (expr.getObject (Exprs.RIGHT));
+        left = Exprs.get (expr.getObject (LEFT));
+        right = Exprs.get (expr.getObject (RIGHT));
     }
 
     @Override
@@ -18,5 +19,9 @@ public class Equality extends BooleanExpr {
         Object leftResult = left.evaluate (bag);
         Object rightResult = right.evaluate (bag);
         return (leftResult != null) ? leftResult.equals (rightResult) : (rightResult == null);
+    }
+
+    public static BagObject bag (BagObject left, BagObject right) {
+        return bag (EQUALITY, left, right);
     }
 }

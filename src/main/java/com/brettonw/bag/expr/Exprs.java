@@ -6,10 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class Exprs {
-    public static final String OPERATOR = "operator";
-    public static final String LEFT = "left";
-    public static final String RIGHT = "right";
-
     @FunctionalInterface
     interface ExprSupplier {
         Expr get (BagObject params);
@@ -27,9 +23,9 @@ public class Exprs {
             if (expr instanceof BagObject) {
                 bagObject = (BagObject) expr;
             } else if (expr instanceof String){
-                bagObject = new BagObject ().put (OPERATOR, Value.VALUE).put (Value.VALUE, expr);
+                bagObject = new BagObject ().put (Expr.OPERATOR, Value.VALUE).put (Value.VALUE, expr);
             }
-            ExprSupplier exprSupplier = exprSuppliers.get (bagObject.getString (OPERATOR));
+            ExprSupplier exprSupplier = exprSuppliers.get (bagObject.getString (Expr.OPERATOR));
             return (exprSupplier != null) ? exprSupplier.get (bagObject) : null;
         }
         return null;
@@ -42,10 +38,10 @@ public class Exprs {
     }
 
     public static BooleanExpr equality (String key, Object value) {
-        BagObject bagObject = new BagObject ()
-                .put (OPERATOR, Equality.EQUALITY)
-                .put (LEFT, new BagObject ().put (OPERATOR, Key.KEY).put (Key.KEY, key))
-                .put (RIGHT, new BagObject ().put (OPERATOR, Value.VALUE).put (Value.VALUE, value));
-        return (BooleanExpr) get (bagObject);
+        return (BooleanExpr) get (Equality.bag (Key.bag (key), Value.bag (value)));
+    }
+
+    public static BooleanExpr inequality (String key, Object value) {
+        return (BooleanExpr) get (Not.bag (Equality.bag (Key.bag (key), Value.bag (value))));
     }
 }

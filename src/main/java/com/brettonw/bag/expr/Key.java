@@ -16,4 +16,8 @@ public class Key extends Expr {
     public Object evaluate (Bag bag) {
         return bag.getObject (key);
     }
+
+    public static BagObject bag (String key) {
+        return Expr.bag (KEY).put (KEY, key);
+    }
 }

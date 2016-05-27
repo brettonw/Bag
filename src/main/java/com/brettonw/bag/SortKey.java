@@ -1,15 +1,5 @@
 package com.brettonw.bag;
 
-enum SortType {
-    ALPHABETIC,
-    NUMERIC
-}
-
-enum SortOrder {
-    ASCENDING,
-    DESCENDING
-}
-
 class SortKey {
     public static final String KEY = "key";
     public static final String TYPE = "type";

@@ -16,4 +16,8 @@ public class Value extends Expr {
     public Object evaluate (Bag bag) {
         return value;
     }
+
+    public static BagObject bag (Object value) {
+        return bag (VALUE).put (VALUE, value);
+    }
 }
