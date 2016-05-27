@@ -243,4 +243,69 @@ public class BagArrayTest {
             // whatever
         }
     }
+
+    @Test
+    public void testSort () {
+        try {
+            BagArray bagArray = new BagArray ();
+
+            int count = 20;
+
+            for (int i = 0; i < count; ++i) {
+                int random = (int) (Math.random () * 10 + 1);
+                int random2 = (int) (Math.random () * 20 + 1);
+                bagArray.add (new BagObject ().put ("id", random).put ("value", random2));
+            }
+
+            {
+                BagArray sortKeys = SortKey.keys ("id", "value");
+                BagArray sortedBagArray = new BagArray (bagArray).sort (sortKeys);
+
+                BagObject lastBagObject = sortedBagArray.getBagObject (0);
+                for (int i = 1; i < count; ++i) {
+                    BagObject nextBagObject = sortedBagArray.getBagObject (i);
+                    AppTest.report (nextBagObject.getString ("id").compareTo (lastBagObject.getString ("id")) >= 0, true, "sorted by id, alphabetic, ascending...");
+                    lastBagObject = nextBagObject;
+                }
+            }
+            {
+                BagArray sortKeys = SortKey.keys ("id", "value");
+                sortKeys.getBagObject (0).put (SortKey.ORDER, SortOrder.DESCENDING.name ());
+                BagArray sortedBagArray = new BagArray (bagArray).sort (sortKeys);
+
+                BagObject lastBagObject = sortedBagArray.getBagObject (0);
+                for (int i = 1; i < count; ++i) {
+                    BagObject nextBagObject = sortedBagArray.getBagObject (i);
+                    AppTest.report (nextBagObject.getString ("id").compareTo (lastBagObject.getString ("id")) <= 0, true, "sorted by id, alphabetic, descending...");
+                    lastBagObject = nextBagObject;
+                }
+            }
+            {
+                BagArray sortKeys = SortKey.keys ("id", "value");
+                sortKeys.getBagObject (0).put (SortKey.TYPE, SortType.NUMERIC.name ());
+                BagArray sortedBagArray = new BagArray (bagArray).sort (sortKeys);
+
+                BagObject lastBagObject = sortedBagArray.getBagObject (0);
+                for (int i = 1; i < count; ++i) {
+                    BagObject nextBagObject = sortedBagArray.getBagObject (i);
+                    AppTest.report (nextBagObject.getInteger ("id") >= lastBagObject.getInteger ("id"), true, "sorted by id, numeric, ascending...");
+                    lastBagObject = nextBagObject;
+                }
+            }
+            {
+                BagArray sortKeys = SortKey.keys ("id", "value");
+                sortKeys.getBagObject (0).put (SortKey.TYPE, SortType.NUMERIC.name ()).put (SortKey.ORDER, SortOrder.DESCENDING.name ());
+                BagArray sortedBagArray = new BagArray (bagArray).sort (sortKeys);
+
+                BagObject lastBagObject = sortedBagArray.getBagObject (0);
+                for (int i = 1; i < count; ++i) {
+                    BagObject nextBagObject = sortedBagArray.getBagObject (i);
+                    AppTest.report (nextBagObject.getInteger ("id") <= lastBagObject.getInteger ("id"), true, "sorted by id, numeric, descending...");
+                    lastBagObject = nextBagObject;
+                }
+            }
+        }catch (IOException exception) {
+            log.error (exception);
+        }
+    }
 }

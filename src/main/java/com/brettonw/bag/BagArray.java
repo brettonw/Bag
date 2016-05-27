@@ -393,6 +393,10 @@ public class BagArray extends Bag implements Selectable<BagArray> {
         return this;
     }
 
+    private int compare (Double left, Double right) {
+        return (left < right) ? -1 : (left > right) ? 1 : 0;
+    }
+
     /**
      *
      * @param sortKeys array of sort keys like [ { "key":"key1" }, { "key":"key2", "type":"alphabetic"}, { "key":"key2", "type":"numeric", "order":"ascending"} ]
@@ -421,20 +425,28 @@ public class BagArray extends Bag implements Selectable<BagArray> {
                 case ALPHABETIC:
                     switch (keys[0].order) {
                         case ASCENDING:
-                            Arrays.sort (container, 0, count, (Object a, Object b) -> { return ((String) a).compareTo ((String) b); } );
+                            Arrays.sort (container, 0, count, (Object a, Object b) -> {
+                                return ((String) a).compareTo ((String) b);
+                            } );
                             break;
                         case DESCENDING:
-                            Arrays.sort (container, 0, count, (Object a, Object b) -> { return ((String) b).compareTo ((String) a); } );
+                            Arrays.sort (container, 0, count, (Object a, Object b) -> {
+                                return ((String) b).compareTo ((String) a);
+                            } );
                             break;
                     }
                     break;
                 case NUMERIC:
                     switch (keys[0].order) {
                         case ASCENDING:
-                            Arrays.sort (container, 0, count, (Object a, Object b) -> { return (new Double ((String) a).compareTo (new Double ((String) b))); } );
+                            Arrays.sort (container, 0, count, (Object a, Object b) -> {
+                                return compare (new Double ((String) a), new Double ((String) b));
+                            } );
                             break;
                         case DESCENDING:
-                            Arrays.sort (container, 0, count, (Object a, Object b) -> { return (new Double ((String) b).compareTo (new Double ((String) a))); } );
+                            Arrays.sort (container, 0, count, (Object a, Object b) -> {
+                                return compare (new Double ((String) b), new Double ((String) a));
+                            } );
                             break;
                     }
                     break;
@@ -461,9 +473,11 @@ public class BagArray extends Bag implements Selectable<BagArray> {
                         case NUMERIC:
                             switch (keys[i].order) {
                                 case ASCENDING:
-                                    cmp = (new Double ((String) objectA).compareTo (new Double ((String) objectB)));
+                                    cmp = compare (new Double ((String) objectA), new Double ((String) objectB));
+                                    break;
                                 case DESCENDING:
-                                    cmp = (new Double ((String) objectB).compareTo (new Double ((String) objectA)));
+                                    cmp = compare (new Double ((String) objectB), new Double ((String) objectA));
+                                    break;
                             }
                             break;
                     }

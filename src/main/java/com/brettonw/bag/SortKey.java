@@ -16,4 +16,12 @@ class SortKey {
         type = Enum.valueOf (SortType.class, bagObject.getString (TYPE, () -> DEFAULT_TYPE).toUpperCase ());
         order = Enum.valueOf (SortOrder.class, bagObject.getString (ORDER, () -> DEFAULT_ORDER).toUpperCase ());
     }
+
+    public static BagArray keys (String... keys) {
+        BagArray bagArray = new BagArray (keys.length);
+        for (String key : keys) {
+            bagArray.add (new BagObject ().put (KEY, key));
+        }
+        return bagArray;
+    }
 }
