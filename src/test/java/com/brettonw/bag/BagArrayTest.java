@@ -230,4 +230,17 @@ public class BagArrayTest {
             AppTest.report (true, false, "Query of array should succeed");
         }
     }
+
+    @Test
+    public void testQuery2 () {
+        try {
+            File testFile = new File ("data", "spark-applications.json");
+            BagArray bagArray = new BagArray (testFile);
+            BagArray queried = bagArray.query (Exprs.equality ("attempts/#last/completed", false), null);
+            AppTest.report (queried.getCount () > 0, true, "Verify good load from sample file with query");
+
+        } catch (IOException exception) {
+            // whatever
+        }
+    }
 }
