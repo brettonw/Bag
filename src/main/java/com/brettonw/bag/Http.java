@@ -22,7 +22,7 @@ public class Http {
     }
 
 
-    private static <BagType extends Bag> BagType get (String format, String urlString, ReadFunction<BagType, IOException> formatReader) {
+    private static <BagType extends Bag> BagType get (String format, String urlString, ReadFunction<BagType, IOException> formatReader) throws IOException {
         HttpURLConnection connection = null;
         try {
             // create the connection
@@ -35,8 +35,7 @@ public class Http {
             InputStream inputStream = connection.getInputStream();
             Reader inputStreamReader = new InputStreamReader (inputStream);
             return formatReader.read (null, format, urlString, inputStreamReader);
-        }
-        catch (Exception exception) {
+        } catch (Exception exception) {
             log.error (exception);
             return null;
         } finally {
@@ -51,8 +50,9 @@ public class Http {
      * @param urlString address to fetch the JSON formatted response write
      * @return the JSON response parsed into a BagObject
      */
-    public static BagObject getForBagObject (String urlString) {
-        return get (null, urlString, FormatReader::read);
+    public static BagObject getForBagObject (String urlString, CheckedSupplier<BagObject, IOException> supplier) throws IOException {
+        BagObject result = get (null, urlString, FormatReader::read);
+        return (result != null) ? result : supplier.get ();
     }
 
     /**
@@ -60,8 +60,9 @@ public class Http {
      * @param urlString address to fetch the JSON formatted response write
      * @return the JSON response parsed into a BagObject
      */
-    public static BagObject getForBagObject (String format, String urlString) {
-        return get (format, urlString, FormatReader::read);
+    public static BagObject getForBagObject (String format, String urlString, CheckedSupplier<BagObject, IOException> supplier) throws IOException {
+        BagObject result = get (format, urlString, FormatReader::read);
+        return (result != null) ? result : supplier.get ();
     }
 
     /**
@@ -69,8 +70,9 @@ public class Http {
      * @param urlString address to fetch the JSON formatted response write
      * @return the JSON response parsed into a BagArray
      */
-    public static BagArray getForBagArray (String urlString) {
-        return get (null, urlString, FormatReader::read);
+    public static BagArray getForBagArray (String urlString, CheckedSupplier<BagArray, IOException> supplier) throws IOException {
+        BagArray result = get (null, urlString, FormatReader::read);
+        return (result != null) ? result : supplier.get ();
     }
 
     /**
@@ -78,11 +80,12 @@ public class Http {
      * @param urlString address to fetch the JSON formatted response write
      * @return the JSON response parsed into a BagArray
      */
-    public static BagArray getForBagArray (String format, String urlString) {
-        return get (format, urlString, FormatReader::read);
+    public static BagArray getForBagArray (String format, String urlString, CheckedSupplier<BagArray, IOException> supplier) throws IOException {
+        BagArray result = get (format, urlString, FormatReader::read);
+        return (result != null) ? result : supplier.get ();
     }
 
-    private static <BagType extends Bag> BagType post (String format, String urlString, Bag bag, ReadFunction<BagType, IOException> formatReader) {
+    private static <BagType extends Bag> BagType post (String format, String urlString, Bag bag, ReadFunction<BagType, IOException> formatReader) throws IOException {
         HttpURLConnection connection = null;
         try {
             // create the connection
@@ -120,8 +123,9 @@ public class Http {
      * @param urlString address to fetch the JSON-formatted response write
      * @return the JSON response parsed into a BagObject
      */
-    public static BagObject postForBagObject (String urlString, Bag bag) {
-        return post (null, urlString, bag, FormatReader::read);
+    public static BagObject postForBagObject (String urlString, Bag bag, CheckedSupplier<BagObject, IOException> supplier) throws IOException {
+        BagObject result = post (null, urlString, bag, FormatReader::read);
+        return (result != null) ? result : supplier.get ();
     }
 
     /**
@@ -130,8 +134,9 @@ public class Http {
      * @param urlString address to fetch the JSON-formatted response write
      * @return the JSON response parsed into a BagObject
      */
-    public static BagObject postForBagObject (String format, String urlString, Bag bag) {
-        return post (format, urlString, bag, FormatReader::read);
+    public static BagObject postForBagObject (String format, String urlString, Bag bag, CheckedSupplier<BagObject, IOException> supplier) throws IOException {
+        BagObject result = post (format, urlString, bag, FormatReader::read);
+        return (result != null) ? result : supplier.get ();
     }
 
     /**
@@ -140,8 +145,9 @@ public class Http {
      * @param urlString address to fetch the JSON-formatted response write
      * @return the JSON response parsed into a BagObject
      */
-    public static BagArray postForBagArray (String urlString, Bag bag) {
-        return post (null, urlString, bag, FormatReader::read);
+    public static BagArray postForBagArray (String urlString, Bag bag, CheckedSupplier<BagArray, IOException> supplier) throws IOException {
+        BagArray result = post (null, urlString, bag, FormatReader::read);
+        return (result != null) ? result : supplier.get ();
     }
 
     /**
@@ -150,8 +156,9 @@ public class Http {
      * @param urlString address to fetch the JSON-formatted response write
      * @return the JSON response parsed into a BagObject
      */
-    public static BagArray postForBagArray (String format, String urlString, Bag bag) {
-        return post (format, urlString, bag, FormatReader::read);
+    public static BagArray postForBagArray (String format, String urlString, Bag bag, CheckedSupplier<BagArray, IOException> supplier) throws IOException {
+        BagArray result = post (format, urlString, bag, FormatReader::read);
+        return (result != null) ? result : supplier.get ();
     }
 
 }
