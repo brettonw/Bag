@@ -406,7 +406,7 @@ public class Serializer {
      * @param <WorkingType> template parameter for the type to return
      * @return the reconstituted object, or null if the reconstitution failed.
      */
-    public static <WorkingType> WorkingType fromBag (Class type, Bag bag) {
+    public static <WorkingType> WorkingType fromBagAsType (Class type, Bag bag) {
         return (bag != null) ? (WorkingType) deserialize (type.getName (), bag) : null;
     }
 }

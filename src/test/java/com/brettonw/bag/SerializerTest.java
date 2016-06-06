@@ -312,7 +312,7 @@ public class SerializerTest {
     public void testSimpleSerializer () {
         BagObject testClassC = new BagObject ()
                 .put ("a", 1).put ("b", 2).put ("c", 3.0).put ("d", 10).put ("e", 20).put ("f", 30.0).put ("g", 30);
-        TestClassC reconC = Serializer.fromBag (TestClassC.class, testClassC);
+        TestClassC reconC = Serializer.fromBagAsType (TestClassC.class, testClassC);
         AppTest.report (reconC.getF (), testClassC.getFloat ("f"), "Simple deserialization - f");
     }
 }
