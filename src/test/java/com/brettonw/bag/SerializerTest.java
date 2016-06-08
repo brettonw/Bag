@@ -11,6 +11,7 @@ import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertArrayEquals;
 
@@ -314,5 +315,16 @@ public class SerializerTest {
                 .put ("a", 1).put ("b", 2).put ("c", 3.0).put ("d", 10).put ("e", 20).put ("f", 30.0).put ("g", 30);
         TestClassC reconC = Serializer.fromBagAsType (TestClassC.class, testClassC);
         AppTest.report (reconC.getF (), testClassC.getFloat ("f"), "Simple deserialization - f");
+    }
+
+    @Test
+    public void testMapTypeSerialization () {
+        Map<String, String> map = new HashMap<> (5);
+        map.put ("he", "she");
+        map.put ("whe", "when");
+        map.put ("the", "they");
+        map.put ("che", "chen");
+        BagObject bagObject = Serializer.toBagObject (map);
+        Map<String, String> recon = Serializer.fromBagObject (bagObject);
     }
 }
