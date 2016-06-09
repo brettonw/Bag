@@ -1,4 +1,4 @@
-package com.brettonw.bag.test;
+package com.brettonw.bag.classloader;
 
 public enum TestEnumXYZ {
     ABC("ABC"),

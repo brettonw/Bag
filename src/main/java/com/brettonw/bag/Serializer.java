@@ -41,7 +41,10 @@ public class Serializer {
     }
 
     private static ClassLoader getClassLoader () {
-        return Thread.currentThread ().getContextClassLoader ();
+        //return Thread.currentThread ().getContextClassLoader ();
+        return Serializer.class.getClassLoader ();
+
+        // walk the call stack to find the next different class loader...
     }
 
     private static Class getClass (String typeString) throws ClassNotFoundException {

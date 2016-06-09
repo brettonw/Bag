@@ -1,4 +1,4 @@
-package com.brettonw.bag.test;
+package com.brettonw.bag.classloader;
 
 public class TestClassE {
     private String e;
