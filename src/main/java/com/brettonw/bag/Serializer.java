@@ -40,6 +40,14 @@ public class Serializer {
         BOXED_TYPES.put ("double", Double.class);
     }
 
+    private static ClassLoader getClassLoader () {
+        return Thread.currentThread ().getContextClassLoader ();
+    }
+
+    private static Class getClass (String typeString) throws ClassNotFoundException {
+        return getClassLoader ().loadClass (typeString);
+    }
+
     // different types of objects are handled differently by the serializer, this is roughly how we
     // group those types
     enum SerializationType {
@@ -71,7 +79,7 @@ public class Serializer {
     private static Class getBoxedType (String typeString) throws ClassNotFoundException {
         return BOXED_TYPES.containsKey (typeString)
                 ? BOXED_TYPES.get (typeString)
-                : ClassLoader.getSystemClassLoader ().loadClass (typeString);
+                : getClass (typeString);
     }
 
     private static SerializationType serializationType (Class type) {
@@ -207,7 +215,7 @@ public class Serializer {
     }
 
     private static Object deserializeJavaEnumType (String typeString, Object object) throws ClassNotFoundException {
-        Class type = ClassLoader.getSystemClassLoader ().loadClass (typeString);
+        Class type = getClass (typeString);
         return Enum.valueOf (type, (String) object);
     }
 
@@ -216,8 +224,7 @@ public class Serializer {
 
         // get the local classloader, and try to get the requested type from it
         // "In this dirty old part of the city, Where the sun refused to shine..."
-        ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        Class type = classLoader.loadClass (typeString);
+        Class type = getClass (typeString);
 
         // instantiate the object using the serialization interface, this should effectively create
         // the object without any initialization. we will do that next.
@@ -253,7 +260,7 @@ public class Serializer {
     }
 
     private static Object deserializeCollectionType (String typeString, Object object) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        Class type = ClassLoader.getSystemClassLoader ().loadClass (typeString);
+        Class type = getClass (typeString);
         Collection target = (Collection) type.newInstance ();
         BagArray bagArray = (BagArray) object;
         for (int i = 0, end = bagArray.getCount (); i < end; ++i) {
@@ -263,7 +270,7 @@ public class Serializer {
     }
 
     private static Object deserializeMapType (String typeString, Object object) throws ClassNotFoundException, IllegalAccessException, InstantiationException {
-        Class type = ClassLoader.getSystemClassLoader ().loadClass (typeString);
+        Class type = getClass (typeString);
         Map target = (Map) type.newInstance ();
         BagArray bagArray = (BagArray) object;
         for (int i = 0, end = bagArray.getCount (); i < end; ++i) {
@@ -300,11 +307,10 @@ public class Serializer {
 
         // if we get here, the type is either a class name, or ???
         if (typeName.charAt (arrayDepth) == 'L') {
-            ClassLoader classLoader = ClassLoader.getSystemClassLoader ();
             int semiColon = typeName.indexOf (';');
             typeName = typeName.substring (arrayDepth + 1, semiColon);
             // note that this could throw ClassNotFound if the typeName is not legitimate.
-            return classLoader.loadClass (typeName);
+            return getClass (typeName);
         }
 
         // this will only happen if we are deserializing write modified source
