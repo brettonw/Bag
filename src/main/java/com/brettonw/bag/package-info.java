@@ -38,7 +38,7 @@
  * <p>
  * In a special case, some users have reported failures when trying to store JSON strings into a
  * BagObject. This is not a supported usage for the reasons outlined above. Users interested in
- * storing JSON should consider simply storing the populated BagObject represented by the JSON ,
+ * storing JSON should consider simply storing the populated BagObject represented by the JSON
  * string, or serializing the structure directly into the BagObject format.
  * <p>
  * <strong>Hierarchical Indexing</strong><br>
