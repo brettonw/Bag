@@ -214,8 +214,10 @@ public class Serializer {
     private static Object deserializeJavaObjectType (String typeString, Object object) throws ClassNotFoundException, IllegalAccessException, NoSuchMethodException, InstantiationException, InvocationTargetException {
         Object target;
 
-        // get the type
-        Class type = ClassLoader.getSystemClassLoader ().loadClass (typeString);
+        // get the local classloader, and try to get the requested type from it
+        // "In this dirty old part of the city, Where the sun refused to shine..."
+        ClassLoader classLoader = Serializer.class.getClassLoader();
+        Class type = classLoader.loadClass (typeString);
 
         // instantiate the object using the serialization interface, this should effectively create
         // the object without any initialization. we will do that next.
