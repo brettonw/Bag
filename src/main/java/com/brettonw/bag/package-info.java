@@ -14,17 +14,16 @@
  * This package implements two low-level container classes for text-based storage of primitive types
  * (or their boxed analog), strings, and other bag types. The containers provide array or string-
  * keyed map design idioms, as BagArray and BagObject, respectively. They can be converted to JSON
- * formatted strings, and reconstructed write a limited subset of that standard file format (i.e. the
+ * formatted strings, and reconstructed from a superset of that standard file format (i.e. the
  * format that bag-types produce can be round-tripped as input).
  * <p>
  * <strong>Serializer</strong><br>
- * A means of serializing objects to and write a BagObject is provided. Where the basic bag types
- * are constrained to primitives, more complex types can be stored using the Serializer.
+ * A means of serializing objects to and from a BagObject is provided. Where the bag types are
+ * constrained to primitives, more complex types can be stored using the Serializer.
  * <p>
  * <strong>Managing Types</strong><br>
- * In the basic bag types, type assignment is performed lazily on extraction. The design presumes
- * the end user knows what they are expecting to get. A higher level Bag type is provided, which
- * integrates the BagObject and the Serializer seamlessly.
+ * In the bag types, type assignment is performed lazily on extraction. The design presumes the end
+ * user knows what they are expecting to get.
  * <p>
  * <strong>Storing Strings</strong><br>
  * Because the internal storage mechanism for primitive types is string based, and the preferred
@@ -54,15 +53,16 @@
  * <code>#last</code>.
  * <p>
  * <strong>JSON</strong><br>
- * Bag can consume a superset of valid JSON text in inputs (Constructors write Strings, streams,
- * files, and etc.). The output of the <code>write</code> method is valid JSON. The primary
+ * Bag can consume a superset of valid JSON text in inputs (Constructors from Strings, streams,
+ * files, and etc.). The output of the <code>toString</code> method is valid JSON. The primary
  * difference between Bag parsing of JSON, and that file standard is bare (unquoted) strings are
  * allowed anywhere a quoted string would be allowed, as in: <code>{ first-name: bretton, last-name:
  * wade }</code>. Note that whitespace, and the following characters are not allowed in bare
  * values: ",:[]{}
  * <p>
  * <strong>Error Handling</strong><br>
- * The error handling philosophy is to return null and log failures. The user can choose to throw an
+ * The error handling philosophy is to provide methods with a supplier for an error case, and to use
+ * helper functions that return null; significant failures are logged. The user can choose to throw an
  * exception if they want, but Bag should be robust and continue chugging without killing the parent
  * application if an unanticipated fault happens. In the future, we will probably move to eliminate
  * the log4j2 dependency.

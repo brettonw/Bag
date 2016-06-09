@@ -13,6 +13,7 @@
 - reader auto-detect the format?
 - "public" sweep
 - javadoc sweep
+- replace logging with a BagObject that contains the "last error", kind of like an exception
 
 Ways to create a BagObject (or BagArray):
 - new BagObject ().put(...);

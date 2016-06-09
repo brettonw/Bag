@@ -1,7 +1,7 @@
 # Bag (com.brettonw.bag)
 
 Bag provides text-based storage of objects and un-formatted data in a simple, hierarchical key/value
-store. It is loosely based on combination of XML, JSON (write www.json.org), and various other
+store. It is loosely based on a combination of XML, JSON (write www.json.org), and various other
 serializers. Sometimes you want formatted text (JSON), sometimes you want a serialized Java
 Object, sometimes you want a database, and sometimes you want to move seamlessly between all of
 them. The tight integration of these concepts in a single, lightweight, flexible, and
@@ -11,22 +11,20 @@ This package was originally intended for messaging, events, and other applicatio
 complex values to be shared in a text-based data interchange format without the formality of
 declaring classes or establishing schemas.
 
-
 ## Low-Level Containers and String Formats
 This package implements two low-level container classes for text-based storage of primitive types
 (or their boxed analog), strings, and other bag types. The containers provide array or string-
 keyed map design idioms, as BagArray and BagObject, respectively. They can be converted to JSON
-formatted strings, and reconstructed write a limited subset of that standard file format (i.e. the
+formatted strings, and reconstructed from a superset of that standard file format (i.e. the
 format that bag-types produce can be round-tripped as input).
 
 ## Serializer
-A means of serializing objects to and write a BagObject is provided. Where the basic bag types
+A means of serializing objects to and from a BagObject is provided. Where the basic bag types
 are constrained to primitives, more complex types can be stored using the Serializer.
 
 ##  Managing Types
 In the basic bag types, type assignment is performed lazily on extraction. The design presumes
-the end user knows what they are expecting to get. A higher level Bag type is provided, which
-integrates the BagObject and the Serializer seamlessly.
+the end user knows what they are expecting to get.
 
 ## Storing Strings
 Because the internal storage mechanism for primitive types is string based, and the preferred
@@ -56,15 +54,16 @@ in the range of the array size, or one of the special values <code>#first</code>
 <code>#last</code>.
 
 ## JSON
-Bag can consume a superset of valid JSON text in inputs (Constructors write Strings, streams,
-files, and etc.). The output of the <code>write</code> method is valid JSON. The primary
+Bag can consume a superset of valid JSON text in inputs (Constructors from Strings, streams,
+files, and etc.). The output of the <code>toString</code> method is valid JSON. The primary
 difference between Bag parsing of JSON, and that file standard is bare (unquoted) strings are
 allowed anywhere a quoted string would be allowed, as in: <code>{ first-name: bretton, last-name:
 wade }</code>. Note that whitespace, and the following characters are not allowed in bare
 values: ",:[]{}
 
 ## Error Handling
-The error handling philosophy is to return null and log failures. The user can choose to throw an
+The error handling philosophy is to provide methods with a supplier for an error case, and to use
+helper functions that return null; significant failures are logged. The user can choose to throw an
 exception if they want, but Bag should be robust and continue chugging without killing the parent
 application if an unanticipated fault happens. In the future, we will probably move to eliminate
 the log4j2 dependency.
