@@ -1,7 +1,5 @@
 package com.brettonw.bag;
 
-import com.brettonw.bag.expr.BooleanExpr;
-
 public interface Selectable<BagType extends Bag> {
     /**
      *
@@ -9,4 +7,5 @@ public interface Selectable<BagType extends Bag> {
      * @return
      */
     BagType select (BagArray select);
+    BagType drop (BagArray drop);
 }

@@ -5,6 +5,8 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.*;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A collection of text-based values store in key/value pairs (maintained in a sorted array).
@@ -410,9 +412,30 @@ public class BagObject extends Bag implements Selectable<BagObject> {
                 String key = select.getString (i);
                 if (key != null) {
                     Object object = getObject (key);
-                    if (object != null) {
-                        bagObject.put (key, object);
-                    }
+                    bagObject.put (key, object);
+                }
+            }
+            return bagObject;
+        }
+        return this;
+    }
+
+    @Override
+    public BagObject drop (BagArray drop) {
+        if ((drop != null) && (drop.getCount () > 0)) {
+            // build the exclude hashmap
+            Set<String> dropKeys = new HashSet<> (drop.getCount ());
+            for (int i = 0, end = drop.getCount (); i < end; ++i) {
+                dropKeys.add (drop.getString (i));
+            }
+
+            // build a new BagObject from my contents
+            BagObject bagObject = new BagObject ();
+            String[] keys = keys ();
+            for (String key : keys) {
+                if ((key != null) && (! dropKeys.contains (key))) {
+                    Object object = getObject (key);
+                    bagObject.put (key, object);
                 }
             }
             return bagObject;

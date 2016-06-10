@@ -8,6 +8,8 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A collection of text-based values stored in a zero-based indexed array.
@@ -385,6 +387,28 @@ public class BagArray extends Bag implements Selectable<BagArray> {
                 Integer index = select.getInteger (i);
                 if (index != null) {
                     Object object = getObject (index);
+                    bagArray.add (object);
+                }
+            }
+            return bagArray;
+        }
+        return this;
+    }
+
+    @Override
+    public BagArray drop (BagArray drop) {
+        if ((drop != null) && (drop.getCount () > 0)) {
+            // build the exclude hashmap
+            Set<Integer> dropKeys = new HashSet<> (drop.getCount ());
+            for (int i = 0, end = drop.getCount (); i < end; ++i) {
+                dropKeys.add (drop.getInteger (i));
+            }
+
+            // build a new BagArray from my contents
+            BagArray bagArray = new BagArray ();
+            for (int i = 0; i < count; ++i) {
+                if (! dropKeys.contains (i)) {
+                    Object object = getObject (i);
                     bagArray.add (object);
                 }
             }
