@@ -40,15 +40,27 @@ public class Serializer {
         BOXED_TYPES.put ("double", Double.class);
     }
 
-    private static ClassLoader getClassLoader () {
-        //return Thread.currentThread ().getContextClassLoader ();
-        return Serializer.class.getClassLoader ();
-
-        // walk the call stack to find the next different class loader...
+    private static final class ClassLoaderResolver extends SecurityManager
+    {
+        private static final ClassLoaderResolver CLASS_LOADER_RESOLVER = new ClassLoaderResolver ();
+        static ClassLoader[] getCallStack () {
+            Class[] classCallStack = CLASS_LOADER_RESOLVER.getClassContext ();
+            ClassLoader[] classLoaderCallStack = new ClassLoader[classCallStack.length];
+            for (int i = 0, end = classCallStack.length; i < end; ++i) {
+                classLoaderCallStack[i] = classCallStack[i].getClassLoader ();
+            }
+            return classLoaderCallStack;
+        }
     }
 
     private static Class getClass (String typeString) throws ClassNotFoundException {
-        return getClassLoader ().loadClass (typeString);
+        /*
+        ClassLoader threadContextClassLoader = Thread.currentThread ().getContextClassLoader ();
+        ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader ();
+        ClassLoader myClassLoader = Serializer.class.getClassLoader ();
+        ClassLoader[] classLoaderCallStack = ClassLoaderResolver.getCallStack ();
+        */
+        return Serializer.class.getClassLoader ().loadClass (typeString);
     }
 
     // different types of objects are handled differently by the serializer, this is roughly how we
