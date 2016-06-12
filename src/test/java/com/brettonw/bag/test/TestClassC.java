@@ -1,4 +1,4 @@
-package com.brettonw.bag.classloader;
+package com.brettonw.bag.test;
 
 public class TestClassC extends TestClassB {
     private int d;

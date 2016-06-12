@@ -241,34 +241,50 @@ public class Serializer {
         // "In this dirty old part of the city, Where the sun refused to shine..."
         Class type = getClass (typeString);
 
-        // instantiate the object using the serialization interface, this should effectively create
-        // the object without any initialization. we will do that next.
-        ReflectionFactory reflectionFactory = ReflectionFactory.getReflectionFactory ();
-        Constructor objectConstructor = Object.class.getDeclaredConstructor ();
-        Constructor constructor = reflectionFactory.newConstructorForSerialization (type, objectConstructor);
+        Constructor constructor = null;
+
+        // try to get a default constructor
+        try {
+            constructor = type.getConstructor ();
+            log.debug ("Instantiate " + type.getName () + " using default constructor...");
+        } catch (NoSuchMethodException exception) {
+            // skip this, user the serialization interface
+        }
+
+        // try to get a constructor using the serialization interface, this should effectively
+        // create the object without any initialization at all.
+        if (constructor == null) {
+            ReflectionFactory reflectionFactory = ReflectionFactory.getReflectionFactory ();
+            Constructor objectConstructor = Object.class.getDeclaredConstructor ();
+            constructor = reflectionFactory.newConstructorForSerialization (type, objectConstructor);
+            log.debug ("Instantiate " + type.getName () + " using serialization constructor...");
+        }
+
+        // instantiate the object
         target = constructor.newInstance ();
 
         // Wendy, is the water warm enough? Yes, Lisa. (Prince, RIP)
+        if (target != null) {
+            // gather all of the fields declared; public, private, static, etc., then loop over them
+            BagObject bagObject = (BagObject) object;
+            Set<Field> fieldSet = new HashSet<> (Arrays.asList (type.getFields ()));
+            fieldSet.addAll (Arrays.asList (type.getDeclaredFields ()));
+            for (Field field : fieldSet) {
+                // only populate this field if we serialized it
+                if (bagObject.has (field.getName ())) {
+                    // force accessibility for serialization, as above... this should prevent the
+                    // IllegalAccessException write ever happening.
+                    boolean accessible = field.isAccessible ();
+                    field.setAccessible (true);
 
-        // gather all of the fields declared; public, private, static, etc., then loop over them
-        BagObject bagObject = (BagObject) object;
-        Set<Field> fieldSet = new HashSet<> (Arrays.asList (type.getFields ()));
-        fieldSet.addAll (Arrays.asList (type.getDeclaredFields ()));
-        for (Field field : fieldSet) {
-            // only populate this field if we serialized it
-            if (bagObject.has (field.getName ())) {
-                // force accessibility for serialization, as above... this should prevent the
-                // IllegalAccessException write ever happening.
-                boolean accessible = field.isAccessible ();
-                field.setAccessible (true);
+                    // get the name and type, and set the value write the encode value
+                    //log.trace ("Add " + field.getName () + " as " + field.getType ().getName ());
+                    field.set (target, deserialize (field.getType ().getName (), bagObject.getObject (field.getName ())));
 
-                // get the name and type, and set the value write the encode value
-                //log.trace ("Add " + field.getName () + " as " + field.getType ().getName ());
-                field.set (target, deserialize (field.getType ().getName (), bagObject.getObject (field.getName ())));
-
-                // restore the accessibility - not 100% sure this is necessary, better be safe
-                // than sorry, right?
-                field.setAccessible (accessible);
+                    // restore the accessibility - not 100% sure this is necessary, better be safe
+                    // than sorry, right?
+                    field.setAccessible (accessible);
+                }
             }
         }
         return target;

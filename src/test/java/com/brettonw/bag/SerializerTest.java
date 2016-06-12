@@ -1,7 +1,7 @@
 package com.brettonw.bag;
 
 import com.brettonw.AppTest;
-import com.brettonw.bag.classloader.*;
+import com.brettonw.bag.test.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
@@ -290,7 +290,7 @@ public class SerializerTest {
         TestClassD d = new TestClassD ("Hello");
         BagObject bagObject = Serializer.toBagObject (d);
         TestClassD xxx = Serializer.fromBagObject (bagObject);
-        AppTest.report (d != xxx, true, "Properly fail on a type without a default constructor or registered extension");
+        AppTest.report (d.equals (xxx), true, "Properly construct on a type without a default constructor");
     }
 
     @Test

@@ -2,8 +2,8 @@ package com.brettonw.bag;
 
 import com.brettonw.AppTest;
 import com.brettonw.bag.json.FormatReaderJson;
-import com.brettonw.bag.classloader.TestClassA;
-import com.brettonw.bag.classloader.TestEnumXYZ;
+import com.brettonw.bag.test.TestClassA;
+import com.brettonw.bag.test.TestEnumXYZ;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;
