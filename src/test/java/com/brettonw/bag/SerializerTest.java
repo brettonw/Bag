@@ -327,4 +327,14 @@ public class SerializerTest {
         BagObject bagObject = Serializer.toBagObject (map);
         Map<String, String> recon = Serializer.fromBagObject (bagObject);
     }
+
+    @Test
+    public void testIncompleteSimpleSerializer () {
+        BagObject testClassC = new BagObject ()
+                // int a, long b, float c, int d, long e, float f
+                .put ("a", 5).put ("b", 7).put ("c", 9).put ("e", 600).put ("f", 3.5f);
+        TestClassC c = Serializer.fromBagAsType (TestClassC.class, testClassC);
+        TestClassC xxx = new TestClassC ();
+        AppTest.report (c.getD (), xxx.getD (), "Simple deserialization with missing items");
+    }
 }

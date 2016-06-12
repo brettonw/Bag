@@ -14,11 +14,11 @@ public class HttpTest {
 
     @Test
     public void testGet () throws IOException {
-        BagObject brettonw = Http.getForBagObject ("https://api.github.com/users/brettonw", () -> null);
-        AppTest.report (brettonw.getString ("login"), "brettonw", "Got a valid BagObject - 1");
+        BagObject brettonw = Http.getForBagObject ("http://ip.jsontest.com/", () -> null);
+        AppTest.report (brettonw.getString ("ip") != null, true, "Got a valid BagObject - 1");
 
-        brettonw = Http.getForBagObject (FormatReaderJson.JSON_FORMAT, "https://api.github.com/users/brettonw", () -> null);
-        AppTest.report (brettonw.getString ("login"), "brettonw", "Got a valid BagObject - 2");
+        brettonw = Http.getForBagObject (FormatReaderJson.JSON_FORMAT, "http://ip.jsontest.com/", () -> null);
+        AppTest.report (brettonw.getString ("ip") != null, true, "Got a valid BagObject - 2");
 
         BagArray repos = Http.getForBagArray ("https://api.github.com/users/brettonw/repos", () -> null);
         AppTest.report (repos.getCount () > 0, true, "Got a valid BagArray - 1");

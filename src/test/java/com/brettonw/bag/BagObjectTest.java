@@ -383,4 +383,15 @@ public class BagObjectTest {
         BagObject fetched = bagObject.getBagObject ("q", () -> new BagObject (bagObject2));
         AppTest.report (fetched.getString ("m"), "n", "CheckedSupplier doesn't throw");
     }
+
+    @Test
+    public void testBogusInstantiationFallback () {
+        BagObject bagObject = new BagObject ().put ("x", "y");
+        try {
+            BagObject fetched = bagObject.getBagObject ("q", () -> new BagObject (new File ("bogus.txt")));
+            AppTest.report (false, true, "BagObject should throw exception when constructing from bogus source");
+        } catch (IOException exception) {
+            AppTest.report (true, true, "BagObject should throw exception when constructing from bogus source");
+        }
+    }
 }

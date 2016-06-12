@@ -284,6 +284,11 @@ public class Serializer {
                     // restore the accessibility - not 100% sure this is necessary, better be safe
                     // than sorry, right?
                     field.setAccessible (accessible);
+                } else {
+                    // warn about skipping a non-static field
+                    if (! Modifier.isStatic (field.getModifiers ())) {
+                        log.warn ("Skipping non-static field initializer (" + field.getName () + "), not in source bag object");
+                    }
                 }
             }
         }

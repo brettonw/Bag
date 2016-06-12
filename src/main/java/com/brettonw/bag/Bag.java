@@ -89,6 +89,7 @@ abstract public class Bag {
         try {
             return getBagObject (key, () -> null);
         } catch (IOException exception) {
+            // untestable, as the supplier I'm giving never actually throws the exception
             return null;
         }
     }
@@ -115,6 +116,7 @@ abstract public class Bag {
         try {
             return getBagArray (key, () -> null);
         } catch (IOException exception) {
+            // untestable, as the supplier I'm giving never actually throws the exception
             return null;
         }
     }

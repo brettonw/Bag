@@ -8,9 +8,9 @@ public class TestClassA {
     public TestClassB sub;
     public TestEnumXYZ xyz;
 
-    public static TestClassA standard = new TestClassA (5, false, 6.0, "7", TestEnumXYZ.ABC);
-
-    private TestClassA () {}
+    private TestClassA () {
+        x = 3;
+    }
 
     public TestClassA (int x, boolean y, double z, String abc, TestEnumXYZ xyz) {
         this.x = x; this.y = y; this.z = z;

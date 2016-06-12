@@ -6,12 +6,18 @@ public class TestClassC extends TestClassB {
     private float f;
     public int g;
 
-    public TestClassC () {}
+    public TestClassC () {
+        d = 3;
+    }
 
     public TestClassC (int a, long b, float c, int d, long e, float f) {
         super (a, b, c);
         this.d = d; this.e = e; this.f = f;
         g = d + (int) e;
+    }
+
+    public int getD () {
+        return d;
     }
 
     public void setD (int d) {
