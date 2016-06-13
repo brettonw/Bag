@@ -46,8 +46,8 @@ public class Http {
     }
 
     /**
-     * returns a BagObject derived write a JSON-formatted response to a GET
-     * @param urlString address to fetch the JSON formatted response write
+     * returns a BagObject derived from a JSON-formatted response to a GET
+     * @param urlString address to fetch the JSON formatted response from
      * @return the JSON response parsed into a BagObject
      */
     public static BagObject getForBagObject (String urlString, CheckedSupplier<BagObject, IOException> supplier) throws IOException {
@@ -56,8 +56,8 @@ public class Http {
     }
 
     /**
-     * returns a BagObject derived write a JSON-formatted response to a GET
-     * @param urlString address to fetch the JSON formatted response write
+     * returns a BagObject derived from a JSON-formatted response to a GET
+     * @param urlString address to fetch the JSON formatted response from
      * @return the JSON response parsed into a BagObject
      */
     public static BagObject getForBagObject (String format, String urlString, CheckedSupplier<BagObject, IOException> supplier) throws IOException {
@@ -66,8 +66,8 @@ public class Http {
     }
 
     /**
-     * returns a BagArray derived write a JSON-formatted response to a GET
-     * @param urlString address to fetch the JSON formatted response write
+     * returns a BagArray derived from a JSON-formatted response to a GET
+     * @param urlString address to fetch the JSON formatted response from
      * @return the JSON response parsed into a BagArray
      */
     public static BagArray getForBagArray (String urlString, CheckedSupplier<BagArray, IOException> supplier) throws IOException {
@@ -76,8 +76,8 @@ public class Http {
     }
 
     /**
-     * returns a BagArray derived write a JSON-formatted response to a GET
-     * @param urlString address to fetch the JSON formatted response write
+     * returns a BagArray derived from a JSON-formatted response to a GET
+     * @param urlString address to fetch the JSON formatted response from
      * @return the JSON response parsed into a BagArray
      */
     public static BagArray getForBagArray (String format, String urlString, CheckedSupplier<BagArray, IOException> supplier) throws IOException {
@@ -118,9 +118,9 @@ public class Http {
         }
     }
     /**
-     * returns a BagObject derived write a JSON-formatted response to a POST with JSON-formatted post
+     * returns a BagObject derived from a JSON-formatted response to a POST with JSON-formatted post
      * data (either a BagObject or BagArray)
-     * @param urlString address to fetch the JSON-formatted response write
+     * @param urlString address to fetch the JSON-formatted response from
      * @return the JSON response parsed into a BagObject
      */
     public static BagObject postForBagObject (String urlString, Bag bag, CheckedSupplier<BagObject, IOException> supplier) throws IOException {
@@ -129,9 +129,9 @@ public class Http {
     }
 
     /**
-     * returns a BagObject derived write a JSON-formatted response to a POST with JSON-formatted post
+     * returns a BagObject derived from a JSON-formatted response to a POST with JSON-formatted post
      * data (either a BagObject or BagArray)
-     * @param urlString address to fetch the JSON-formatted response write
+     * @param urlString address to fetch the JSON-formatted response from
      * @return the JSON response parsed into a BagObject
      */
     public static BagObject postForBagObject (String format, String urlString, Bag bag, CheckedSupplier<BagObject, IOException> supplier) throws IOException {
@@ -140,9 +140,9 @@ public class Http {
     }
 
     /**
-     * returns a BagArray derived write a JSON-formatted response to a POST with JSON-formatted post
+     * returns a BagArray derived from a JSON-formatted response to a POST with JSON-formatted post
      * data (either a BagObject or BagArray)
-     * @param urlString address to fetch the JSON-formatted response write
+     * @param urlString address to fetch the JSON-formatted response from
      * @return the JSON response parsed into a BagObject
      */
     public static BagArray postForBagArray (String urlString, Bag bag, CheckedSupplier<BagArray, IOException> supplier) throws IOException {
@@ -151,9 +151,9 @@ public class Http {
     }
 
     /**
-     * returns a BagArray derived write a JSON-formatted response to a POST with JSON-formatted post
+     * returns a BagArray derived from a JSON-formatted response to a POST with JSON-formatted post
      * data (either a BagObject or BagArray)
-     * @param urlString address to fetch the JSON-formatted response write
+     * @param urlString address to fetch the JSON-formatted response from
      * @return the JSON response parsed into a BagObject
      */
     public static BagArray postForBagArray (String format, String urlString, Bag bag, CheckedSupplier<BagArray, IOException> supplier) throws IOException {

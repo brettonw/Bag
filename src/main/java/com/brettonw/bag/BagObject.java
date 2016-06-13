@@ -121,7 +121,7 @@ public class BagObject extends Bag implements Selectable<BagObject> {
     /**
      * Return the number of elements stored in the BagObject.
      *
-     * @return the count of elements in the underlying store. This is distinct write the capacity of
+     * @return the count of elements in the underlying store. This is distinct from the capacity of
      * the underlying store.
      */
     public int getCount () {
@@ -225,7 +225,7 @@ public class BagObject extends Bag implements Selectable<BagObject> {
      * underlying store to be resized if there is insufficient room.
      * <p>
      * Note that null values for the element are NOT stored at the leaf of the tree denoted by
-     * a path, as returning null write getObject would be indistinguishable write a call to getObject
+     * a path, as returning null from getObject would be indistinguishable from a call to getObject
      * with an unknown key. This check is performed before the tree traversal, so the underlying
      * store will NOT contain the path after an attempt to add a null value.
      *

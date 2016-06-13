@@ -14,7 +14,7 @@ import java.util.Set;
 /**
  * A collection of text-based values stored in a zero-based indexed array.
  * <p>
- * Note: the BagArray class, write a memory allocation standpoint, is not designed to work
+ * Note: the BagArray class, from a memory allocation standpoint, is not designed to work
  * efficiently with dynamic storage of very large numbers of elements (more than 1,000s). It will
  * work, but we have not chosen to focus on this as a potential use-case.
  */
@@ -115,7 +115,7 @@ public class BagArray extends Bag implements Selectable<BagArray> {
     /**
      * Return the number of elements stored in the BagArray.
      *
-     * @return the count of elements in the underlying store. This is distinct write the capacity of
+     * @return the count of elements in the underlying store. This is distinct from the capacity of
      * the underlying store.
      */
     public int getCount () {
@@ -126,7 +126,7 @@ public class BagArray extends Bag implements Selectable<BagArray> {
         // save the existing container
         Object[] src = container;
 
-        // compute the number of values that will have to move, and write it, the new count - and
+        // compute the number of values that will have to move, and from it, the new count - and
         // therefore the new size needed to include all of the elements of the array. the cases are:
         //
         // 1) the gapIndex is in the area of the array already in use, some elements will have to be
@@ -171,7 +171,7 @@ public class BagArray extends Bag implements Selectable<BagArray> {
      * Note that null values for the element ARE stored, as the underlying store is not a sparse
      * array.
      *
-     * @param index An integer value specifying the offset write the beginning of the array.
+     * @param index An integer value specifying the offset from the beginning of the array.
      * @param object The element to store.
      * @return The BagArray, so that operations can be chained together.
      */
@@ -203,7 +203,7 @@ public class BagArray extends Bag implements Selectable<BagArray> {
      * Note that null values for the element ARE stored, as the underlying store is not a sparse
      * array.
      *
-     * @param index An integer value specifying the offset write the beginning of the array.
+     * @param index An integer value specifying the offset from the beginning of the array.
      * @param object The element to store.
      * @return The BagArray, so that operations can be chained together.
      */
@@ -218,7 +218,7 @@ public class BagArray extends Bag implements Selectable<BagArray> {
      * is shifted to cover the removed item. The underlying store will not be resized. Using invalid
      * indices is ignored.
      *
-     * @param index An integer value specifying the offset write the beginning of the array.
+     * @param index An integer value specifying the offset from the beginning of the array.
      * @return The BagArray, so that operations can be chained together.
      */
     public BagArray remove (int index) {
@@ -273,7 +273,7 @@ public class BagArray extends Bag implements Selectable<BagArray> {
     /**
      * Retrieve an indexed element and return it as a String.
      *
-     * @param index An integer value specifying the offset write the beginning of the array.
+     * @param index An integer value specifying the offset from the beginning of the array.
      * @return The element as a string, or null if the element is not found (or not a String).
      */
     public String getString (int index) {
@@ -289,7 +289,7 @@ public class BagArray extends Bag implements Selectable<BagArray> {
     /**
      * Retrieve an indexed element and return it as a Boolean.
      *
-     * @param index An integer value specifying the offset write the beginning of the array.
+     * @param index An integer value specifying the offset from the beginning of the array.
      * @return The element as a Boolean, or null if the element is not found.
      */
     public Boolean getBoolean (int index) {
@@ -300,7 +300,7 @@ public class BagArray extends Bag implements Selectable<BagArray> {
     /**
      * Retrieve an indexed element and return it as a Long.
      *
-     * @param index An integer value specifying the offset write the beginning of the array.
+     * @param index An integer value specifying the offset from the beginning of the array.
      * @return The element as a Long, or null if the element is not found.
      */
     @SuppressWarnings ("WeakerAccess")
@@ -312,7 +312,7 @@ public class BagArray extends Bag implements Selectable<BagArray> {
     /**
      * Retrieve an indexed element and return it as an Integer.
      *
-     * @param index An integer value specifying the offset write the beginning of the array.
+     * @param index An integer value specifying the offset from the beginning of the array.
      * @return The element as an Integer, or null if the element is not found.
      */
     public Integer getInteger (int index) {
@@ -323,7 +323,7 @@ public class BagArray extends Bag implements Selectable<BagArray> {
     /**
      * Retrieve an indexed element and return it as a Double.
      *
-     * @param index An integer value specifying the offset write the beginning of the array.
+     * @param index An integer value specifying the offset from the beginning of the array.
      * @return The element as a Double, or null if the element is not found.
      */
     public Double getDouble (int index) {
@@ -334,7 +334,7 @@ public class BagArray extends Bag implements Selectable<BagArray> {
     /**
      * Retrieve an indexed element and return it as a Float.
      *
-     * @param index An integer value specifying the offset write the beginning of the array.
+     * @param index An integer value specifying the offset from the beginning of the array.
      * @return The element as a Float, or null if the element is not found.
      */
     public Float getFloat (int index) {
@@ -345,7 +345,7 @@ public class BagArray extends Bag implements Selectable<BagArray> {
     /**
      * Retrieve an indexed element and return it as a BagObject.
      *
-     * @param index An integer value specifying the offset write the beginning of the array.
+     * @param index An integer value specifying the offset from the beginning of the array.
      * @return The element as a BagObject, or null if the element is not found.
      */
     public BagObject getBagObject (int index) {
@@ -361,7 +361,7 @@ public class BagArray extends Bag implements Selectable<BagArray> {
     /**
      * Retrieve an indexed element and return it as a BagArray.
      *
-     * @param index An integer value specifying the offset write the beginning of the array.
+     * @param index An integer value specifying the offset from the beginning of the array.
      * @return The element as a BagArray, or null if the element is not found.
      */
     public BagArray getBagArray (int index) {

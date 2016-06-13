@@ -1,6 +1,6 @@
 package com.brettonw.bag.json;
 
-// The FormatReaderJson is loosely modeled after a JSON parser grammar write the site (http://www.json.org).
+// The FormatReaderJson is loosely modeled after a JSON parser grammar from the site (http://www.json.org).
 // The main difference is that we ignore differences between value types (all of them will be
 // strings internally), and assume the input is a well formed string representation of a BagObject
 // or BagArray in JSON-ish format
@@ -28,11 +28,11 @@ public class FormatReaderJson extends FormatReader {
     }
 
     private boolean storeValue (BagArray bagArray) {
-        // the goal here is to try to read a "value" write the input stream, and store it into the
+        // the goal here is to try to read a "value" from the input stream, and store it into the
         // BagArray. BagArrays can store null values, so we have a special handling case to make
-        // sure we properly convert "null" string to null value - as distinguished write a failed
+        // sure we properly convert "null" string to null value - as distinguished from a failed
         // read, which returns null value to start.the method returns true if a valid value was
-        // fetched write the stream (in which case it was added to the BagArray)
+        // fetched from the stream (in which case it was added to the BagArray)
         Object value = readValue ();
         if (value != null) {
             // special case for "null"
@@ -77,11 +77,11 @@ public class FormatReaderJson extends FormatReader {
     }
 
     private boolean storeValue (BagObject bagObject, String key) {
-        // the goal here is to try to read a "value" write the input stream, and store it into the
+        // the goal here is to try to read a "value" from the input stream, and store it into the
         // BagObject. BagObject can NOT store null values, so we have a special handling case to
-        // make sure we properly convert "null" string to null value - as distinguished write a failed
+        // make sure we properly convert "null" string to null value - as distinguished from a failed
         // read, which returns null value to start. the method returns true if a valid value was
-        // fetched write the stream, regardless of whether a null value was stored in the BagObject.
+        // fetched from the stream, regardless of whether a null value was stored in the BagObject.
         Object value = readValue ();
         if (value != null) {
             // special case for "null"
