@@ -46,6 +46,13 @@ abstract public class Bag {
     abstract public Object getObject (String key);
 
     /**
+     *
+     * @return
+     */
+    abstract public String[] keys ();
+
+
+    /**
      * Returns true if the Selectable matches the 'match' criteria
      * @param booleanExpr a BooleanExpr containing criteria:
      * @return

@@ -12,6 +12,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
@@ -217,12 +218,14 @@ public class BagArrayTest {
             File testFile = new File ("data", "UCS_Satellite_Database_2-1-14.json");
             BagArray bagArray = new BagArray (testFile);
             BooleanExpr equality = Exprs.equality ("Country of Operator/Owner", "USA");
-            BagArray queried = bagArray.query (equality, new BagArray().add ("Current Official Name of Satellite").add ("Country of Operator/Owner"));
+            SelectKey selectKey = new SelectKey (new BagObject ().put (SelectKey.TYPE, SelectType.INCLUDE.name ()).put (SelectKey.KEYS, new BagArray().add ("Current Official Name of Satellite").add ("Country of Operator")));
+            BagArray queried = bagArray.query (equality, selectKey);
             AppTest.report (queried.getCount () > 0, true, "Queried Array returned some results");
             AppTest.report (queried.getString ("53/Country of Operator/Owner"), "USA", "Query results for #53 should match the query");
 
             // now try sorting
-            queried.sort (new BagArray ().add (new BagObject ().put (SortKey.KEY, "Current Official Name of Satellite")));
+            SortKey[] sortKeys = SortKey.keys (new BagArray ().add (new BagObject ().put (SortKey.KEY, "Current Official Name of Satellite")));
+            queried.sort (sortKeys);
             AppTest.report (queried.getString ("36/Country of Operator/Owner"), "USA", "Query results for #36 should match the query");
         } catch (Exception exception) {
             log.error (exception);
@@ -258,7 +261,7 @@ public class BagArrayTest {
             }
 
             {
-                BagArray sortKeys = SortKey.keys ("id", "value");
+                SortKey[] sortKeys = SortKey.keys ("id", "value");
                 BagArray sortedBagArray = new BagArray (bagArray).sort (sortKeys);
 
                 BagObject lastBagObject = sortedBagArray.getBagObject (0);
@@ -269,8 +272,8 @@ public class BagArrayTest {
                 }
             }
             {
-                BagArray sortKeys = SortKey.keys ("id", "value");
-                sortKeys.getBagObject (0).put (SortKey.ORDER, SortOrder.DESCENDING.name ());
+                SortKey[] sortKeys = SortKey.keys ("id", "value");
+                sortKeys[0].setOrder (SortOrder.DESCENDING);
                 BagArray sortedBagArray = new BagArray (bagArray).sort (sortKeys);
 
                 BagObject lastBagObject = sortedBagArray.getBagObject (0);
@@ -281,8 +284,8 @@ public class BagArrayTest {
                 }
             }
             {
-                BagArray sortKeys = SortKey.keys ("id", "value");
-                sortKeys.getBagObject (0).put (SortKey.TYPE, SortType.NUMERIC.name ());
+                SortKey[] sortKeys = SortKey.keys ("id", "value");
+                sortKeys[0].setType (SortType.NUMERIC);
                 BagArray sortedBagArray = new BagArray (bagArray).sort (sortKeys);
 
                 BagObject lastBagObject = sortedBagArray.getBagObject (0);
@@ -293,8 +296,8 @@ public class BagArrayTest {
                 }
             }
             {
-                BagArray sortKeys = SortKey.keys ("id", "value");
-                sortKeys.getBagObject (0).put (SortKey.TYPE, SortType.NUMERIC.name ()).put (SortKey.ORDER, SortOrder.DESCENDING.name ());
+                SortKey[] sortKeys = SortKey.keys ("id", "value");
+                sortKeys[0].setOrder (SortOrder.DESCENDING).setType (SortType.NUMERIC);
                 BagArray sortedBagArray = new BagArray (bagArray).sort (sortKeys);
 
                 BagObject lastBagObject = sortedBagArray.getBagObject (0);
@@ -307,5 +310,27 @@ public class BagArrayTest {
         }catch (IOException exception) {
             log.error (exception);
         }
+    }
+
+    @Test
+    public void testSubset () {
+        BagArray bagArray = new BagArray (97);
+        Random random = new Random ();
+        for (int i = 0; i < 97; ++i) {
+            bagArray.add (random.nextInt (100));
+        }
+        bagArray.sort (null);
+
+        int start = 0;
+        int pageSize = 10;
+        int pages = 0;
+        BagArray subset = bagArray.subset (start, pageSize);
+        while (subset.getCount () > 0) {
+            ++pages;
+            start += pageSize;
+            AppTest.report (subset.getCount () > 0, true, "subset " + pages + " has " + subset.getCount () + " element(s)");
+            subset = bagArray.subset (start, pageSize);
+        }
+        AppTest.report (true, true, "Got through a subset run in " + pages + " page(s)");
     }
 }
