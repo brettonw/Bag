@@ -380,21 +380,12 @@ public class BagArray extends Bag implements Selectable<BagArray> {
     }
 
     @Override
-    public String[] keys () {
-        String[] keys = new String[count];
-        for (int i = 0; i < count; ++i) {
-            keys[i] = Integer.toString (i);
-        }
-        return keys;
-    }
-
-    @Override
     public BagArray select (SelectKey selectKey) {
         if (selectKey != null) {
             BagArray bagArray = new BagArray ();
-            String[] keys = keys ();
-            for (String key : keys) {
-                if (selectKey.select (key)) {
+            for (int i = 0; i < count; ++i) {
+                String key = Integer.toString (i);
+                if ((key = selectKey.select (key)) != null) {
                     Object object = getObject (key);
                     bagArray.add (object);
                 }

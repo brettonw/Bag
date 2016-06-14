@@ -20,15 +20,15 @@ public class SelectKey {
         type = Enum.valueOf (SelectType.class, bagObject.getString (TYPE, () -> DEFAULT_TYPE.name ()).toUpperCase ());
     }
 
-    public boolean select (String key) {
+    public String select (String key) {
         if (key != null) {
             switch (type) {
                 case INCLUDE:
-                    return keys.contains (key);
+                    return keys.contains (key) ? key : null;
                 case EXCLUDE:
-                    return !keys.contains (key);
+                    return (!keys.contains (key)) ? key : null;
             }
         }
-        return false;
+        return null;
     }
 }
