@@ -408,9 +408,10 @@ public class BagObject extends Bag implements Selectable<BagObject> {
             BagObject bagObject = new BagObject ();
             String[] keys = keys ();
             for (String key : keys) {
-                if ((key = selectKey.select (key)) != null) {
+                String asKey = selectKey.select (key);
+                if (asKey != null) {
                     Object object = getObject (key);
-                    bagObject.put (key, object);
+                    bagObject.put (asKey, object);
                 }
             }
             return bagObject;
