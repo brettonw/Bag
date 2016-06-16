@@ -483,6 +483,8 @@ public class BagArray extends Bag implements Selectable<BagArray> {
             }
             return target;
         } catch (Exception exception) {
+            // yeah, we really aren't going to support any other types - it must have a constructor
+            // from a string
             log.error (exception);
         }
         return null;

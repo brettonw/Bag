@@ -22,8 +22,9 @@ public class SerializerTest {
     public void testBareType() {
         // serialize a bare type
         int x = 24;
-        BagObject serializedX = Serializer.toBagObject (x);
-        int deserializedX = Serializer.fromBagObject (serializedX);
+        BagObject bagObject = Serializer.toBagObject (x);
+        log.info (bagObject.toString ());
+        int deserializedX = Serializer.fromBagObject (bagObject);
         AppTest.report (deserializedX, x, "Serializer - test bare type");
     }
 
@@ -131,7 +132,7 @@ public class SerializerTest {
                             .put (Serializer.TYPE_KEY, "java.lang.Sring")
                             .put (Serializer.VALUE_KEY, "PDQ")
                     );
-            String serializedString =mockup.toString ();
+            String serializedString = mockup.toString ();
             BagObject serializedStringBagObject = new BagObject (serializedString);
             String deserializedString = Serializer.fromBagObject (serializedStringBagObject);
             AppTest.report (deserializedString, null, "Serializer test reconstituting a modified source");
@@ -220,6 +221,7 @@ public class SerializerTest {
                 new TestClassA (4, true, 4.5, "Roxy", TestEnumXYZ.GHI)
         };
         BagObject bagObject = Serializer.toBagObject (testArrayA);
+        log.info (bagObject.toString ());
         TestClassA reconTestArrayA[] = Serializer.fromBagObject (bagObject);
         boolean pass = true;
         for (int i = 0, end = testArrayA.length; i < end; ++i) {
@@ -267,6 +269,7 @@ public class SerializerTest {
         // deal with a type that has a no default constructor?
         OffsetDateTime  odt = OffsetDateTime.now ();
         BagObject bagObject = Serializer.toBagObject (odt);
+        log.info (bagObject.toString ());
         OffsetDateTime  reconOdt = Serializer.fromBagObject (bagObject);
         AppTest.report (odt, reconOdt, "Reconstructed OffsetDateTime should match the original");
     }
@@ -276,6 +279,7 @@ public class SerializerTest {
         // deal with a type that has a no default constructor?
         OffsetDateTime  odt = OffsetDateTime.now ();
         BagObject bagObject = Serializer.toBagObject (odt);
+        log.info (bagObject.toString ());
         try {
             LocalTime localTime = Serializer.fromBagObject (bagObject);
             AppTest.report  (odt, localTime, "This should fail");
@@ -289,6 +293,7 @@ public class SerializerTest {
         // deal with a type that has a no default constructor and no registered extension
         TestClassD d = new TestClassD ("Hello");
         BagObject bagObject = Serializer.toBagObject (d);
+        log.info (bagObject.toString ());
         TestClassD xxx = Serializer.fromBagObject (bagObject);
         AppTest.report (d.equals (xxx), true, "Properly construct on a type without a default constructor");
     }
@@ -297,6 +302,7 @@ public class SerializerTest {
     public void testClassE () {
         TestClassE d = new TestClassE ("Hello");
         BagObject bagObject = Serializer.toBagObject (d);
+        log.info (bagObject.toString ());
         TestClassE xxx = Serializer.fromBagObject (bagObject);
         AppTest.report (d, xxx, "Properly handle a serialized typen");
     }

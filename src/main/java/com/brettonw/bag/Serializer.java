@@ -11,10 +11,11 @@ public class Serializer {
     private static final Logger log = LogManager.getLogger (Serializer.class);
 
     // the static interface
-    static final String TYPE_KEY = "type";
-    static final String VERSION_KEY = "v";
-    static final String KEY_KEY = "key";
-    static final String VALUE_KEY = "value";
+    private static final String SPECIAL_CHAR = "@";
+    static final String TYPE_KEY = SPECIAL_CHAR + "type";
+    static final String VERSION_KEY = SPECIAL_CHAR + "v";
+    static final String KEY_KEY = SPECIAL_CHAR + "key";
+    static final String VALUE_KEY = SPECIAL_CHAR + "value";
 
     // future changes might require the serializer to know a different type of encoding is expected.
     // we use a two step version, where changes in the ".x" region don't require a new deserializer
@@ -25,19 +26,29 @@ public class Serializer {
     static final String SERIALIZER_VERSION_1 = "1.0";
     static final String SERIALIZER_VERSION_2 = "2";
     static final String SERIALIZER_VERSION_3 = "3";
-    static final String SERIALIZER_VERSION = SERIALIZER_VERSION_3;
+    static final String SERIALIZER_VERSION_4 = "4";
+    static final String SERIALIZER_VERSION = SERIALIZER_VERSION_4;
 
-    private static final Map<String, Class> BOXED_TYPES;
+    private static final boolean WITH_VERSION = true;
+    private static final boolean WITHOUT_VERSION = false;
+
+    private static final Map<String, Class> BOXED_TYPES_MAP;
+    private static final Set<Class> BOXED_TYPES_SET;
     static {
-        BOXED_TYPES = new HashMap<> ();
-        BOXED_TYPES.put ("int", Integer.class);
-        BOXED_TYPES.put ("long", Long.class);
-        BOXED_TYPES.put ("short", Short.class);
-        BOXED_TYPES.put ("byte", Byte.class);
-        BOXED_TYPES.put ("char", Character.class);
-        BOXED_TYPES.put ("boolean", Boolean.class);
-        BOXED_TYPES.put ("float", Float.class);
-        BOXED_TYPES.put ("double", Double.class);
+        BOXED_TYPES_MAP = new HashMap<> ();
+        BOXED_TYPES_MAP.put ("int", Integer.class);
+        BOXED_TYPES_MAP.put ("long", Long.class);
+        BOXED_TYPES_MAP.put ("short", Short.class);
+        BOXED_TYPES_MAP.put ("byte", Byte.class);
+        BOXED_TYPES_MAP.put ("char", Character.class);
+        BOXED_TYPES_MAP.put ("boolean", Boolean.class);
+        BOXED_TYPES_MAP.put ("float", Float.class);
+        BOXED_TYPES_MAP.put ("double", Double.class);
+
+        BOXED_TYPES_SET = new HashSet<> ();
+        for (String key : BOXED_TYPES_MAP.keySet ()) {
+            BOXED_TYPES_SET.add (BOXED_TYPES_MAP.get (key));
+        }
     }
 
     private static final class ClassLoaderResolver extends SecurityManager
@@ -78,23 +89,18 @@ public class Serializer {
 
     private static boolean isBoxedPrimitive (Class type) {
         // boxed primitives and strings...
-        switch (type.getName ()) {
-            case "java.lang.Long": case "java.lang.Integer": case "java.lang.Short": case "java.lang.Byte":
-            case "java.lang.Character":
-            case "java.lang.Boolean":
-            case "java.lang.Double": case "java.lang.Float":
-            case "java.lang.String":
-                return true;
-        }
-
-        // it wasn't any of those, return false;
-        return false;
+        return BOXED_TYPES_SET.contains (type) || (type.equals (String.class));
     }
 
     private static Class getBoxedType (String typeString) throws ClassNotFoundException {
-        return BOXED_TYPES.containsKey (typeString)
-                ? BOXED_TYPES.get (typeString)
+        return BOXED_TYPES_MAP.containsKey (typeString)
+                ? BOXED_TYPES_MAP.get (typeString)
                 : getClass (typeString);
+    }
+
+    private static Class getBoxedType (Class type) {
+        Class boxedType = BOXED_TYPES_MAP.get (type.getName ());
+        return (boxedType != null) ? boxedType : type;
     }
 
     private static SerializationType serializationType (Class type) {
@@ -136,7 +142,16 @@ public class Serializer {
 
                 // get the name and type, and get the value to encode
                 try {
-                    bagObject.put (field.getName (), serialize (field.get (object)));
+                    // if the type of the object is not a subclass of the field type, serialize it
+                    // directly - otherwise, serialize with type
+                    Object fieldObject = field.get (object);
+                    Class fieldObjectType = getBoxedType (fieldObject.getClass ());
+                    Class fieldType = getBoxedType (field.getType ());
+                    if (fieldObjectType.isAssignableFrom (fieldType)) {
+                        bagObject.put (field.getName (), serialize (fieldObject));
+                    } else {
+                        bagObject.put (field.getName (), serializeWithType (fieldObject, WITHOUT_VERSION));
+                    }
                 } catch (IllegalAccessException exception) {
                     // NOTE this shouldn't happen, per the comments above, and is untestable for
                     // purpose of measuring coverage
@@ -157,7 +172,7 @@ public class Serializer {
         for (int i = 0; i < length; ++i) {
             // serialized containers could use base classes as the container type specifier, so we
             // have to instantiate each object individually
-            bagArray.add (serializeWithTypeAndValue (Array.get (object, i), false));
+            bagArray.add (serializeWithType (Array.get (object, i), WITHOUT_VERSION));
         }
         return bagArray;
     }
@@ -170,8 +185,8 @@ public class Serializer {
             // serialized containers could use base classes as the container type specifier, so we
             // have to instantiate each object individually
             BagObject pair = new BagObject (2)
-                    .put (KEY_KEY, serializeWithTypeAndValue (key, false))
-                    .put (VALUE_KEY, serializeWithTypeAndValue (item, false));
+                    .put (KEY_KEY, serializeWithType (key, WITHOUT_VERSION))
+                    .put (VALUE_KEY, serializeWithType (item, WITHOUT_VERSION));
             bagArray.add (pair);
         }
         return bagArray;
@@ -194,7 +209,7 @@ public class Serializer {
         return null;
     }
 
-    private static BagObject serializeWithTypeAndValue (Object object, boolean emitVersion) {
+    private static BagObject serializeWithType (Object object, boolean emitVersion) {
         if (object != null) {
             // build an encapsulation for the serializer
             return (emitVersion ? new BagObject (3).put (VERSION_KEY, SERIALIZER_VERSION) : new BagObject (2))
@@ -215,7 +230,7 @@ public class Serializer {
      * @return A BagObject encapsulation of the target object, or null if the conversion failed.
      */
     public static BagObject toBagObject (Object object) {
-        return serializeWithTypeAndValue (object, true);
+        return serializeWithType (object, WITH_VERSION);
     }
 
     private static Object deserializePrimitiveType (String typeString, Object object) throws ClassNotFoundException, NoSuchMethodException, IllegalAccessException, InstantiationException, InvocationTargetException {
@@ -279,7 +294,13 @@ public class Serializer {
 
                     // get the name and type, and set the value from the encode value
                     //log.trace ("Add " + field.getName () + " as " + field.getType ().getName ());
-                    field.set (target, deserialize (field.getType ().getName (), bagObject.getObject (field.getName ())));
+                    Object fieldObject = bagObject.getObject (field.getName ());
+                    String fieldType = field.getType ().getName ();
+                    if ((fieldObject instanceof BagObject) && (((BagObject) fieldObject).getString (TYPE_KEY) != null)) {
+                        field.set (target, deserializeWithType ((BagObject) fieldObject, WITHOUT_VERSION));
+                    } else {
+                        field.set (target, deserialize (fieldType, fieldObject));
+                    }
 
                     // restore the accessibility - not 100% sure this is necessary, better be safe
                     // than sorry, right?
@@ -300,7 +321,7 @@ public class Serializer {
         Collection target = (Collection) type.newInstance ();
         BagArray bagArray = (BagArray) object;
         for (int i = 0, end = bagArray.getCount (); i < end; ++i) {
-            target.add (deserializeWithTypeAndValue (bagArray.getBagObject (i), false));
+            target.add (deserializeWithType (bagArray.getBagObject (i), WITHOUT_VERSION));
         }
         return target;
     }
@@ -311,8 +332,8 @@ public class Serializer {
         BagArray bagArray = (BagArray) object;
         for (int i = 0, end = bagArray.getCount (); i < end; ++i) {
             BagObject entry = bagArray.getBagObject (i);
-            Object key = deserializeWithTypeAndValue (entry.getBagObject (KEY_KEY), false);
-            Object value = deserializeWithTypeAndValue (entry.getBagObject (VALUE_KEY), false);
+            Object key = deserializeWithType (entry.getBagObject (KEY_KEY), WITHOUT_VERSION);
+            Object value = deserializeWithType (entry.getBagObject (VALUE_KEY), WITHOUT_VERSION);
             target.put (key, value);
         }
         return target;
@@ -380,7 +401,7 @@ public class Serializer {
         } else {
             // we should set each value
             for (int i = 0, end = arraySizes[x]; i < end; ++i) {
-                Array.set (target, i, deserializeWithTypeAndValue (bagArray.getBagObject (i), false));
+                Array.set (target, i, deserializeWithType (bagArray.getBagObject (i), WITHOUT_VERSION));
             }
         }
     }
@@ -423,7 +444,7 @@ public class Serializer {
         return result;
     }
 
-    private static Object deserializeWithTypeAndValue (BagObject bagObject, boolean expectVersion) {
+    private static Object deserializeWithType (BagObject bagObject, boolean expectVersion) {
         return ((bagObject != null) && checkVersion (expectVersion, bagObject))
                 ? deserialize (bagObject.getString (TYPE_KEY), bagObject.getObject (VALUE_KEY))
                 : null;
@@ -440,7 +461,7 @@ public class Serializer {
     public static <WorkingType> WorkingType fromBagObject (BagObject bagObject) {
         // we expect a future change might use a different approach to deserialization, so we
         // check to be sure this is the version we are working to
-        return (WorkingType) deserializeWithTypeAndValue (bagObject, true);
+        return (WorkingType) deserializeWithType (bagObject, WITH_VERSION);
     }
 
     /**
