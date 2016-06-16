@@ -29,9 +29,11 @@ public class Serializer {
     static final String SERIALIZER_VERSION_4 = "4";
     static final String SERIALIZER_VERSION = SERIALIZER_VERSION_4;
 
+    // flags to clarify whether or not to include/expect version
     private static final boolean WITH_VERSION = true;
     private static final boolean WITHOUT_VERSION = false;
 
+    // maps and sets to help with determining boxed type relationships
     private static final Map<String, Class> BOXED_TYPES_MAP;
     private static final Set<Class> BOXED_TYPES_SET;
     static {
@@ -453,10 +455,10 @@ public class Serializer {
     /**
      * Reconstitute the given BagObject representation back to the object it represents.
      *
+     * @param <WorkingType> template parameter for the type to return
      * @param bagObject the target BagObject to deserialize. It must be a valid representation of
      *                  the encoded type(i.e. created by the toBagObject method).
-     * @return the reconstituted object (user must typecast it), or null if the reconstitution
-     * failed.
+     * @return the reconstituted object, or null if the reconstitution failed.
      */
     public static <WorkingType> WorkingType fromBagObject (BagObject bagObject) {
         // we expect a future change might use a different approach to deserialization, so we
@@ -465,10 +467,10 @@ public class Serializer {
     }
 
     /**
-     * Reconstitute the given BagObject representation back to the object it represents.
+     * Reconstitute the given BagObject representation back to the object it represents, using a
+     * "best-effort" approach to matching the fields of the BagObject to the class being initialized.
      * @param type the Class representing the type to reconstruct
-     * @param bag The input data to reconstruct, either a BagObject or BagArray
-     * @param <WorkingType> template parameter for the type to return
+     * @param bag The input data to reconstruct from, either a BagObject or BagArray
      * @return the reconstituted object, or null if the reconstitution failed.
      */
     public static <WorkingType> WorkingType fromBagAsType (Class type, Bag bag) {
