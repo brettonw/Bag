@@ -14,33 +14,51 @@ class SortKey {
     private SortOrder order;
 
     public SortKey () {
-        type = DEFAULT_TYPE;
-        order = DEFAULT_ORDER;
+        this ((String) null);
     }
 
     public SortKey (String key) {
+        this (key, DEFAULT_TYPE, DEFAULT_ORDER);
+    }
+
+    public SortKey (String key, SortType type, SortOrder order) {
         this.key = key;
-        type = DEFAULT_TYPE;
-        order = DEFAULT_ORDER;
+        this.type = type;
+        this.order = order;
     }
 
     public SortKey (BagObject bagObject) {
-        key = bagObject.getString (KEY);
-        type = Enum.valueOf (SortType.class, bagObject.getString (TYPE, () -> DEFAULT_TYPE.name ()).toUpperCase ());
-        order = Enum.valueOf (SortOrder.class, bagObject.getString (ORDER, () -> DEFAULT_ORDER.name ()).toUpperCase ());
+        this (
+                bagObject.getString (KEY),
+                bagObject.getEnum (TYPE, SortType.class, () -> DEFAULT_TYPE),
+                bagObject.getEnum (ORDER, SortOrder.class, () -> DEFAULT_ORDER)
+        );
     }
 
     public String getKey () {
         return key;
     }
 
-    public SortKey setOrder (SortOrder order) {
-        this.order = order;
+    public SortType getType () {
+        return type;
+    }
+
+    public SortOrder getOrder () {
+        return order;
+    }
+
+    public SortKey setKey (String key) {
+        this.key = key;
         return this;
     }
 
     public SortKey setType (SortType type) {
         this.type = type;
+        return this;
+    }
+
+    public SortKey setOrder (SortOrder order) {
+        this.order = order;
         return this;
     }
 

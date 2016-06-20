@@ -30,6 +30,10 @@ abstract public class Bag {
                     return value;
 
                 default:
+                    // if it's an enum, just get the string value
+                    if (type.isEnum ()) {
+                        return ((Enum)value).name ();
+                    }
                     // no other type should be stored in the bag classes
                     //log.error ("Unhandled type: " + typeName);
                     throw new UnsupportedTypeException (type);
@@ -133,7 +137,16 @@ abstract public class Bag {
         return (object instanceof BagArray) ? (BagArray) object : notFound.get ();
     }
 
-    private <T> T getParsed (String key, Function<String, T> parser, Supplier<T> notFound) {
+    public <EnumType extends Enum<EnumType>> EnumType getEnum (String key, Class<EnumType> type) {
+        return getEnum (key, type, () -> null);
+    }
+
+    public <EnumType extends Enum<EnumType>> EnumType getEnum (String key, Class<EnumType> type, Supplier<EnumType> notFound) {
+        Object object = getObject (key);
+        return (object instanceof String) ? Enum.valueOf (type, (String) object) : notFound.get ();
+    }
+
+    private <ParsedType> ParsedType getParsed (String key, Function<String, ParsedType> parser, Supplier<ParsedType> notFound) {
         Object object = getObject (key);
         return (object instanceof String) ? parser.apply ((String) object) : notFound.get ();
     }

@@ -9,6 +9,8 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
+        SortKeyTest.class,
+        SelectKeyTest.class,
         BagArrayTest.class,
         BagObjectTest.class,
         KeyTest.class,

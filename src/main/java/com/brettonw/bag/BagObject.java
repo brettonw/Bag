@@ -32,7 +32,7 @@ public class BagObject extends Bag implements Selectable<BagObject> {
      * Create a new BagObject with a default underlying storage size.
      */
     public BagObject () {
-        init (DEFAULT_CONTAINER_SIZE);
+        this (DEFAULT_CONTAINER_SIZE);
     }
 
     /**
@@ -42,15 +42,34 @@ public class BagObject extends Bag implements Selectable<BagObject> {
      *             to normal allocation behavior.
      */
     public BagObject (int size) {
-        init (size);
+        count = 0;
+        container = new Pair[Math.max (size, 1)];
+    }
+
+    /**
+     * Create a BagObject
+     * @param size The expected number of elements in the BagObject, treated as a hint to optimize
+     *             memory allocation. If additional elements are stored, the BagObject will revert
+     *             to normal allocation behavior.
+     * @param format The format of the data supplied to the reader
+     * @param name The name of the data supplied to the reader, a filename or URL for instance. This
+     *             might be used to try to extract the MIME type of the data, for instance
+     * @param reader The formatted data to be used to construct the BagObject
+     * @throws IOException
+     * @throws ReadException
+     */
+    public BagObject (int size, String format, String name, Reader reader) throws IOException, ReadException {
+        this (size);
+        if (FormatReader.read (this, format, name, reader) == null) {
+            throw new ReadException ();
+        }
     }
 
     /**
      * Create a new BagObject as deep copy of another BagObject
      */
     public BagObject (BagObject bagObject) throws IOException, ReadException {
-        Reader reader = new StringReader (bagObject.toString (FormatWriterJson.JSON_FORMAT));
-        init (bagObject.getCount (), null, null, reader);
+        this (bagObject.getCount (), null, null, new StringReader (bagObject.toString (FormatWriterJson.JSON_FORMAT)));
     }
 
     /**
@@ -58,7 +77,7 @@ public class BagObject extends Bag implements Selectable<BagObject> {
      * @throws ReadException if the parser fails and the object is left in an unusable state
      */
     public BagObject (String formattedString) throws IOException, ReadException {
-        init (DEFAULT_CONTAINER_SIZE, null, null, new StringReader (formattedString));
+        this (DEFAULT_CONTAINER_SIZE, null, null, new StringReader (formattedString));
     }
 
     /**
@@ -67,7 +86,7 @@ public class BagObject extends Bag implements Selectable<BagObject> {
      * @throws ReadException if the parser fails and the object is left in an unusable state
      */
     public BagObject (String format, String formattedString) throws IOException, ReadException {
-        init (DEFAULT_CONTAINER_SIZE, format, null, new StringReader (formattedString));
+        this (DEFAULT_CONTAINER_SIZE, format, null, new StringReader (formattedString));
     }
 
     /**
@@ -75,7 +94,7 @@ public class BagObject extends Bag implements Selectable<BagObject> {
      * @throws ReadException if the parser fails and the object is left in an unusable state
      */
     public BagObject (InputStream formattedInputStream) throws IOException, ReadException {
-        init (DEFAULT_CONTAINER_SIZE, null, null, new InputStreamReader (formattedInputStream));
+        this (DEFAULT_CONTAINER_SIZE, null, null, new InputStreamReader (formattedInputStream));
     }
 
     /**
@@ -84,7 +103,7 @@ public class BagObject extends Bag implements Selectable<BagObject> {
      * @throws ReadException if the parser fails and the object is left in an unusable state
      */
     public BagObject (String format, InputStream formattedInputStream) throws IOException, ReadException {
-        init (DEFAULT_CONTAINER_SIZE, format, null, new InputStreamReader (formattedInputStream));
+        this (DEFAULT_CONTAINER_SIZE, format, null, new InputStreamReader (formattedInputStream));
     }
 
     /**
@@ -92,7 +111,7 @@ public class BagObject extends Bag implements Selectable<BagObject> {
      * @throws ReadException if the parser fails and the object is left in an unusable state
      */
     public BagObject (File formattedFile) throws IOException, ReadException {
-        init (DEFAULT_CONTAINER_SIZE, null, formattedFile.getName (), new FileReader (formattedFile));
+        this (DEFAULT_CONTAINER_SIZE, null, formattedFile.getName (), new FileReader (formattedFile));
     }
 
     /**
@@ -101,19 +120,7 @@ public class BagObject extends Bag implements Selectable<BagObject> {
      * @throws ReadException if the parser fails and the object is left in an unusable state
      */
     public BagObject (String format, File formattedFile) throws IOException, ReadException {
-        init (DEFAULT_CONTAINER_SIZE, format, formattedFile.getName (), new FileReader (formattedFile));
-    }
-
-    private void init (int containerSize) {
-        count = 0;
-        container = new Pair[Math.max (containerSize, 1)];
-    }
-
-    private void init (int containerSize, String format, String name, Reader reader) throws IOException, ReadException {
-        init (containerSize);
-        if (FormatReader.read (this, format, name, reader) == null) {
-            throw new ReadException ();
-        }
+        this (DEFAULT_CONTAINER_SIZE, format, formattedFile.getName (), new FileReader (formattedFile));
     }
 
     /**
