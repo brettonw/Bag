@@ -12,7 +12,7 @@ import com.brettonw.bag.FormatReader;
 import java.util.Arrays;
 
 public class FormatReaderJson extends FormatReader {
-    public static final String JSON_FORMAT = "json";
+    public static final String JSON_FORMAT = "application/json";
 
     public FormatReaderJson (String input) {
         super (input);

@@ -1,5 +1,6 @@
 package com.brettonw.bag;
 
+import com.brettonw.bag.json.FormatReaderJson;
 import com.brettonw.bag.json.FormatWriterJson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -69,7 +70,7 @@ public class BagObject extends Bag implements Selectable<BagObject> {
      * Create a new BagObject as deep copy of another BagObject
      */
     public BagObject (BagObject bagObject) throws IOException, ReadException {
-        this (bagObject.getCount (), null, null, new StringReader (bagObject.toString (FormatWriterJson.JSON_FORMAT)));
+        this (bagObject.getCount (), FormatReaderJson.JSON_FORMAT, null, new StringReader (bagObject.toString (FormatWriterJson.JSON_FORMAT)));
     }
 
     /**

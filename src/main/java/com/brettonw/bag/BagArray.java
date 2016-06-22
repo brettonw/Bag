@@ -21,6 +21,7 @@ import java.util.Arrays;
 public class BagArray extends Bag implements Selectable<BagArray> {
     private static final Logger log = LogManager.getLogger (BagArray.class);
 
+    private static final int UNKNOWN_SIZE = -1;
     private static final int START_SIZE = 1;
     private static final int DOUBLING_CAP = 128;
     private Object[] container;
@@ -30,7 +31,7 @@ public class BagArray extends Bag implements Selectable<BagArray> {
      * Create a new BagArray with a default underlying storage size.
      */
     public BagArray () {
-        init (START_SIZE);
+        this (UNKNOWN_SIZE);
     }
 
     /**
@@ -41,15 +42,33 @@ public class BagArray extends Bag implements Selectable<BagArray> {
      *             to normal allocation behavior.
      */
     public BagArray (int size) {
-        init (size);
+        count = 0;
+        container = new Object[Math.max (size, START_SIZE)];
+    }
+
+    /**
+     *  Create a new BagArray from a formatted external source
+     * @param size The expected number of elements in the BagArray (if we know it). It is treated as
+     *             a hint to optimize memory allocation. If additional elements are stored, the
+     *             BagArray will revert to normal allocation behavior.
+     * @param format
+     * @param name
+     * @param reader
+     * @throws IOException
+     * @throws ReadException
+     */
+    public BagArray (int size, String format, String name, Reader reader) throws IOException, ReadException {
+        this (size);
+        if (FormatReader.read (this, format, name, reader) == null) {
+            throw new ReadException ();
+        }
     }
 
     /**
      * Create a new BagArray as deep copy of another BagArray
      */
     public BagArray (BagArray bagArray) throws IOException, ReadException {
-        Reader reader = new StringReader (bagArray.toString (FormatWriterJson.JSON_FORMAT));
-        init (bagArray.getCount (), FormatReaderJson.JSON_FORMAT, null, reader);
+        this (bagArray.getCount (), FormatReaderJson.JSON_FORMAT, null, new StringReader (bagArray.toString (FormatWriterJson.JSON_FORMAT)));
     }
 
     /**
@@ -57,7 +76,7 @@ public class BagArray extends Bag implements Selectable<BagArray> {
      * @throws ReadException if the parser fails and the array is left in an unusable state
      */
     public BagArray (String formattedString) throws IOException, ReadException {
-        init (START_SIZE, null, null, new StringReader (formattedString));
+        this (UNKNOWN_SIZE, null, null, new StringReader (formattedString));
     }
 
     /**
@@ -65,7 +84,7 @@ public class BagArray extends Bag implements Selectable<BagArray> {
      * @throws ReadException if the parser fails and the array is left in an unusable state
      */
     public BagArray (String format, String formattedString) throws IOException, ReadException {
-        init (START_SIZE, format, null, new StringReader (formattedString));
+        this (UNKNOWN_SIZE, format, null, new StringReader (formattedString));
     }
 
     /**
@@ -73,7 +92,7 @@ public class BagArray extends Bag implements Selectable<BagArray> {
      * @throws ReadException if the parser fails and the array is left in an unusable state
      */
     public BagArray (InputStream formattedInputStream) throws IOException, ReadException {
-        init (START_SIZE, null, null, new InputStreamReader (formattedInputStream));
+        this (UNKNOWN_SIZE, null, null, new InputStreamReader (formattedInputStream));
     }
 
     /**
@@ -81,7 +100,7 @@ public class BagArray extends Bag implements Selectable<BagArray> {
      * @throws ReadException if the parser fails and the array is left in an unusable state
      */
     public BagArray (String format, InputStream formattedInputStream) throws IOException, ReadException {
-        init (START_SIZE, format, null, new InputStreamReader (formattedInputStream));
+        this (UNKNOWN_SIZE, format, null, new InputStreamReader (formattedInputStream));
     }
 
     /**
@@ -89,7 +108,7 @@ public class BagArray extends Bag implements Selectable<BagArray> {
      * @throws ReadException if the parser fails and the array is left in an unusable state
      */
     public BagArray (File formattedFile) throws IOException, ReadException {
-        init (START_SIZE, null, formattedFile.getName (), new FileReader (formattedFile));
+        this (UNKNOWN_SIZE, null, formattedFile.getName (), new FileReader (formattedFile));
     }
 
     /**
@@ -97,19 +116,7 @@ public class BagArray extends Bag implements Selectable<BagArray> {
      * @throws ReadException if the parser fails and the array is left in an unusable state
      */
     public BagArray (String format, File formattedFile) throws IOException, ReadException {
-        init (START_SIZE, format, formattedFile.getName (), new FileReader (formattedFile));
-    }
-
-    private void init (int containerSize) {
-        count = 0;
-        container = new Object[Math.max (containerSize, 1)];
-    }
-
-    private void init (int containerSize, String format, String name, Reader reader) throws IOException, ReadException {
-        init (containerSize);
-        if (FormatReader.read (this, format, name, reader) == null) {
-            throw new ReadException ();
-        }
+        this (UNKNOWN_SIZE, format, formattedFile.getName (), new FileReader (formattedFile));
     }
 
     /**

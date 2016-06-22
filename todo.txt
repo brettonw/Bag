@@ -8,7 +8,7 @@
 - 'putType' and 'getType' methods that invoke the Serializer?
 - should the serializer be automatically invoked when objectify fails with an unknown type? I think
   not, because the user will otherwise have to know to extract via the serializer
-- XML...
+- XML? CSV? Other formats?
 - iterators?
 - reader auto-detect the format?
 - "public" sweep
