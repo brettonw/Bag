@@ -60,7 +60,7 @@ public class SourceAdapterHttp extends SourceAdapter {
             // get the response data
             InputStream inputStream = connection.getInputStream();
             Reader inputStreamReader = new InputStreamReader (inputStream, charset);
-            stringData = SourceAdapter.readString (inputStreamReader);
+            stringData = readString (inputStreamReader);
             connection.disconnect();
         }
     }

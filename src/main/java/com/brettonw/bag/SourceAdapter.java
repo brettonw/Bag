@@ -42,6 +42,11 @@ public class SourceAdapter {
         return (stringData != null) ? stringData : noStringData.get ();
     }
 
+    static String deduceMimeType (String name) {
+        // XXX yeah, no
+        return "application/json";
+    }
+
     static String readString (Reader reader) throws IOException {
         BufferedReader bufferedReader = new BufferedReader (reader);
         StringBuilder stringBuilder = new StringBuilder ();
