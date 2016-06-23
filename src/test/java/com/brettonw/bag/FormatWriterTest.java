@@ -36,12 +36,12 @@ public class FormatWriterTest {
                                 .put ("r", "s")
                         )
                 );
-        String output = FormatWriter.write (bagObject, FormatWriterJson.JSON_FORMAT);
+        String output = FormatWriter.write (bagObject, MimeType.JSON);
         AppTest.report (output.length () > 0, true, "write...");
 
         try {
             BagObject recon = new BagObject (output);
-            AppTest.report (FormatWriter.write (recon, FormatWriterJson.JSON_FORMAT), output, "Json output is round-trippable");
+            AppTest.report (FormatWriter.write (recon, MimeType.JSON), output, "Json output is round-trippable");
             AppTest.report (recon.getString ("def/xyz"), "pdq", "Json output is valid");
         } catch (IOException e) {
             e.printStackTrace ();

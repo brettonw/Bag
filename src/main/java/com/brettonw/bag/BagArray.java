@@ -68,7 +68,7 @@ public class BagArray extends Bag implements Selectable<BagArray> {
      * Create a new BagArray as deep copy of another BagArray
      */
     public BagArray (BagArray bagArray) throws IOException, ReadException {
-        this (bagArray.getCount (), FormatReaderJson.JSON_FORMAT, null, new StringReader (bagArray.toString (FormatWriterJson.JSON_FORMAT)));
+        this (bagArray.getCount (), MimeType.JSON, null, new StringReader (bagArray.toString (MimeType.JSON)));
     }
 
     /**

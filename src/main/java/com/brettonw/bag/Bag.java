@@ -282,12 +282,12 @@ abstract public class Bag {
     @Override
     public String toString () {
         // JSON is the default format
-        return toString(FormatWriterJson.JSON_FORMAT);
+        return toString(MimeType.JSON);
     }
 
     // make sure we can read and/or write JSON formatted data
     static {
-        FormatWriter.registerFormatWriter (FormatWriterJson.JSON_FORMAT, false, FormatWriterJson::new);
-        FormatReader.registerFormatReader (FormatReaderJson.JSON_FORMAT, false, FormatReaderJson::new);
+        FormatWriter.registerFormatWriter (MimeType.JSON, false, FormatWriterJson::new);
+        FormatReader.registerFormatReader (MimeType.JSON, false, FormatReaderJson::new);
     }
 }

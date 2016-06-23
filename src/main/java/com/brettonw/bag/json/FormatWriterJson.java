@@ -5,8 +5,6 @@ import com.brettonw.bag.BagObject;
 import com.brettonw.bag.FormatWriter;
 
 public class FormatWriterJson extends FormatWriter {
-    public static final String JSON_FORMAT = "application/json";
-
     static final String[] CURLY_BRACKETS = { "{", "}" };
     static final String[] SQUARE_BRACKETS = { "[", "]" };
 

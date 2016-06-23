@@ -93,7 +93,7 @@ public class Http {
             connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("POST");
             connection.setRequestProperty("Content-Type", "application/json;charset=UTF-8");
-            String  jsonString = bag.toString(FormatWriterJson.JSON_FORMAT);
+            String  jsonString = bag.toString(MimeType.JSON);
             connection.setRequestProperty("Content-Length", Integer.toString(jsonString.getBytes().length));
             connection.setUseCaches(false);
 

@@ -18,7 +18,8 @@ import org.junit.runners.Suite;
         SerializerTest.class,
         FormatWriterTest.class,
         SourceAdapterTest.class,
-        SourceAdapterHttpTest.class
+        SourceAdapterHttpTest.class,
+        SourceAdapterReaderTest.class
 })
 
 public class AppTest {

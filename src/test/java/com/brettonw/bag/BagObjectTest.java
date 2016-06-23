@@ -178,7 +178,7 @@ public class BagObjectTest {
         try {
             // test a reconstruction from a hand-authored JSON string
             String jsonString = " { Married:\"true\",   \"Children\": [] ,       \"First Name\": \"Bretton\" , \"Last Name\" : \"Wade\" , \"Weight\":\"220.5\", Size:8 }";
-            BagObject bagObject = new BagObject (FormatReaderJson.JSON_FORMAT, jsonString);
+            BagObject bagObject = new BagObject (MimeType.JSON, jsonString);
             AppTest.report (bagObject.getString ("Last Name"), "Wade", "BagObject - reconstitute from a hand-crafted string should pass");
             AppTest.report (bagObject.has ("Married"), true, "BagObject - check that a tag is present");
             AppTest.report (bagObject.has ("Junk"), false, "BagObject - check that a tag is not present");
@@ -237,11 +237,11 @@ public class BagObjectTest {
             File testFile = new File ("data", "bagObject.json");
             BagObject bagObject = new BagObject (testFile);
             AppTest.report (bagObject != null, true, "BagObject - verify a successful load from a file - 1");
-            bagObject = new BagObject (FormatReaderJson.JSON_FORMAT, testFile);
+            bagObject = new BagObject (MimeType.JSON, testFile);
             AppTest.report (bagObject != null, true, "BagObject - verify a successful load from a file - 2");
             bagObject = new BagObject (new FileInputStream (testFile));
             AppTest.report (bagObject.getString ("glossary/title"), "example glossary", "BagObject - basic test that load from stream succeeds - 1");
-            bagObject = new BagObject (FormatReaderJson.JSON_FORMAT, new FileInputStream (testFile));
+            bagObject = new BagObject (MimeType.JSON, new FileInputStream (testFile));
             AppTest.report (bagObject.getString ("glossary/title"), "example glossary", "BagObject - basic test that load from stream succeeds - 2");
             AppTest.report (bagObject.getString ("glossary/GlossDiv/GlossList/GlossEntry/ID"), "SGML", "BagObject - complex test that load from stream succeeds");
         } catch (IOException exception) {

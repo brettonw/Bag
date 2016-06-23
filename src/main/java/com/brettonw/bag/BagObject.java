@@ -70,7 +70,7 @@ public class BagObject extends Bag implements Selectable<BagObject> {
      * Create a new BagObject as deep copy of another BagObject
      */
     public BagObject (BagObject bagObject) throws IOException, ReadException {
-        this (bagObject.getCount (), FormatReaderJson.JSON_FORMAT, null, new StringReader (bagObject.toString (FormatWriterJson.JSON_FORMAT)));
+        this (bagObject.getCount (), MimeType.JSON, null, new StringReader (bagObject.toString (MimeType.JSON)));
     }
 
     /**

@@ -146,17 +146,17 @@ public class BagArrayTest {
     public void testRegressionCase() {
         try {
             File testFile = new File ("data", "UCS_Satellite_Database_2-1-14.json");
-            BagArray bagArray = new BagArray (FormatReaderJson.JSON_FORMAT, testFile);
+            BagArray bagArray = new BagArray (MimeType.JSON, testFile);
             AppTest.report (bagArray != null, true, "BagArray - Regression Test 1");
             bagArray = new BagArray (testFile);
             AppTest.report (bagArray != null, true, "BagArray - Regression Test 2");
-            bagArray = new BagArray (FormatReaderJson.JSON_FORMAT, new FileInputStream (testFile));
+            bagArray = new BagArray (MimeType.JSON, new FileInputStream (testFile));
             AppTest.report (bagArray != null, true, "BagArray - Regression Test 3");
             bagArray = new BagArray (new FileInputStream (testFile));
             AppTest.report (bagArray != null, true, "BagArray - Regression Test 4");
 
-            String string = bagArray.toString (FormatWriterJson.JSON_FORMAT);
-            bagArray = new BagArray (FormatReaderJson.JSON_FORMAT, string);
+            String string = bagArray.toString (MimeType.JSON);
+            bagArray = new BagArray (MimeType.JSON, string);
             AppTest.report (bagArray != null, true, "BagArray - Regression Test 4");
         } catch (Exception exception) {
             AppTest.report (false, true, "BagArray - Regression Test 1 - Exception failure");

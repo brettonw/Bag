@@ -25,7 +25,7 @@ public class SourceAdapterHttpTest {
                     .put ("login", "brettonw")
                     .put ("First Name", "Bretton")
                     .put ("Last Name", "Wade");
-            SourceAdapter sourceAdapter = new SourceAdapterHttp ("http://jsonplaceholder.typicode.com/posts/", bagObject, FormatWriterJson.JSON_FORMAT);
+            SourceAdapter sourceAdapter = new SourceAdapterHttp ("http://jsonplaceholder.typicode.com/posts/", bagObject, MimeType.JSON);
             BagObject responseBagObject = new BagObject (sourceAdapter.getStringData ());
             AppTest.report (responseBagObject.getString ("login"), "brettonw", "Got a valid response");
         } catch (IOException exception ){

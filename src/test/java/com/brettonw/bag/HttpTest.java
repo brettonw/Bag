@@ -17,19 +17,19 @@ public class HttpTest {
         BagObject brettonw = Http.getForBagObject ("https://httpbin.org/ip", () -> null);
         AppTest.report (brettonw.getString ("origin") != null, true, "Got a valid BagObject - 1");
 
-        brettonw = Http.getForBagObject (FormatReaderJson.JSON_FORMAT, "https://httpbin.org/ip", () -> null);
+        brettonw = Http.getForBagObject (MimeType.JSON, "https://httpbin.org/ip", () -> null);
         AppTest.report (brettonw.getString ("origin") != null, true, "Got a valid BagObject - 2");
 
         BagArray repos = Http.getForBagArray ("https://api.github.com/users/brettonw/repos", () -> null);
         AppTest.report (repos.getCount () > 0, true, "Got a valid BagArray - 1");
 
-        repos = Http.getForBagArray (FormatReaderJson.JSON_FORMAT, "https://api.github.com/users/brettonw/repos", () -> null);
+        repos = Http.getForBagArray (MimeType.JSON, "https://api.github.com/users/brettonw/repos", () -> null);
         AppTest.report (repos.getCount () > 0, true, "Got a valid BagArray - 2");
     }
 
     @Test
     public void testPost () throws IOException {
-        BagObject postResponseBagObject = Http.postForBagObject (FormatReaderJson.JSON_FORMAT, "http://jsonplaceholder.typicode.com/posts/",
+        BagObject postResponseBagObject = Http.postForBagObject (MimeType.JSON, "http://jsonplaceholder.typicode.com/posts/",
                 new BagObject ()
                         .put ("login", "brettonw")
                         .put ("First Name", "Bretton")
@@ -38,7 +38,7 @@ public class HttpTest {
         );
         AppTest.report (postResponseBagObject.getString ("login"), "brettonw", "Got a valid BagObject - 1");
 
-        postResponseBagObject = Http.postForBagObject (FormatReaderJson.JSON_FORMAT, "http://jsonplaceholder.typicode.com/posts/",
+        postResponseBagObject = Http.postForBagObject (MimeType.JSON, "http://jsonplaceholder.typicode.com/posts/",
                 new BagObject ()
                         .put ("login", "brettonw")
                         .put ("First Name", "Bretton")
@@ -47,7 +47,7 @@ public class HttpTest {
         );
         AppTest.report (postResponseBagObject.getString ("login"), "brettonw", "Got a valid BagObject - 2");
 
-        BagArray postResponseBagArray = Http.postForBagArray (FormatReaderJson.JSON_FORMAT, "http://jsonplaceholder.typicode.com/posts/",
+        BagArray postResponseBagArray = Http.postForBagArray (MimeType.JSON, "http://jsonplaceholder.typicode.com/posts/",
                 new BagArray ()
                         .add ("login")
                         .add ("brettonw")
@@ -59,7 +59,7 @@ public class HttpTest {
         );
         AppTest.report (postResponseBagArray.getString (1), "brettonw", "Got a valid BagArray - 1");
 
-        postResponseBagArray = Http.postForBagArray (FormatReaderJson.JSON_FORMAT, "http://jsonplaceholder.typicode.com/posts/",
+        postResponseBagArray = Http.postForBagArray (MimeType.JSON, "http://jsonplaceholder.typicode.com/posts/",
                 new BagArray ()
                         .add ("login")
                         .add ("brettonw")
@@ -74,13 +74,13 @@ public class HttpTest {
 
     @Test
     public void testBogusGet () throws IOException {
-        BagObject bogus = Http.getForBagObject (FormatReaderJson.JSON_FORMAT, "http://gojsonogle.com", () -> null);
+        BagObject bogus = Http.getForBagObject (MimeType.JSON, "http://gojsonogle.com", () -> null);
         AppTest.report (bogus, null, "Not a valid URL");
     }
 
     @Test
     public void testBogusPost () throws IOException {
-        BagObject bogus = Http.postForBagObject (FormatReaderJson.JSON_FORMAT, "http://gojsonogle.com", new BagObject ().put ("a", "b"), () -> null);
+        BagObject bogus = Http.postForBagObject (MimeType.JSON, "http://gojsonogle.com", new BagObject ().put ("a", "b"), () -> null);
         AppTest.report (bogus, null, "Not a valid URL");
     }
 }
