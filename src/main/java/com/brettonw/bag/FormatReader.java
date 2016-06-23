@@ -237,4 +237,20 @@ abstract public class FormatReader {
         FormatReader formatReader = getFormatReader (format, name, reader);
         return (formatReader != null) ? formatReader.read (bagObject) : null;
     }
+
+    private static FormatReader getFormatReader (String mimeType, String stringData) {
+        // deduce the format, and create the format reader
+        return ((mimeType != null) && formatReaders.containsKey(mimeType)) ? formatReaders.get(mimeType).apply(stringData) : null;
+    }
+
+    public static BagArray read (BagArray bagArray, SourceAdapter sourceAdapter) {
+        FormatReader formatReader = getFormatReader(sourceAdapter.getMimeType(), sourceAdapter.getStringData());
+        return (formatReader != null) ? formatReader.read (bagArray) : null;
+    }
+
+    public static BagObject read (BagObject bagObject, SourceAdapter sourceAdapter) {
+        FormatReader formatReader = getFormatReader(sourceAdapter.getMimeType(), sourceAdapter.getStringData());
+        return (formatReader != null) ? formatReader.read (bagObject) : null;
+    }
+
 }

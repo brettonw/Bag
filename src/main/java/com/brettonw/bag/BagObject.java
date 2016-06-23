@@ -52,6 +52,22 @@ public class BagObject extends Bag implements Selectable<BagObject> {
      * @param size The expected number of elements in the BagObject, treated as a hint to optimize
      *             memory allocation. If additional elements are stored, the BagObject will revert
      *             to normal allocation behavior.
+     * @param sourceAdapter The adaptor to the formatted data to be used to construct the BagObject
+     * @throws IOException
+     * @throws ReadException
+     */
+    public BagObject (int size, SourceAdapter sourceAdapter) throws ReadException {
+        this (size);
+        if (FormatReader.read (this, sourceAdapter) == null) {
+            throw new ReadException ();
+        }
+    }
+
+    /**
+     * Create a BagObject
+     * @param size The expected number of elements in the BagObject, treated as a hint to optimize
+     *             memory allocation. If additional elements are stored, the BagObject will revert
+     *             to normal allocation behavior.
      * @param format The format of the data supplied to the reader
      * @param name The name of the data supplied to the reader, a filename or URL for instance. This
      *             might be used to try to extract the MIME type of the data, for instance

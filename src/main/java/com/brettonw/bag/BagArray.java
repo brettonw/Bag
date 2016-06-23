@@ -47,6 +47,19 @@ public class BagArray extends Bag implements Selectable<BagArray> {
     }
 
     /**
+     * 
+     * @param size
+     * @param sourceAdapter
+     * @throws ReadException
+     */
+    public BagArray (int size, SourceAdapter sourceAdapter) throws ReadException {
+        this (size);
+        if (FormatReader.read (this, sourceAdapter) == null) {
+            throw new ReadException ();
+        }
+    }
+
+    /**
      *  Create a new BagArray from a formatted external source
      * @param size The expected number of elements in the BagArray (if we know it). It is treated as
      *             a hint to optimize memory allocation. If additional elements are stored, the
