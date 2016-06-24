@@ -1,12 +1,9 @@
 package com.brettonw.bag;
 
 import com.brettonw.bag.expr.BooleanExpr;
-import com.brettonw.bag.json.FormatReaderJson;
-import com.brettonw.bag.json.FormatWriterJson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.*;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
@@ -22,7 +19,7 @@ public class BagArray extends Bag implements Selectable<BagArray> {
     private static final Logger log = LogManager.getLogger (BagArray.class);
 
     private static final int UNKNOWN_SIZE = -1;
-    private static final int START_SIZE = 1;
+    private static final int DEFAULT_CONTAINER_SIZE = 1;
     private static final int DOUBLING_CAP = 128;
     private Object[] container;
     private int count;
@@ -43,16 +40,14 @@ public class BagArray extends Bag implements Selectable<BagArray> {
      */
     public BagArray (int size) {
         count = 0;
-        container = new Object[Math.max (size, START_SIZE)];
+        container = new Object[Math.max (size, DEFAULT_CONTAINER_SIZE)];
     }
 
-    /**
-     * 
-     * @param size
-     * @param sourceAdapter
-     * @throws ReadException
-     */
-    public BagArray (int size, SourceAdapter sourceAdapter) throws ReadException {
+    BagArray (SourceAdapter sourceAdapter) throws ReadException {
+        this (UNKNOWN_SIZE, sourceAdapter);
+    }
+
+    BagArray (int size, SourceAdapter sourceAdapter) throws ReadException {
         this (size);
         if (FormatReader.read (this, sourceAdapter) == null) {
             throw new ReadException ();
@@ -60,76 +55,10 @@ public class BagArray extends Bag implements Selectable<BagArray> {
     }
 
     /**
-     *  Create a new BagArray from a formatted external source
-     * @param size The expected number of elements in the BagArray (if we know it). It is treated as
-     *             a hint to optimize memory allocation. If additional elements are stored, the
-     *             BagArray will revert to normal allocation behavior.
-     * @param format
-     * @param name
-     * @param reader
-     * @throws IOException
-     * @throws ReadException
-     */
-    public BagArray (int size, String format, String name, Reader reader) throws IOException, ReadException {
-        this (size);
-        if (FormatReader.read (this, format, name, reader) == null) {
-            throw new ReadException ();
-        }
-    }
-
-    /**
      * Create a new BagArray as deep copy of another BagArray
      */
-    public BagArray (BagArray bagArray) throws IOException, ReadException {
-        this (bagArray.getCount (), MimeType.JSON, null, new StringReader (bagArray.toString (MimeType.JSON)));
-    }
-
-    /**
-     * Create a new BagArray initialized from a formatted string
-     * @throws ReadException if the parser fails and the array is left in an unusable state
-     */
-    public BagArray (String formattedString) throws IOException, ReadException {
-        this (UNKNOWN_SIZE, null, null, new StringReader (formattedString));
-    }
-
-    /**
-     * Create a new BagArray initialized from a formatted string
-     * @throws ReadException if the parser fails and the array is left in an unusable state
-     */
-    public BagArray (String format, String formattedString) throws IOException, ReadException {
-        this (UNKNOWN_SIZE, format, null, new StringReader (formattedString));
-    }
-
-    /**
-     * Create a new BagArray initialized from a formatted string read out of an inputStream
-     * @throws ReadException if the parser fails and the array is left in an unusable state
-     */
-    public BagArray (InputStream formattedInputStream) throws IOException, ReadException {
-        this (UNKNOWN_SIZE, null, null, new InputStreamReader (formattedInputStream));
-    }
-
-    /**
-     * Create a new BagArray initialized from a formatted string read out of an inputStream
-     * @throws ReadException if the parser fails and the array is left in an unusable state
-     */
-    public BagArray (String format, InputStream formattedInputStream) throws IOException, ReadException {
-        this (UNKNOWN_SIZE, format, null, new InputStreamReader (formattedInputStream));
-    }
-
-    /**
-     * Create a new BagArray initialized from a formatted string read out of a file
-     * @throws ReadException if the parser fails and the array is left in an unusable state
-     */
-    public BagArray (File formattedFile) throws IOException, ReadException {
-        this (UNKNOWN_SIZE, null, formattedFile.getName (), new FileReader (formattedFile));
-    }
-
-    /**
-     * Create a new BagArray initialized from a formatted string read out of a file
-     * @throws ReadException if the parser fails and the array is left in an unusable state
-     */
-    public BagArray (String format, File formattedFile) throws IOException, ReadException {
-        this (UNKNOWN_SIZE, format, formattedFile.getName (), new FileReader (formattedFile));
+    public BagArray (BagArray bagArray) {
+        this (bagArray.getCount (), new SourceAdapter (bagArray.toString (MimeType.DEFAULT), MimeType.DEFAULT));
     }
 
     /**

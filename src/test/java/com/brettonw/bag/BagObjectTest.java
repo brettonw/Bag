@@ -1,7 +1,6 @@
 package com.brettonw.bag;
 
 import com.brettonw.AppTest;
-import com.brettonw.bag.json.FormatReaderJson;
 import com.brettonw.bag.test.TestClassA;
 import com.brettonw.bag.test.TestEnumXYZ;
 import org.apache.logging.log4j.LogManager;
@@ -48,7 +47,6 @@ public class BagObjectTest {
 
     @Test
     public void testSimpleStringSerialization() {
-        try {
             // first round, a simple string serialization example
             BagObject testObject = new BagObject ();
             testObject.put ("First Name", "Bretton");
@@ -58,18 +56,14 @@ public class BagObjectTest {
             String testString = testObject.toString ();
             AppTest.report (testString, testString, "BagObject simple ToString exercise (" + testString + ")");
 
-            BagObject recon = new BagObject (testString);
+            BagObject recon = BagObjectFrom.string (testString);
             assertNotNull (recon);
             String reconString = recon.toString ();
             AppTest.report (reconString, testString, "BagObject simple reconstitution");
-        } catch (IOException exception) {
-            AppTest.report (false, true, "An exception is a failure case");
-        }
     }
 
     @Test
     public void testComplexStringSerialization() {
-        try {
             // second round, a bit more sophisticated
             BagObject testObject = new BagObject();
             testObject.put("First Name", "Bretton");
@@ -88,28 +82,21 @@ public class BagObjectTest {
             String testString = testObject.toString ();
             AppTest.report (testString, testString, "BagObject simple ToString exercise (" + testString + ")");
 
-            BagObject recon = new BagObject (testString);
+            BagObject recon = BagObjectFrom.string (testString);
             assertNotNull (recon);
             String reconString = recon.toString ();
             AppTest.report (reconString, testString, "BagObject simple reconstitution");
-        } catch (IOException exception) {
-            AppTest.report (false, true, "An exception is a failure case");
-        }
     }
 
     @Test
     public void testEscapedStrings() {
-        try {
             // test an escaped string
             String escapedString = "a longer string with a \\\"quote from shakespeare\\\" in \\\"it\\\"";
             BagObject testObject = new BagObject ().put ("escaped", escapedString);
             AppTest.report (testObject.getString ("escaped"), escapedString, "BagObject simple test escaped string");
             String testString = testObject.toString ();
-            BagObject recon = new BagObject (testString);
+            BagObject recon = BagObjectFrom.string (testString);
             AppTest.report (recon.getString ("escaped"), escapedString, "BagObject simple test escaped string from reconstituted bagobject");
-        } catch (IOException exception) {
-            AppTest.report (false, true, "An exception is a failure case");
-        }
     }
 
     @Test
@@ -125,7 +112,6 @@ public class BagObjectTest {
 
     @Test
     public void testSubObject() {
-        try {
             // on with the show
             BagObject dateObject = new BagObject ()
                     .put ("Year", 2015)
@@ -144,7 +130,7 @@ public class BagObjectTest {
             String testString = testObject.toString ();
             AppTest.report (testString, testString, "BagObject complex ToString exercise (" + testString + ")");
 
-            BagObject recon = new BagObject (testString);
+            BagObject recon = BagObjectFrom.string (testString);
             String reconString = recon.toString ();
             AppTest.report (recon, testObject, "BagObject complex object equals");
             AppTest.report (reconString, testString, "BagObject complex reconsititution");
@@ -155,53 +141,36 @@ public class BagObjectTest {
 
             AppTest.report (recon.getBoolean ("DOB"), null, "BagObject simple bad type request (should be null)");
             AppTest.report (recon.getString ("Joseph"), null, "BagObject simple bad key request (should be null)");
-        } catch (IOException exception) {
-            AppTest.report (false, true, "An exception is a failure case");
-        }
     }
 
     @Test
     public void testEmptyObject() {
-        try {
             // test reconstruction of an empty object
             BagObject bagObject = new BagObject ();
             String testString = bagObject.toString ();
-            BagObject reconBagObject = new BagObject (testString);
+            BagObject reconBagObject = BagObjectFrom.string (testString);
             AppTest.report (reconBagObject.toString (), testString, "BagObject - reconstitute an empty object");
-        } catch (IOException exception) {
-            AppTest.report (false, true, "An exception is a failure case");
-        }
     }
 
     @Test
     public void testHandAuthoredJson() {
-        try {
             // test a reconstruction from a hand-authored JSON string
             String jsonString = " { Married:\"true\",   \"Children\": [] ,       \"First Name\": \"Bretton\" , \"Last Name\" : \"Wade\" , \"Weight\":\"220.5\", Size:8 }";
-            BagObject bagObject = new BagObject (MimeType.JSON, jsonString);
+            BagObject bagObject = BagObjectFrom.string (jsonString, MimeType.JSON);
             AppTest.report (bagObject.getString ("Last Name"), "Wade", "BagObject - reconstitute from a hand-crafted string should pass");
             AppTest.report (bagObject.has ("Married"), true, "BagObject - check that a tag is present");
             AppTest.report (bagObject.has ("Junk"), false, "BagObject - check that a tag is not present");
             AppTest.report (bagObject.getBoolean ("Married"), true, "BagObject - reconstitute from a hand-crafted string with bare names should pass");
             AppTest.report (bagObject.getInteger ("Size"), 8, "BagObject - reconstitute from a hand-crafted string with bare values should pass");
             AppTest.report (bagObject.getBagArray ("Children").getCount (), 0, "BagObject - reconstitute from a hand-crafted string with empty array should be size 0");
-        } catch (IOException exception) {
-            AppTest.report (false, true, "An exception is a failure case");
-        }
     }
 
     @Test
     public void testBogusJson() {
-        try {
             // test a reconstruction from a bogus string
             String bogusString = "{\"Children\":\"\",\"First Name\":\"Bretton\",\"\"Wade\",\"Married\":\"true\",\"Weight\":\"220.5\"}";
-            BagObject bogusBagObject = new BagObject (bogusString);
+            BagObject bogusBagObject = BagObjectFrom.string (bogusString);
             AppTest.report (bogusBagObject, null, "BagObject - reconstitute from a bogus string should fail");
-        } catch (ReadException readException) {
-            AppTest.report (false, false, "BagObject - reconstitute from a bogus string should fail");
-        } catch (IOException exception) {
-            AppTest.report (false, true, "An exception is a failure case");
-        }
     }
 
     @Test
@@ -235,14 +204,12 @@ public class BagObjectTest {
         // file and stream tests
         try {
             File testFile = new File ("data", "bagObject.json");
-            BagObject bagObject = new BagObject (testFile);
+            BagObject bagObject = BagObjectFrom.file (testFile);
             AppTest.report (bagObject != null, true, "BagObject - verify a successful load from a file - 1");
-            bagObject = new BagObject (MimeType.JSON, testFile);
+            bagObject = BagObjectFrom.file (testFile, MimeType.JSON);
             AppTest.report (bagObject != null, true, "BagObject - verify a successful load from a file - 2");
-            bagObject = new BagObject (new FileInputStream (testFile));
+            bagObject = BagObjectFrom.inputStream (new FileInputStream (testFile), MimeType.JSON);
             AppTest.report (bagObject.getString ("glossary/title"), "example glossary", "BagObject - basic test that load from stream succeeds - 1");
-            bagObject = new BagObject (MimeType.JSON, new FileInputStream (testFile));
-            AppTest.report (bagObject.getString ("glossary/title"), "example glossary", "BagObject - basic test that load from stream succeeds - 2");
             AppTest.report (bagObject.getString ("glossary/GlossDiv/GlossList/GlossEntry/ID"), "SGML", "BagObject - complex test that load from stream succeeds");
         } catch (IOException exception) {
             AppTest.report (false, true, exception.getMessage ());
@@ -252,49 +219,23 @@ public class BagObjectTest {
 
     @Test
     public void testJohnF() {
-        try {
             File testFile = new File ("data", "JohnF.json");
-            BagObject bagObject = new BagObject (testFile);
+            BagObject bagObject = BagObjectFrom.file (testFile);
             AppTest.report (bagObject != null, true, "BagObject - test regression case on complex file successfully loaded");
-        } catch (IOException exception) {
-            AppTest.report (false, true, exception.getMessage ());
-        }
     }
 
     @Test
     public void testJohnF2() {
-        try {
             File testFile = new File ("data", "JohnF2.json");
-            BagObject bagObject = new BagObject (testFile);
+            BagObject bagObject = BagObjectFrom.file (testFile);
             AppTest.report (bagObject != null, true, "BagObject - test regression case on complex file 2 successfully loaded");
-        } catch (IOException exception) {
-            AppTest.report (false, true, exception.getMessage ());
-        }
     }
 
     @Test
     public void testBadFiles() {
-        try {
-            try {
-                new BagObject (new File ("data", "badFile.json"));
-            } catch (ReadException readException) {
-                AppTest.report (false, false, "BagObject - Test that a bad file fails to parse (check error message in log)");
-            }
-
-            try {
-                new BagObject (new File ("data", "badFile2.json"));
-            } catch (ReadException readException) {
-                AppTest.report (false, false, "BagObject - Test that a bad file fails to parse 2 (check error message in log)");
-            }
-
-            try {
-                new BagObject (new File ("data", "badFile3.json"));
-            } catch (ReadException readException) {
-                AppTest.report (false, false, "BagObject - Test that a bad file fails to parse 3 (check error message in log)");
-            }
-        } catch (IOException exception) {
-            AppTest.report (false, true, exception.getMessage ());
-        }
+        AppTest.report (BagObjectFrom.file (new File ("data", "badFile.json")), null, "BagObject - Test that a bad file fails to parse 1 (check error message in log)");
+        AppTest.report (BagObjectFrom.file (new File ("data", "badFile2.json")), null, "BagObject - Test that a bad file fails to parse 2 (check error message in log)");
+        AppTest.report (BagObjectFrom.file (new File ("data", "badFile3.json")), null, "BagObject - Test that a bad file fails to parse 3 (check error message in log)");
     }
 
     @Test
@@ -388,8 +329,8 @@ public class BagObjectTest {
     public void testBogusInstantiationFallback () {
         BagObject bagObject = new BagObject ().put ("x", "y");
         try {
-            BagObject fetched = bagObject.getBagObject ("q", () -> new BagObject (new File ("bogus.txt")));
-            AppTest.report (false, true, "BagObject should throw exception when constructing from bogus source");
+            BagObject fetched = bagObject.getBagObject ("q", () -> BagObjectFrom.file (new File ("bogus.txt")));
+            AppTest.report (fetched, null, "BagObject should fail spectacularly");
         } catch (IOException exception) {
             AppTest.report (true, true, "BagObject should throw exception when constructing from bogus source");
         }

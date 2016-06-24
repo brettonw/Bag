@@ -1,7 +1,6 @@
 package com.brettonw.bag;
 
 import com.brettonw.AppTest;
-import com.brettonw.bag.json.FormatReaderJson;
 import org.junit.Test;
 
 import java.io.IOException;
@@ -9,40 +8,36 @@ import java.io.IOException;
 public class HttpTest {
     @Test
     public void test () {
-        new Http ();
+
     }
 
     @Test
     public void testGet () throws IOException {
-        BagObject brettonw = Http.getForBagObject ("https://httpbin.org/ip", () -> null);
-        AppTest.report (brettonw.getString ("origin") != null, true, "Got a valid BagObject - 1");
+        BagObject brettonw = BagObjectFrom.url ("https://httpbin.org/ip", () -> null);
+        AppTest.report (brettonw.getString ("origin") != null, true, "Got a valid BagObject");
 
-        brettonw = Http.getForBagObject (MimeType.JSON, "https://httpbin.org/ip", () -> null);
-        AppTest.report (brettonw.getString ("origin") != null, true, "Got a valid BagObject - 2");
-
-        BagArray repos = Http.getForBagArray ("https://api.github.com/users/brettonw/repos", () -> null);
-        AppTest.report (repos.getCount () > 0, true, "Got a valid BagArray - 1");
-
-        repos = Http.getForBagArray (MimeType.JSON, "https://api.github.com/users/brettonw/repos", () -> null);
-        AppTest.report (repos.getCount () > 0, true, "Got a valid BagArray - 2");
+        BagArray repos = BagArrayFrom.url ("https://api.github.com/users/brettonw/repos", () -> null);
+        AppTest.report (repos.getCount () > 0, true, "Got a valid BagArray");
     }
 
     @Test
     public void testPost () throws IOException {
-        BagObject postResponseBagObject = Http.postForBagObject (MimeType.JSON, "http://jsonplaceholder.typicode.com/posts/",
+        BagObject postResponseBagObject = BagObjectFrom.url ("http://jsonplaceholder.typicode.com/posts/",
                 new BagObject ()
                         .put ("login", "brettonw")
                         .put ("First Name", "Bretton")
                         .put ("Last Name", "Wade"),
+                MimeType.JSON,
                 () -> null
         );
         AppTest.report (postResponseBagObject.getString ("login"), "brettonw", "Got a valid BagObject - 1");
 
-        postResponseBagObject = Http.postForBagObject (MimeType.JSON, "http://jsonplaceholder.typicode.com/posts/",
+        postResponseBagObject = BagObjectFrom.url ("http://jsonplaceholder.typicode.com/posts/",
                 new BagObject ()
                         .put ("login", "brettonw")
                         .put ("First Name", "Bretton")
                         .put ("Last Name", "Wade"),
+                MimeType.JSON,
                 () -> null
         );
         AppTest.report (postResponseBagObject.getString ("login"), "brettonw", "Got a valid BagObject - 2");
@@ -74,13 +69,13 @@ public class HttpTest {
 
     @Test
     public void testBogusGet () throws IOException {
-        BagObject bogus = Http.getForBagObject (MimeType.JSON, "http://gojsonogle.com", () -> null);
+        BagObject bogus = BagObjectFrom.url ("http://gojsonogle.com", () -> null);
         AppTest.report (bogus, null, "Not a valid URL");
     }
 
     @Test
     public void testBogusPost () throws IOException {
-        BagObject bogus = Http.postForBagObject (MimeType.JSON, "http://gojsonogle.com", new BagObject ().put ("a", "b"), () -> null);
+        BagObject bogus = BagObjectFrom.url ("http://gojsonogle.com", new BagObject ().put ("a", "b"), MimeType.JSON, () -> null);
         AppTest.report (bogus, null, "Not a valid URL");
     }
 }

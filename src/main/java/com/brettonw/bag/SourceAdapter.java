@@ -11,9 +11,9 @@ public class SourceAdapter {
 
     public SourceAdapter () {}
 
-    public SourceAdapter (String mimeType, String stringData) {
-        this.mimeType = mimeType;
+    public SourceAdapter (String stringData, String mimeType) {
         this.stringData = stringData;
+        this.mimeType = mimeType;
     }
 
     public SourceAdapter setMimeType (String mimeType) {
@@ -42,9 +42,21 @@ public class SourceAdapter {
         return (stringData != null) ? stringData : noStringData.get ();
     }
 
-    static String deduceMimeType (String name) {
-        // XXX yeah, no
-        return "application/json";
+    static String deduceMimeType (String hint, String name) {
+        // extract the name extension, this is the most definitive source
+        if (name != null) {
+            int i = name.lastIndexOf('.');
+            String extension = (i > 0) ? name.substring (i + 1).toLowerCase () : null;
+            if (extension != null) {
+                String mimeType = MimeType.getFromExtension (extension);
+                if (mimeType != null) {
+                    return mimeType;
+                }
+            }
+        }
+
+        // fall back to the hint
+        return hint;
     }
 
     static String readString (Reader reader) throws IOException {

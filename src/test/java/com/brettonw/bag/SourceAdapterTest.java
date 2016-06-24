@@ -16,10 +16,10 @@ public class SourceAdapterTest {
         AppTest.report (sourceAdapter.getStringData (), "xxx", "test getStringData");
 
         sourceAdapter = new SourceAdapter ("yyy", "zzz");
-        AppTest.report (sourceAdapter.getMimeType (), "yyy", "test getMimeType");
-        AppTest.report (sourceAdapter.getStringData (), "zzz", "test getStringData");
+        AppTest.report (sourceAdapter.getMimeType (), "zzz", "test getMimeType");
+        AppTest.report (sourceAdapter.getStringData (), "yyy", "test getStringData");
 
-        AppTest.report (sourceAdapter.getMimeType (() -> "abc"), "yyy", "test getMimeType");
-        AppTest.report (sourceAdapter.getStringData (() -> "def"), "zzz", "test getStringData");
+        AppTest.report (sourceAdapter.getMimeType (() -> "abc"), "zzz", "test getMimeType");
+        AppTest.report (sourceAdapter.getStringData (() -> "def"), "yyy", "test getStringData");
     }
 }

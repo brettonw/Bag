@@ -3,9 +3,6 @@ package com.brettonw.bag;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.Reader;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -162,94 +159,18 @@ abstract public class FormatReader {
         }
     }
 
-    private static String deduceFormat (String format, String name, String input) {
-        // did the user tell us? if so, go with it...
-        if (format != null) {
-            format = format.toLowerCase ();
-            if (formatReaders.containsKey (format)) {
-                return format;
-            }
-        }
-
-        // if there was a filename or url...
-        if (name != null) {
-            int i = name.lastIndexOf('.');
-            String extension = (i > 0) ? name.substring (i + 1).toLowerCase () : null;
-            if ((extension != null) && formatReaders.containsKey (extension)) {
-                return extension;
-            }
-        }
-
-        // ok, what if there is only one registered reader (probably a normal case)
-        if (formatReaders.size () == 1) {
-            return (String) formatReaders.keySet ().toArray ()[0];
-        }
-
-        // look at the input, and see if we can deduce the input type
-        // XXX TODO
-
-        return null;
-    }
-
-    private static FormatReader getFormatReader (String format, String name, Reader reader) throws IOException {
-        // read the input into the source string we will use
-        BufferedReader bufferedReader = new BufferedReader (reader);
-        StringBuilder stringBuilder = new StringBuilder ();
-        String line;
-        while ((line = bufferedReader.readLine ()) != null) {
-            stringBuilder.append (line).append ('\n');
-        }
-        bufferedReader.close ();
-        String input = stringBuilder.toString ();
-
-        // deduce the format, and create the format reader
-        format = deduceFormat (format, name, input);
-        if ((format != null) && formatReaders.containsKey(format)) {
-            return formatReaders.get(format).apply (input);
-        }
-        return null;
-    }
-
-    /**
-     *
-     * @param bagArray
-     * @param format
-     * @param name
-     * @param reader
-     * @return
-     * @throws IOException
-     */
-    public static BagArray read (BagArray bagArray, String format, String name, Reader reader) throws IOException {
-        FormatReader formatReader = getFormatReader (format, name, reader);
-        return (formatReader != null) ? formatReader.read (bagArray) : null;
-    }
-
-    /**
-     *
-     * @param bagObject
-     * @param format
-     * @param name
-     * @param reader
-     * @return
-     * @throws IOException
-     */
-    public static BagObject read (BagObject bagObject, String format, String name, Reader reader) throws IOException {
-        FormatReader formatReader = getFormatReader (format, name, reader);
-        return (formatReader != null) ? formatReader.read (bagObject) : null;
-    }
-
-    private static FormatReader getFormatReader (String mimeType, String stringData) {
+    private static FormatReader getFormatReader (String stringData, String mimeType) {
         // deduce the format, and create the format reader
         return ((mimeType != null) && formatReaders.containsKey(mimeType)) ? formatReaders.get(mimeType).apply(stringData) : null;
     }
 
     public static BagArray read (BagArray bagArray, SourceAdapter sourceAdapter) {
-        FormatReader formatReader = getFormatReader(sourceAdapter.getMimeType(), sourceAdapter.getStringData());
+        FormatReader formatReader = getFormatReader(sourceAdapter.getStringData(), sourceAdapter.getMimeType());
         return (formatReader != null) ? formatReader.read (bagArray) : null;
     }
 
     public static BagObject read (BagObject bagObject, SourceAdapter sourceAdapter) {
-        FormatReader formatReader = getFormatReader(sourceAdapter.getMimeType(), sourceAdapter.getStringData());
+        FormatReader formatReader = getFormatReader(sourceAdapter.getStringData(), sourceAdapter.getMimeType());
         return (formatReader != null) ? formatReader.read (bagObject) : null;
     }
 

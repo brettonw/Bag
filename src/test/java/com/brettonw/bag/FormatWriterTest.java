@@ -4,8 +4,6 @@ import com.brettonw.AppTest;
 import com.brettonw.bag.json.FormatWriterJson;
 import org.junit.Test;
 
-import java.io.IOException;
-
 public class FormatWriterTest {
 
     static {
@@ -39,12 +37,8 @@ public class FormatWriterTest {
         String output = FormatWriter.write (bagObject, MimeType.JSON);
         AppTest.report (output.length () > 0, true, "write...");
 
-        try {
-            BagObject recon = new BagObject (output);
-            AppTest.report (FormatWriter.write (recon, MimeType.JSON), output, "Json output is round-trippable");
-            AppTest.report (recon.getString ("def/xyz"), "pdq", "Json output is valid");
-        } catch (IOException e) {
-            e.printStackTrace ();
-        }
+        BagObject recon = BagObjectFrom.string (output);
+        AppTest.report (FormatWriter.write (recon, MimeType.JSON), output, "Json output is round-trippable");
+        AppTest.report (recon.getString ("def/xyz"), "pdq", "Json output is valid");
     }
 }

@@ -1,11 +1,7 @@
 package com.brettonw.bag;
 
-import com.brettonw.bag.json.FormatReaderJson;
-import com.brettonw.bag.json.FormatWriterJson;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
-import java.io.*;
 
 /**
  * A collection of text-based values store in key/value pairs (maintained in a sorted array).
@@ -13,6 +9,7 @@ import java.io.*;
 public class BagObject extends Bag implements Selectable<BagObject> {
     private static final Logger log = LogManager.getLogger (BagObject.class);
 
+    private static final int UNKNOWN_SIZE = -1;
     private static final int DEFAULT_CONTAINER_SIZE = 1;
     private static final int DOUBLING_CAP = 16;
     static final String PATH_SEPARATOR = "/";
@@ -33,7 +30,7 @@ public class BagObject extends Bag implements Selectable<BagObject> {
      * Create a new BagObject with a default underlying storage size.
      */
     public BagObject () {
-        this (DEFAULT_CONTAINER_SIZE);
+        this (UNKNOWN_SIZE);
     }
 
     /**
@@ -44,19 +41,14 @@ public class BagObject extends Bag implements Selectable<BagObject> {
      */
     public BagObject (int size) {
         count = 0;
-        container = new Pair[Math.max (size, 1)];
+        container = new Pair[Math.max (size, DEFAULT_CONTAINER_SIZE)];
     }
 
-    /**
-     * Create a BagObject
-     * @param size The expected number of elements in the BagObject, treated as a hint to optimize
-     *             memory allocation. If additional elements are stored, the BagObject will revert
-     *             to normal allocation behavior.
-     * @param sourceAdapter The adaptor to the formatted data to be used to construct the BagObject
-     * @throws IOException
-     * @throws ReadException
-     */
-    public BagObject (int size, SourceAdapter sourceAdapter) throws ReadException {
+    BagObject (SourceAdapter sourceAdapter) throws ReadException {
+        this (UNKNOWN_SIZE, sourceAdapter);
+    }
+
+    BagObject (int size, SourceAdapter sourceAdapter) throws ReadException {
         this (size);
         if (FormatReader.read (this, sourceAdapter) == null) {
             throw new ReadException ();
@@ -64,80 +56,10 @@ public class BagObject extends Bag implements Selectable<BagObject> {
     }
 
     /**
-     * Create a BagObject
-     * @param size The expected number of elements in the BagObject, treated as a hint to optimize
-     *             memory allocation. If additional elements are stored, the BagObject will revert
-     *             to normal allocation behavior.
-     * @param format The format of the data supplied to the reader
-     * @param name The name of the data supplied to the reader, a filename or URL for instance. This
-     *             might be used to try to extract the MIME type of the data, for instance
-     * @param reader The formatted data to be used to construct the BagObject
-     * @throws IOException
-     * @throws ReadException
-     */
-    public BagObject (int size, String format, String name, Reader reader) throws IOException, ReadException {
-        this (size);
-        if (FormatReader.read (this, format, name, reader) == null) {
-            throw new ReadException ();
-        }
-    }
-
-    /**
      * Create a new BagObject as deep copy of another BagObject
      */
-    public BagObject (BagObject bagObject) throws IOException, ReadException {
-        this (bagObject.getCount (), MimeType.JSON, null, new StringReader (bagObject.toString (MimeType.JSON)));
-    }
-
-    /**
-     * Create a new BagObject initialized from a formatted string
-     * @throws ReadException if the parser fails and the object is left in an unusable state
-     */
-    public BagObject (String formattedString) throws IOException, ReadException {
-        this (DEFAULT_CONTAINER_SIZE, null, null, new StringReader (formattedString));
-    }
-
-    /**
-     * Create a new BagObject initialized from a formatted string
-     * @param format String name of the format to parse
-     * @throws ReadException if the parser fails and the object is left in an unusable state
-     */
-    public BagObject (String format, String formattedString) throws IOException, ReadException {
-        this (DEFAULT_CONTAINER_SIZE, format, null, new StringReader (formattedString));
-    }
-
-    /**
-     * Create a new BagObject initialized from a formatted string read out of an inputStream
-     * @throws ReadException if the parser fails and the object is left in an unusable state
-     */
-    public BagObject (InputStream formattedInputStream) throws IOException, ReadException {
-        this (DEFAULT_CONTAINER_SIZE, null, null, new InputStreamReader (formattedInputStream));
-    }
-
-    /**
-     * Create a new BagObject initialized from a formatted string read out of an inputStream
-     * @param format String name of the format to parse
-     * @throws ReadException if the parser fails and the object is left in an unusable state
-     */
-    public BagObject (String format, InputStream formattedInputStream) throws IOException, ReadException {
-        this (DEFAULT_CONTAINER_SIZE, format, null, new InputStreamReader (formattedInputStream));
-    }
-
-    /**
-     * Create a new BagObject initialized from a formatted string read out of a file
-     * @throws ReadException if the parser fails and the object is left in an unusable state
-     */
-    public BagObject (File formattedFile) throws IOException, ReadException {
-        this (DEFAULT_CONTAINER_SIZE, null, formattedFile.getName (), new FileReader (formattedFile));
-    }
-
-    /**
-     * Create a new BagObject initialized from a formatted string read out of a file
-     * @param format String name of the format to parse
-     * @throws ReadException if the parser fails and the object is left in an unusable state
-     */
-    public BagObject (String format, File formattedFile) throws IOException, ReadException {
-        this (DEFAULT_CONTAINER_SIZE, format, formattedFile.getName (), new FileReader (formattedFile));
+    public BagObject (BagObject bagObject) {
+        this (bagObject.getCount (), new SourceAdapter (bagObject.toString (MimeType.DEFAULT), MimeType.DEFAULT));
     }
 
     /**
