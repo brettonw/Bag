@@ -53,6 +53,7 @@ public class Serializer {
         }
     }
 
+    /*
     private static final class ClassLoaderResolver extends SecurityManager
     {
         private static final ClassLoaderResolver CLASS_LOADER_RESOLVER = new ClassLoaderResolver ();
@@ -65,6 +66,7 @@ public class Serializer {
             return classLoaderCallStack;
         }
     }
+    */
 
     private static Class getClass (String typeString) throws ClassNotFoundException {
         /*

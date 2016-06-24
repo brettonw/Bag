@@ -14,12 +14,13 @@ import org.junit.runners.Suite;
         BagArrayTest.class,
         BagObjectTest.class,
         KeyTest.class,
-        HttpTest.class,
+        FromUrlTest.class,
         SerializerTest.class,
         FormatWriterTest.class,
         SourceAdapterTest.class,
         SourceAdapterHttpTest.class,
-        SourceAdapterReaderTest.class
+        SourceAdapterReaderTest.class,
+        MimeTypeTest.class
 })
 
 public class AppTest {

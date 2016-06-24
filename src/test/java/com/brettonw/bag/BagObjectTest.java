@@ -206,6 +206,11 @@ public class BagObjectTest {
             File testFile = new File ("data", "bagObject.json");
             BagObject bagObject = BagObjectFrom.file (testFile);
             AppTest.report (bagObject != null, true, "BagObject - verify a successful load from a file - 1");
+
+            testFile = new File ("data", "bagObject.txt");
+            bagObject = BagObjectFrom.file (testFile);
+            AppTest.report (bagObject != null, true, "BagObject - verify a successful load from a file - 1");
+
             bagObject = BagObjectFrom.file (testFile, MimeType.JSON);
             AppTest.report (bagObject != null, true, "BagObject - verify a successful load from a file - 2");
             bagObject = BagObjectFrom.inputStream (new FileInputStream (testFile), MimeType.JSON);

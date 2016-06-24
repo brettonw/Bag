@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 
-public class HttpTest {
+public class FromUrlTest {
     @Test
     public void test () {
 
