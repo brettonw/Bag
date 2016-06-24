@@ -37,12 +37,11 @@ public class HttpTest {
                         .put ("login", "brettonw")
                         .put ("First Name", "Bretton")
                         .put ("Last Name", "Wade"),
-                MimeType.JSON,
-                () -> null
+                MimeType.JSON
         );
         AppTest.report (postResponseBagObject.getString ("login"), "brettonw", "Got a valid BagObject - 2");
 
-        BagArray postResponseBagArray = Http.postForBagArray (MimeType.JSON, "http://jsonplaceholder.typicode.com/posts/",
+        BagArray postResponseBagArray = BagArrayFrom.url ("http://jsonplaceholder.typicode.com/posts/",
                 new BagArray ()
                         .add ("login")
                         .add ("brettonw")
@@ -50,11 +49,11 @@ public class HttpTest {
                         .add ("Bretton")
                         .add ("Last Name")
                         .add ("Wade"),
-                () -> null
+                MimeType.JSON
         );
         AppTest.report (postResponseBagArray.getString (1), "brettonw", "Got a valid BagArray - 1");
 
-        postResponseBagArray = Http.postForBagArray (MimeType.JSON, "http://jsonplaceholder.typicode.com/posts/",
+        postResponseBagArray = BagArrayFrom.url ("http://jsonplaceholder.typicode.com/posts/",
                 new BagArray ()
                         .add ("login")
                         .add ("brettonw")
@@ -62,6 +61,7 @@ public class HttpTest {
                         .add ("Bretton")
                         .add ("Last Name")
                         .add ("Wade"),
+                MimeType.JSON,
                 () -> null
         );
         AppTest.report (postResponseBagArray.getString (1), "brettonw", "Got a valid BagArray - 2");
