@@ -15,7 +15,6 @@
 - javadoc sweep
 - replace logging with a BagObject that contains the "last error", kind of like an exception
 - think about - "SELECT AS"
-- try to use MIME Types?
 
 Ways to create a BagObject (or BagArray):
 - new BagObject ().put(...);
