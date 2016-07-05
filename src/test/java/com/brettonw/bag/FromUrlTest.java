@@ -22,7 +22,7 @@ public class FromUrlTest {
 
     @Test
     public void testPost () throws IOException {
-        BagObject postResponseBagObject = BagObjectFrom.url ("http://jsonplaceholder.typicode.com/posts/",
+        BagObject postResponseBagObject = BagObjectFrom.url ("http://localhost:8080/bag-test-server/api?command=echo",
                 new BagObject ()
                         .put ("login", "brettonw")
                         .put ("First Name", "Bretton")
@@ -32,7 +32,7 @@ public class FromUrlTest {
         );
         AppTest.report (postResponseBagObject.getString ("login"), "brettonw", "Got a valid BagObject - 1");
 
-        postResponseBagObject = BagObjectFrom.url ("http://jsonplaceholder.typicode.com/posts/",
+        postResponseBagObject = BagObjectFrom.url ("http://localhost:8080/bag-test-server/api?command=echo",
                 new BagObject ()
                         .put ("login", "brettonw")
                         .put ("First Name", "Bretton")
@@ -41,26 +41,28 @@ public class FromUrlTest {
         );
         AppTest.report (postResponseBagObject.getString ("login"), "brettonw", "Got a valid BagObject - 2");
 
-        BagArray postResponseBagArray = BagArrayFrom.url ("http://jsonplaceholder.typicode.com/posts/",
+        BagArray postResponseBagArray = BagArrayFrom.url ("http://localhost:8080/bag-test-server/api?command=data",
+                new BagObject ().put ("data",
                 new BagArray ()
                         .add ("login")
                         .add ("brettonw")
                         .add ("First Name")
                         .add ("Bretton")
                         .add ("Last Name")
-                        .add ("Wade"),
+                        .add ("Wade")),
                 MimeType.JSON
         );
         AppTest.report (postResponseBagArray.getString (1), "brettonw", "Got a valid BagArray - 1");
 
-        postResponseBagArray = BagArrayFrom.url ("http://jsonplaceholder.typicode.com/posts/",
-                new BagArray ()
-                        .add ("login")
-                        .add ("brettonw")
-                        .add ("First Name")
-                        .add ("Bretton")
-                        .add ("Last Name")
-                        .add ("Wade"),
+        postResponseBagArray = BagArrayFrom.url ("http://localhost:8080/bag-test-server/api?command=data",
+                new BagObject ().put ("data",
+                        new BagArray ()
+                                .add ("login")
+                                .add ("brettonw")
+                                .add ("First Name")
+                                .add ("Bretton")
+                                .add ("Last Name")
+                                .add ("Wade")),
                 MimeType.JSON,
                 () -> null
         );
