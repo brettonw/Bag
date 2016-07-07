@@ -2,7 +2,7 @@
     * mvn release:clean release:prepare release:perform
 
 - add a Database type, based on a bagarray, complete with sort, search, filter, etc. (or just do
-  that on BagArray?)
+  that on BagArray?) - with indices?
 - in BagArray, allow string based indexing for a 'put' operation
 - rename 'getObject' to 'get'?
 - 'putType' and 'getType' methods that invoke the Serializer?

@@ -6,9 +6,12 @@ import org.apache.logging.log4j.Logger;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 public class SourceAdapterHttp extends SourceAdapter {
     private static final Logger log = LogManager.getLogger (SourceAdapterHttp.class);
+
+    private static final String UTF_8 = StandardCharsets.UTF_8.name ();
 
     public SourceAdapterHttp (String urlString) throws IOException {
         this (new URL (urlString));
@@ -55,7 +58,7 @@ public class SourceAdapterHttp extends SourceAdapter {
             // default to UTF-8 if it's not given, because that's what it will be in Java
             String[] contentType = connection.getHeaderField("Content-Type").replace(" ", "").split(";");
             mimeType = contentType[0];
-            String charset = (contentType.length > 1) ? (contentType[1].split ("=", 2)[1]) : "UTF-8";
+            String charset = (contentType.length > 1) ? (contentType[1].split ("=", 2)[1]) : UTF_8;
 
             // get the response data
             InputStream inputStream = connection.getInputStream();
