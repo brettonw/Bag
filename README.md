@@ -67,3 +67,12 @@ helper functions that return null; significant failures are logged. The user can
 exception if they want, but Bag should be robust and continue chugging without killing the parent
 application if an unanticipated fault happens. In the future, we will probably move to eliminate
 the log4j2 dependency.
+
+## See Also...
+ We found that the various JSON test servers were wholly inadequate for our purposes. Primarily
+ because they regularly hit their quotas, and then stopped returning valid results. This meant that
+ our URL-based test cases would fail randomly, impeding both development and deployment. To work
+ around this problem, we bootstrapped a very simple web app using the BagObject and BagArray code.
+ You can download that webapp and deploy it in your own test environment for JSON response testing: 
+ 
+ https://github.com/brettonw/bagTestServer
