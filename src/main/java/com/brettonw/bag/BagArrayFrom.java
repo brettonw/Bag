@@ -50,6 +50,28 @@ public class BagArrayFrom {
         return fail.get ();
     }
 
+    // from a resource, with the mime type specified
+    static public BagArray resource (Class context, String name) {
+        return resource (context, name, () -> null);
+    }
+
+    static public BagArray resource (Class context, String name, Supplier<BagArray> fail) {
+        return resource (context, name, MimeType.DEFAULT, fail);
+    }
+
+    static public BagArray resource (Class context, String name, String mimeType) {
+        return resource (context, name, mimeType, () -> null);
+    }
+
+    static public BagArray resource (Class context, String name, String mimeType, Supplier<BagArray> fail) {
+        try {
+            SourceAdapter sourceAdapter = new SourceAdapterReader (context, name, mimeType);
+            return new BagArray (sourceAdapter);
+        } catch (Exception exception) {
+        }
+        return fail.get ();
+    }
+
     // from a stream, with the mime type specified
     static public BagArray inputStream (InputStream inputStream) {
         return inputStream (inputStream, MimeType.DEFAULT);

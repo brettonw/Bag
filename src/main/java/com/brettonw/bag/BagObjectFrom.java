@@ -50,6 +50,28 @@ public class BagObjectFrom {
         return fail.get ();
     }
 
+    // from a resource, with the mime type specified
+    static public BagObject resource (Class context, String name) {
+        return resource (context, name, () -> null);
+    }
+
+    static public BagObject resource (Class context, String name, Supplier<BagObject> fail) {
+        return resource (context, name, MimeType.DEFAULT, fail);
+    }
+
+    static public BagObject resource (Class context, String name, String mimeType) {
+        return resource (context, name, mimeType, () -> null);
+    }
+
+    static public BagObject resource (Class context, String name, String mimeType, Supplier<BagObject> fail) {
+        try {
+            SourceAdapter sourceAdapter = new SourceAdapterReader (context, name, mimeType);
+            return new BagObject (sourceAdapter);
+        } catch (Exception exception) {
+        }
+        return fail.get ();
+    }
+
     // from a stream, with the mime type specified
     static public BagObject inputStream (InputStream inputStream) {
         return inputStream (inputStream, MimeType.DEFAULT);

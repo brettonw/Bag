@@ -25,4 +25,12 @@ public class SourceAdapterReader extends SourceAdapter {
     public SourceAdapterReader (File file, String mimeType) throws IOException {
         this (new FileInputStream (file), deduceMimeType(mimeType, file.getName()));
     }
+
+    public SourceAdapterReader (Class context, String name) throws IOException {
+        this (context, name, MimeType.DEFAULT);
+    }
+
+    public SourceAdapterReader (Class context, String name, String mimeType) throws IOException {
+        this (context.getResourceAsStream (name), deduceMimeType (mimeType, name));
+    }
 }
