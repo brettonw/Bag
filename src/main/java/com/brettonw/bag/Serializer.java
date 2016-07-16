@@ -471,11 +471,11 @@ public class Serializer {
     /**
      * Reconstitute the given BagObject representation back to the object it represents, using a
      * "best-effort" approach to matching the fields of the BagObject to the class being initialized.
-     * @param type the Class representing the type to reconstruct
      * @param bag The input data to reconstruct from, either a BagObject or BagArray
+     * @param type the Class representing the type to reconstruct
      * @return the reconstituted object, or null if the reconstitution failed.
      */
-    public static <WorkingType> WorkingType fromBagAsType (Class type, Bag bag) {
+    public static <WorkingType> WorkingType fromBagAsType (Bag bag, Class type) {
         return (bag != null) ? (WorkingType) deserialize (type.getName (), bag) : null;
     }
 }
