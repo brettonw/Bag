@@ -323,21 +323,17 @@ public class BagObjectTest {
     }
 
     @Test
-    public void testGetWithDefaultStringConstructor () throws IOException {
+    public void testGetWithCopyConstructorFallback () throws IOException {
         BagObject bagObject = new BagObject ().put ("x", "y");
         BagObject bagObject2 = new BagObject ().put ("m", "n");
         BagObject fetched = bagObject.getBagObject ("q", () -> new BagObject (bagObject2));
-        AppTest.report (fetched.getString ("m"), "n", "CheckedSupplier doesn't throw");
+        AppTest.report (fetched.getString ("m"), "n", "copy constructor doesn't throw");
     }
 
     @Test
     public void testBogusInstantiationFallback () {
         BagObject bagObject = new BagObject ().put ("x", "y");
-        try {
-            BagObject fetched = bagObject.getBagObject ("q", () -> BagObjectFrom.file (new File ("bogus.txt")));
-            AppTest.report (fetched, null, "BagObject should fail spectacularly");
-        } catch (IOException exception) {
-            AppTest.report (true, true, "BagObject should throw exception when constructing from bogus source");
-        }
+        BagObject fetched = bagObject.getBagObject ("q", () -> BagObjectFrom.file (new File ("bogus.txt")));
+        AppTest.report (fetched, null, "BagObject should fail quietly");
     }
 }

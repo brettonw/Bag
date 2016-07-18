@@ -90,12 +90,7 @@ abstract public class Bag {
      * @return The element as a BagObject, or null if the element is not found.
      */
     public BagObject getBagObject (String key) {
-        try {
-            return getBagObject (key, () -> null);
-        } catch (IOException exception) {
-            // untestable, as the supplier I'm giving never actually throws the exception
-            return null;
-        }
+        return getBagObject (key, () -> null);
     }
 
     /**
@@ -105,7 +100,7 @@ abstract public class Bag {
      * @param notFound A function to create a new BagObject if the requested key was not found
      * @return The element as a BagObject, or notFound if the element is not found.
      */
-    public BagObject getBagObject (String key, CheckedSupplier<BagObject, IOException> notFound) throws IOException {
+    public BagObject getBagObject (String key, Supplier<BagObject> notFound) {
         Object object = getObject (key);
         return (object instanceof BagObject) ? (BagObject) object : notFound.get ();
     }
@@ -117,12 +112,7 @@ abstract public class Bag {
      * @return The element as a BagArray, or null if the element is not found.
      */
     public BagArray getBagArray (String key) {
-        try {
-            return getBagArray (key, () -> null);
-        } catch (IOException exception) {
-            // untestable, as the supplier I'm giving never actually throws the exception
-            return null;
-        }
+        return getBagArray (key, () -> null);
     }
 
     /**
@@ -132,7 +122,7 @@ abstract public class Bag {
      * @param notFound A function to create a new BagArray if the requested key was not found
      * @return The element as a BagArray, or notFound if the element is not found.
      */
-    public BagArray getBagArray (String key, CheckedSupplier<BagArray, IOException> notFound) throws IOException {
+    public BagArray getBagArray (String key, Supplier<BagArray> notFound) {
         Object object = getObject (key);
         return (object instanceof BagArray) ? (BagArray) object : notFound.get ();
     }
