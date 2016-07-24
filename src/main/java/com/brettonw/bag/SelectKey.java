@@ -1,17 +1,22 @@
 package com.brettonw.bag;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import java.util.function.Supplier;
 
 public class SelectKey {
+    private static final Logger log = LogManager.getLogger (SelectKey.class);
+
     public static final String KEYS = "keys";
     public static final String TYPE = "type";
     public static final SelectType DEFAULT_TYPE = SelectType.INCLUDE;
 
-    private Set<String> keys;
+    private Map<String, String> keys;
     private SelectType type;
 
     public SelectKey () {
@@ -43,9 +48,12 @@ public class SelectKey {
         if (key != null) {
             switch (type) {
                 case INCLUDE:
-                    return keys.contains (key) ? key : notFound.get ();
+                    // in the include case, we can map the requested to to an "as" key
+                    if (keys.containsKey (key)) return keys.get (key);
+                    break;
                 case EXCLUDE:
-                    return (!keys.contains (key)) ? key : notFound.get ();
+                    if (!keys.containsKey (key)) return key;
+                    break;
             }
         }
         return notFound.get ();
@@ -65,14 +73,29 @@ public class SelectKey {
     }
 
     public SelectKey setKeys (String... keysArray) {
-        keys = new HashSet<> ();
+        keys = new HashMap<> ();
         return addKeys (keysArray);
     }
 
     public SelectKey addKeys (String... keysArray) {
+        return addKeys (keysArray, null);
+    }
+    public SelectKey addKeys (String[] keysArray, String[] asArray) {
         if (keysArray != null) {
-            List<String> keysList = Arrays.asList (keysArray);
-            keys.addAll (keysList);
+            // if asArray is not supplied, use the keysArray itself
+            if (asArray == null) asArray = keysArray;
+
+            // check that the two arrays are the same size, and build the map if they are.
+            if (keysArray.length == asArray.length) {
+                List<String> keysList = Arrays.asList (keysArray);
+                for (int i = 0, end = keysArray.length; i < end; ++i) {
+                    keys.put (keysArray[i], asArray[i]);
+                }
+            } else {
+                // what? throw an exception
+                log.error ("Invalid 'AS' mapping specified");
+            }
+
         }
         return this;
     }
