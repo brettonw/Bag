@@ -224,6 +224,16 @@ public class Serializer {
     }
 
     /**
+     * Return the @value component of a serialized object
+     *
+     * @param bagObject the BagObject representing the serialized object.
+     * @return A BagObject from the @value component, or null if it's not a valid serialization.
+     */
+    public static BagObject Unwrap (BagObject bagObject) {
+        return bagObject.getBagObject (VALUE_KEY);
+    }
+
+    /**
      * Convert the given object to a BagObject representation that can be used to reconstitute the
      * given object after serialization.
      *

@@ -8,15 +8,18 @@
 - 'putType' and 'getType' methods that invoke the Serializer?
 - should the serializer be automatically invoked when objectify fails with an unknown type? I think
   not, because the user will otherwise have to know to extract via the serializer
-- XML? CSV? Other formats?
 - iterators?
-- reader auto-detect the format?
 - "public" sweep
 - javadoc sweep
 - replace logging with a BagObject that contains the "last error", kind of like an exception
-- think about - "SELECT AS"
+
+Formats to support
+- reader auto-detect the format?
+- XML
+- CSV
 - Kml file format for google maps
 - web post format
+- Other?
 
 Ways to create a BagObject (or BagArray):
 - new BagObject ().put(...);
@@ -36,5 +39,3 @@ Ways to get the formats to use:
   do this?
 - magic
 
-We have a bunch of "adapters" sitting on the front of the readers - File, InputStream, String, etc.;
-can they be leveraged or abstracted away?
