@@ -1,11 +1,12 @@
 package com.brettonw.bag;
 
 import com.brettonw.bag.expr.BooleanExpr;
-import com.brettonw.bag.json.FormatReaderJson;
-import com.brettonw.bag.json.FormatWriterJson;
+import com.brettonw.bag.formats.FormatReader;
+import com.brettonw.bag.formats.FormatWriter;
+import com.brettonw.bag.formats.MimeType;
 import org.apache.logging.log4j.util.Supplier;
+import org.atteo.classindex.ClassIndex;
 
-import java.io.IOException;
 import java.util.function.Function;
 
 abstract public class Bag {
@@ -271,13 +272,23 @@ abstract public class Bag {
 
     @Override
     public String toString () {
-        // JSON is the default format
-        return toString(MimeType.JSON);
+        return toString(MimeType.DEFAULT);
     }
 
     // make sure we can read and/or write JSON formatted data
     static {
-        FormatWriter.registerFormatWriter (MimeType.JSON, false, FormatWriterJson::new);
-        FormatReader.registerFormatReader (MimeType.JSON, false, FormatReaderJson::new);
+        try {
+            for (Class<?> type : ClassIndex.getSubclasses (FormatReader.class)) {
+                Class.forName (type.getName ()).newInstance ();
+            }
+            for (Class<?> type : ClassIndex.getSubclasses (FormatWriter.class)) {
+                Class.forName (type.getName ()).newInstance ();
+            }
+        } catch (Exception exception) {
+            exception.printStackTrace ();
+        }
+
+        //FormatWriter.registerFormatWriter (MimeType.DEFAULT, false, FormatWriterJson::new);
+        //FormatReader.registerFormatReader (MimeType.DEFAULT, false, FormatReaderJson::new);
     }
 }

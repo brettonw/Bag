@@ -1,5 +1,7 @@
 package com.brettonw.bag;
 
+import com.brettonw.bag.formats.MimeType;
+
 import java.io.File;
 import java.io.InputStream;
 import java.net.MalformedURLException;

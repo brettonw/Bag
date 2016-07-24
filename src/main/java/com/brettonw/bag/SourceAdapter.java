@@ -1,5 +1,7 @@
 package com.brettonw.bag;
 
+import com.brettonw.bag.formats.MimeType;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;

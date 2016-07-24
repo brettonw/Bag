@@ -3,6 +3,7 @@ package com.brettonw.bag;
 import com.brettonw.AppTest;
 import com.brettonw.bag.expr.BooleanExpr;
 import com.brettonw.bag.expr.Exprs;
+import com.brettonw.bag.formats.MimeType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Test;

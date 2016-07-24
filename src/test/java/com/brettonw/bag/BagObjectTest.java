@@ -1,6 +1,7 @@
 package com.brettonw.bag;
 
 import com.brettonw.AppTest;
+import com.brettonw.bag.formats.MimeType;
 import com.brettonw.bag.test.TestClassA;
 import com.brettonw.bag.test.TestEnumXYZ;
 import org.apache.logging.log4j.LogManager;

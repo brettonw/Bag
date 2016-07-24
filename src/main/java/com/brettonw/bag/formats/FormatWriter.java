@@ -1,9 +1,14 @@
-package com.brettonw.bag;
+package com.brettonw.bag.formats;
+
+import com.brettonw.bag.BagArray;
+import com.brettonw.bag.BagObject;
+import org.atteo.classindex.IndexSubclasses;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
+@IndexSubclasses
 abstract public class FormatWriter {
     protected static final String[] QUOTES = { "\"" };
 

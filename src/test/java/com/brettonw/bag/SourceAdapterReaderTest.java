@@ -1,12 +1,10 @@
 package com.brettonw.bag;
 
 import com.brettonw.AppTest;
+import com.brettonw.bag.formats.MimeType;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.InputStreamReader;
 
 public class SourceAdapterReaderTest {
     @Test

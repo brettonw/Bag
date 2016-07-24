@@ -15,10 +15,11 @@
 
 Formats to support
 - reader auto-detect the format?
-- XML
-- CSV
+- XML (application/xml or text/xml)
+- CSV (application/csv or text/csv)
 - Kml file format for google maps
-- web post format
+- web post format (application/x-www-form-urlencoded or multipart/form-data)
+- web URL format ()
 - Other?
 
 Ways to create a BagObject (or BagArray):

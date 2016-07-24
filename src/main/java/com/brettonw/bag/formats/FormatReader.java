@@ -1,13 +1,18 @@
-package com.brettonw.bag;
+package com.brettonw.bag.formats;
 
+import com.brettonw.bag.BagArray;
+import com.brettonw.bag.BagObject;
+import com.brettonw.bag.SourceAdapter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.atteo.classindex.IndexSubclasses;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+@IndexSubclasses
 abstract public class FormatReader {
     private static final Logger log = LogManager.getLogger (FormatReader.class);
 
@@ -20,11 +25,18 @@ abstract public class FormatReader {
 
     /**
      *
+     */
+    public FormatReader () {
+        this (null);
+    }
+
+    /**
+     *
      * @param input
      */
     public FormatReader (String input) {
         this.input = input;
-        inputLength = input.length ();
+        inputLength = (input != null) ? input.length () : 0;
         index = 0;
         lineNumber = 1;
         lastLineIndex = 0;

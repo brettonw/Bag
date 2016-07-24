@@ -1,4 +1,4 @@
-package com.brettonw.bag.json;
+package com.brettonw.bag.formats.json;
 
 // The FormatReaderJson is loosely modeled after a JSON parser grammar from the site (http://www.json.org).
 // The main difference is that we ignore differences between value types (all of them will be
@@ -7,7 +7,8 @@ package com.brettonw.bag.json;
 
 import com.brettonw.bag.BagArray;
 import com.brettonw.bag.BagObject;
-import com.brettonw.bag.FormatReader;
+import com.brettonw.bag.formats.FormatReader;
+import com.brettonw.bag.formats.MimeType;
 
 import java.util.Arrays;
 
@@ -172,5 +173,10 @@ public class FormatReaderJson extends FormatReader {
             }
         }
         return value;
+    }
+
+    public FormatReaderJson () {}
+    static {
+        FormatReader.registerFormatReader (MimeType.DEFAULT, false, FormatReaderJson::new);
     }
 }

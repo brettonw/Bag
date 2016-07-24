@@ -1,8 +1,9 @@
-package com.brettonw.bag.json;
+package com.brettonw.bag.formats.json;
 
 import com.brettonw.bag.BagArray;
 import com.brettonw.bag.BagObject;
-import com.brettonw.bag.FormatWriter;
+import com.brettonw.bag.formats.FormatWriter;
+import com.brettonw.bag.formats.MimeType;
 
 public class FormatWriterJson extends FormatWriter {
     static final String[] CURLY_BRACKETS = { "{", "}" };
@@ -53,5 +54,10 @@ public class FormatWriterJson extends FormatWriter {
             separator = ",";
         }
         return enclose(stringBuilder.toString(), SQUARE_BRACKETS);
+    }
+
+    public FormatWriterJson () { super (); }
+    static {
+        FormatWriter.registerFormatWriter (MimeType.DEFAULT, false, FormatWriterJson::new);
     }
 }

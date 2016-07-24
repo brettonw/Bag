@@ -1,5 +1,7 @@
 package com.brettonw.bag;
 
+import com.brettonw.bag.formats.MimeType;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 
