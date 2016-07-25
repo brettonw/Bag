@@ -35,7 +35,7 @@ public class SelectKeyTest {
     @Test
     public void testBagConstructors () {
         BagArray bagArray = new BagArray ().add ("Abc").add ("Def");
-        BagObject bagObject = new BagObject ().put (SelectKey.KEYS, bagArray);
+        BagObject bagObject = new BagObject ().put (SelectKey.KEYS_KEY, bagArray);
         SelectKey
         selectKey = new SelectKey (bagObject);
         AppTest.report (selectKey.getType (), SelectType.INCLUDE, "Test getType and default constructor");
@@ -53,7 +53,7 @@ public class SelectKeyTest {
     @Test
     public void testSelectExclude () {
         BagArray bagArray = new BagArray ().add ("Abc").add ("Def");
-        BagObject bagObject = new BagObject ().put (SelectKey.TYPE, SelectType.EXCLUDE).put (SelectKey.KEYS, bagArray);
+        BagObject bagObject = new BagObject ().put (SelectKey.TYPE_KEY, SelectType.EXCLUDE).put (SelectKey.KEYS_KEY, bagArray);
         SelectKey selectKey = new SelectKey (bagObject);
         AppTest.report (selectKey.getType (), SelectType.EXCLUDE, "Test getType");
         AppTest.report (selectKey.select ("Hello"), "Hello", "Test select (exclude) of value not in select key");

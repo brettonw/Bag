@@ -12,20 +12,25 @@ import java.util.function.Supplier;
 public class SelectKey {
     private static final Logger log = LogManager.getLogger (SelectKey.class);
 
-    public static final String KEYS = "keys";
-    public static final String TYPE = "type";
+    public static final String AS_KEY = "as";
+    public static final String KEYS_KEY = "keys";
+    public static final String TYPE_KEY = "type";
     public static final SelectType DEFAULT_TYPE = SelectType.INCLUDE;
 
     private Map<String, String> keys;
     private SelectType type;
 
     public SelectKey () {
-        this (DEFAULT_TYPE, (String[]) null);
+        this (DEFAULT_TYPE, (String[]) null, (String[]) null);
     }
 
     public SelectKey (SelectType type, String... keysArray) {
+        this (DEFAULT_TYPE, keysArray, null);
+    }
+
+    public SelectKey (SelectType type, String[] keysArray, String[] asArray) {
         this.type = type;
-        setKeys (keysArray);
+        setKeys (keysArray, asArray);
     }
 
     public SelectKey (String... keysArray) {
@@ -36,12 +41,18 @@ public class SelectKey {
         this (DEFAULT_TYPE, bagArray);
     }
 
-    public SelectKey (SelectType type, BagArray bagArray) {
-        this (type, bagArray.toArray (String.class));
+    public SelectKey (SelectType type, BagArray keysArray) {
+        this (type, keysArray.toArray (String.class), null);
+    }
+
+    public SelectKey (SelectType type, BagArray keysArray, BagArray asArray) {
+        this (type,
+                (keysArray != null) ? keysArray.toArray (String.class) : null,
+                (asArray != null) ? asArray.toArray (String.class) : null);
     }
 
     public SelectKey (BagObject bagObject) {
-        this (bagObject.getEnum (TYPE, SelectType.class, () -> DEFAULT_TYPE), bagObject.getBagArray (KEYS));
+        this (bagObject.getEnum (TYPE_KEY, SelectType.class, () -> DEFAULT_TYPE), bagObject.getBagArray (KEYS_KEY), bagObject.getBagArray (AS_KEY));
     }
 
     public String select (String key, Supplier<String> notFound) {
@@ -73,8 +84,12 @@ public class SelectKey {
     }
 
     public SelectKey setKeys (String... keysArray) {
+        return setKeys (keysArray, null);
+    }
+
+    public SelectKey setKeys (String[] keysArray, String[] asArray) {
         keys = new HashMap<> ();
-        return addKeys (keysArray);
+        return addKeys (keysArray, asArray);
     }
 
     public SelectKey addKeys (String... keysArray) {

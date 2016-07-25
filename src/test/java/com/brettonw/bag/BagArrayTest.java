@@ -184,7 +184,7 @@ public class BagArrayTest {
             File testFile = new File ("data", "UCS_Satellite_Database_2-1-14.json");
             BagArray bagArray = BagArrayFrom.file (testFile);
             BooleanExpr equality = Exprs.equality ("Country of Operator/Owner", "USA");
-            SelectKey selectKey = new SelectKey (new BagObject ().put (SelectKey.TYPE, SelectType.INCLUDE.name ()).put (SelectKey.KEYS, new BagArray().add ("Current Official Name of Satellite").add ("Country of Operator")));
+            SelectKey selectKey = new SelectKey (new BagObject ().put (SelectKey.TYPE_KEY, SelectType.INCLUDE.name ()).put (SelectKey.KEYS_KEY, new BagArray().add ("Current Official Name of Satellite").add ("Country of Operator")));
             BagArray queried = bagArray.query (equality, selectKey);
             AppTest.report (queried.getCount () > 0, true, "Queried Array returned some results");
             AppTest.report (queried.getString ("53/Country of Operator/Owner"), "USA", "Query results for #53 should match the query");
