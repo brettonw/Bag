@@ -16,7 +16,15 @@ import org.junit.runners.Suite;
         KeyTest.class,
         FromUrlTest.class,
         SerializerTest.class,
+
+        FormatReaderTest.class,
+        FormatReaderUrlTest.class,
+        FormatReaderJsonTest.class,
+
         FormatWriterTest.class,
+        FormatWriterUrlTest.class,
+        FormatWriterJsonTest.class,
+
         SourceAdapterTest.class,
         SourceAdapterHttpTest.class,
         SourceAdapterReaderTest.class,

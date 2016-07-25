@@ -11,7 +11,7 @@ public class FormatReaderUrlTest {
         String testQuery = "command&param1&param2";
         FormatReaderUrl fru = new FormatReaderUrl (testQuery);
         BagArray bagArray = fru.read (new BagArray ());
-        assertTrue ("goodbye".equals (bagArray.getString (0)));
+        assertTrue ("command".equals (bagArray.getString (0)));
         assertTrue ("param1".equals (bagArray.getString (1)));
         assertTrue ("param2".equals (bagArray.getString (2)));
     }
