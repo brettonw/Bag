@@ -18,8 +18,8 @@ public class FormatReaderUrl extends FormatReader {
     @Override
     public BagArray read (BagArray bagArray) {
         if (bagArray == null) bagArray = new BagArray ();
-
-            String[] queryParameters = input.split ("&");
+            String conditionedInput = input.trim ();
+            String[] queryParameters = conditionedInput.split ("&");
             for (String queryParameter : queryParameters) {
                 bagArray.add (queryParameter);
             }
@@ -31,7 +31,8 @@ public class FormatReaderUrl extends FormatReader {
     public BagObject read (BagObject bagObject) {
         if (bagObject == null) bagObject = new BagObject ();
 
-        String[] queryParameters = input.split ("&");
+        String conditionedInput = input.trim ();
+        String[] queryParameters = conditionedInput.split ("&");
         for (String queryParameter : queryParameters) {
             String[] pair = queryParameter.split ("=");
             bagObject.put (pair[0], pair[1]);

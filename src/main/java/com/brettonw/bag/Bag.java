@@ -275,20 +275,23 @@ abstract public class Bag {
         return toString(MimeType.DEFAULT);
     }
 
-    // make sure we can read and/or write JSON formatted data
     static {
+        // autoload all the readers
         try {
             for (Class<?> type : ClassIndex.getSubclasses (FormatReader.class)) {
-                Class.forName (type.getName ()).newInstance ();
-            }
-            for (Class<?> type : ClassIndex.getSubclasses (FormatWriter.class)) {
                 Class.forName (type.getName ()).newInstance ();
             }
         } catch (Exception exception) {
             exception.printStackTrace ();
         }
 
-        //FormatWriter.registerFormatWriter (MimeType.DEFAULT, false, FormatWriterJson::new);
-        //FormatReader.registerFormatReader (MimeType.DEFAULT, false, FormatReaderJson::new);
+        // autoload all the writers
+        try {
+            for (Class<?> type : ClassIndex.getSubclasses (FormatWriter.class)) {
+                Class.forName (type.getName ()).newInstance ();
+            }
+        } catch (Exception exception) {
+            exception.printStackTrace ();
+        }
     }
 }
