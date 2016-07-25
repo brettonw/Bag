@@ -31,7 +31,7 @@ public class FromUrlTest {
                 MimeType.JSON,
                 () -> null
         );
-        AppTest.report (postResponseBagObject.getString ("login"), "brettonw", "Got a valid BagObject - 1");
+        AppTest.report (postResponseBagObject.getString ("post-data/login"), "brettonw", "Got a valid BagObject - 1");
 
         postResponseBagObject = BagObjectFrom.url ("http://bag-test-server.azurewebsites.net/api?command=echo",
                 new BagObject ()
@@ -40,30 +40,28 @@ public class FromUrlTest {
                         .put ("Last Name", "Wade"),
                 MimeType.JSON
         );
-        AppTest.report (postResponseBagObject.getString ("login"), "brettonw", "Got a valid BagObject - 2");
+        AppTest.report (postResponseBagObject.getString ("post-data/login"), "brettonw", "Got a valid BagObject - 2");
 
-        BagArray postResponseBagArray = BagArrayFrom.url ("http://bag-test-server.azurewebsites.net/api?command=data",
-                new BagObject ().put ("data",
+        BagArray postResponseBagArray = BagArrayFrom.url ("http://bag-test-server.azurewebsites.net/api?command=post-data",
                 new BagArray ()
                         .add ("login")
                         .add ("brettonw")
                         .add ("First Name")
                         .add ("Bretton")
                         .add ("Last Name")
-                        .add ("Wade")),
+                        .add ("Wade"),
                 MimeType.JSON
         );
         AppTest.report (postResponseBagArray.getString (1), "brettonw", "Got a valid BagArray - 1");
 
-        postResponseBagArray = BagArrayFrom.url ("http://bag-test-server.azurewebsites.net/api?command=data",
-                new BagObject ().put ("data",
-                        new BagArray ()
-                                .add ("login")
-                                .add ("brettonw")
-                                .add ("First Name")
-                                .add ("Bretton")
-                                .add ("Last Name")
-                                .add ("Wade")),
+        postResponseBagArray = BagArrayFrom.url ("http://bag-test-server.azurewebsites.net/api?command=post-data",
+                new BagArray ()
+                        .add ("login")
+                        .add ("brettonw")
+                        .add ("First Name")
+                        .add ("Bretton")
+                        .add ("Last Name")
+                        .add ("Wade"),
                 MimeType.JSON,
                 () -> null
         );
