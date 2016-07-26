@@ -1,6 +1,8 @@
 package com.brettonw.bag;
 
 import com.brettonw.bag.formats.MimeType;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.io.InputStream;
@@ -9,6 +11,7 @@ import java.net.URL;
 import java.util.function.Supplier;
 
 public class BagObjectFrom {
+    private static final Logger log = LogManager.getLogger (BagObjectFrom.class);
 
     // from a string, with the mime type specified
     static public BagObject string (String string) {
@@ -27,7 +30,9 @@ public class BagObjectFrom {
         try {
             SourceAdapter sourceAdapter = new SourceAdapterReader(string, mimeType);
             return new BagObject (sourceAdapter);
-        } catch (Exception exception) { }
+        } catch (Exception exception) {
+            log.error (exception);
+        }
         return fail.get ();
     }
 
@@ -48,7 +53,9 @@ public class BagObjectFrom {
         try {
             SourceAdapter sourceAdapter = new SourceAdapterReader(file, mimeType);
             return new BagObject (sourceAdapter);
-        } catch (Exception exception) { }
+        } catch (Exception exception) {
+            log.error (exception);
+        }
         return fail.get ();
     }
 
@@ -70,6 +77,7 @@ public class BagObjectFrom {
             SourceAdapter sourceAdapter = new SourceAdapterReader (context, name, mimeType);
             return new BagObject (sourceAdapter);
         } catch (Exception exception) {
+            log.error (exception);
         }
         return fail.get ();
     }
@@ -91,7 +99,9 @@ public class BagObjectFrom {
         try {
             SourceAdapter sourceAdapter = new SourceAdapterReader(inputStream, mimeType);
             return new BagObject (sourceAdapter);
-        } catch (Exception exception) { }
+        } catch (Exception exception) {
+            log.error (exception);
+        }
         return fail.get ();
     }
 
@@ -104,7 +114,9 @@ public class BagObjectFrom {
         try {
             URL url = new URL (urlString);
             return url (url, fail);
-        } catch (MalformedURLException exception) { }
+        } catch (MalformedURLException exception) {
+            log.error (exception);
+        }
         return fail.get ();
     }
 
@@ -116,7 +128,9 @@ public class BagObjectFrom {
         try {
             SourceAdapter sourceAdapter = new SourceAdapterHttp(url);
             return new BagObject (sourceAdapter);
-        } catch (Exception exception) { }
+        } catch (Exception exception) {
+            log.error (exception);
+        }
         return fail.get ();
     }
 
@@ -129,7 +143,9 @@ public class BagObjectFrom {
         try {
             URL url = new URL (urlString);
             return url (url, postData, postDataMimeType, fail);
-        } catch (MalformedURLException exception) { }
+        } catch (MalformedURLException exception) {
+            log.error (exception);
+        }
         return fail.get ();
     }
 
@@ -141,7 +157,9 @@ public class BagObjectFrom {
         try {
             SourceAdapter sourceAdapter = new SourceAdapterHttp(url, postData, postDataMimeType);
             return new BagObject (sourceAdapter);
-        } catch (Exception exception) { }
+        } catch (Exception exception) {
+            log.error (exception);
+        }
         return fail.get ();
     }
 }
