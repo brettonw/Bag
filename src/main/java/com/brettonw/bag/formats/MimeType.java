@@ -44,6 +44,7 @@ public class MimeType {
         addMimeType (JSON, "text/json");
         addMimeType (XML, "text/xml");
         addMimeType (CSV, "text/csv");
+        addMimeType (URL);
     }
 
     /**

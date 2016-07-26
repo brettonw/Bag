@@ -1,5 +1,6 @@
 package com.brettonw.bag;
 
+import com.brettonw.bag.formats.MimeType;
 import com.brettonw.bag.formats.url.FormatReaderUrl;
 import org.junit.Test;
 import static org.junit.Assert.assertTrue;
@@ -21,6 +22,16 @@ public class FormatReaderUrlTest {
         String testQuery = "command=goodbye&param1=1&param2=2";
         FormatReaderUrl fru = new FormatReaderUrl (testQuery);
         BagObject bagObject = fru.read (new BagObject ());
+        assertTrue ("goodbye".equals (bagObject.getString ("command")));
+        assertTrue ("1".equals (bagObject.getString ("param1")));
+        assertTrue ("2".equals (bagObject.getString ("param2")));
+    }
+
+
+    @Test
+    public void testMimeTypeMapping () {
+        String testQuery = "command=goodbye&param1=1&param2=2";
+        BagObject bagObject = BagObjectFrom.string (testQuery, MimeType.URL);
         assertTrue ("goodbye".equals (bagObject.getString ("command")));
         assertTrue ("1".equals (bagObject.getString ("param1")));
         assertTrue ("2".equals (bagObject.getString ("param2")));
