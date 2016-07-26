@@ -15,7 +15,7 @@ public class FromUrlTest {
     @Test
     public void testGet () throws IOException {
         BagObject brettonw = BagObjectFrom.url ("http://bag-test-server.azurewebsites.net/api?command=ip", () -> null);
-        AppTest.report (brettonw.getString ("ip") != null, true, "Got a valid BagObject");
+        AppTest.report (brettonw.getString ("response/ip") != null, true, "Got a valid BagObject");
 
         BagArray repos = BagArrayFrom.url ("https://api.github.com/users/brettonw/repos", () -> null);
         AppTest.report (repos.getCount () > 0, true, "Got a valid BagArray");

@@ -12,7 +12,7 @@ public class SourceAdapterHttpTest {
         try {
             SourceAdapter sourceAdapter = new SourceAdapterHttp ("http://bag-test-server.azurewebsites.net/api?command=ip");
             BagObject responseBagObject = BagObjectFrom.string (sourceAdapter.getStringData (), sourceAdapter.getMimeType ());
-            AppTest.report (responseBagObject.getString ("ip") != null, true, "Got a valid response");
+            AppTest.report (responseBagObject.getString ("response/ip") != null, true, "Got a valid response");
         } catch (IOException exception ){
             AppTest.report (true, false, "An exception is a failure");
         }
