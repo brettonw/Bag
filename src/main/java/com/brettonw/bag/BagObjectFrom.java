@@ -163,6 +163,10 @@ public class BagObjectFrom {
         return fail.get ();
     }
 
+    static public BagObject sourceAdapter (SourceAdapter sourceAdapter) {
+        return sourceAdapter (sourceAdapter, () -> null);
+    }
+
     static public BagObject sourceAdapter (SourceAdapter sourceAdapter, Supplier<BagObject> fail) {
         try {
             return new BagObject (sourceAdapter);

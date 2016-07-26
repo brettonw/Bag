@@ -163,6 +163,10 @@ public class BagArrayFrom {
         return fail.get ();
     }
 
+    static public BagArray sourceAdapter (SourceAdapter sourceAdapter) {
+        return sourceAdapter (sourceAdapter, () -> null);
+    }
+
     static public BagArray sourceAdapter (SourceAdapter sourceAdapter, Supplier<BagArray> fail) {
         try {
             return new BagArray (sourceAdapter);
