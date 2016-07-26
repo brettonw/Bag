@@ -47,11 +47,11 @@ public class BagObject extends Bag implements Selectable<BagObject> {
         container = new Pair[Math.max (size, DEFAULT_CONTAINER_SIZE)];
     }
 
-    BagObject (SourceAdapter sourceAdapter) throws ReadException {
+    public BagObject (SourceAdapter sourceAdapter) throws ReadException {
         this (UNKNOWN_SIZE, sourceAdapter);
     }
 
-    BagObject (int size, SourceAdapter sourceAdapter) throws ReadException {
+    public BagObject (int size, SourceAdapter sourceAdapter) throws ReadException {
         this (size);
         if (FormatReader.read (this, sourceAdapter) == null) {
             throw new ReadException ();
