@@ -1,5 +1,6 @@
 package com.brettonw.bag;
 
+import com.brettonw.bag.formats.MimeType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -54,11 +55,19 @@ public class SourceAdapterHttp extends SourceAdapter {
                 connection.setRequestMethod("GET");
             }
 
-            // get the response type, tease out the response type and the charset (if given) -
-            // default to UTF-8 if it's not given, because that's what it will be in Java
-            String[] contentType = connection.getHeaderField("Content-Type").replace(" ", "").split(";");
-            mimeType = contentType[0];
-            String charset = (contentType.length > 1) ? (contentType[1].split ("=", 2)[1]) : UTF_8;
+            // get the response type (this will trigger the actual fetch), then tease out the
+            // response type (use a default if it's not present) and the charset (if given,
+            // otherwise default to UTF-8, because that's what it will be in Java)
+            String contentTypeHeader = connection.getHeaderField("Content-Type");
+            String charset = UTF_8;
+            mimeType = MimeType.DEFAULT;
+            if (contentTypeHeader != null) {
+                String[] contentType = contentTypeHeader.replace (" ", "").split (";");
+                mimeType = contentType[0];
+                if (contentType.length > 1) {
+                    charset = contentType[1].split ("=", 2)[1];
+                }
+            }
 
             // get the response data
             InputStream inputStream = connection.getInputStream();
