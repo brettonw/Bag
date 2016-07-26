@@ -29,7 +29,7 @@ public class FormatWriterUrl extends FormatWriter {
             } else {
                 stringBuilder.append ("&");
             }
-            stringBuilder.append (bagObject.getString (key));
+            stringBuilder.append (key).append ("=").append (bagObject.getString (key));
         }
         return stringBuilder.toString ();
     }
