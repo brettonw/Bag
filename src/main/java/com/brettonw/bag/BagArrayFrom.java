@@ -162,4 +162,13 @@ public class BagArrayFrom {
         }
         return fail.get ();
     }
+
+    static public BagArray sourceAdapter (SourceAdapter sourceAdapter, Supplier<BagArray> fail) {
+        try {
+            return new BagArray (sourceAdapter);
+        } catch (Exception exception) {
+            log.error (exception);
+        }
+        return fail.get ();
+    }
 }

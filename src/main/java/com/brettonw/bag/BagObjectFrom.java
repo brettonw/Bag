@@ -162,4 +162,13 @@ public class BagObjectFrom {
         }
         return fail.get ();
     }
+
+    static public BagObject sourceAdapter (SourceAdapter sourceAdapter, Supplier<BagObject> fail) {
+        try {
+            return new BagObject (sourceAdapter);
+        } catch (Exception exception) {
+            log.error (exception);
+        }
+        return fail.get ();
+    }
 }
