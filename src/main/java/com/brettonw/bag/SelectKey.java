@@ -25,7 +25,7 @@ public class SelectKey {
     }
 
     public SelectKey (SelectType type, String... keysArray) {
-        this (DEFAULT_TYPE, keysArray, null);
+        this (type, keysArray, null);
     }
 
     public SelectKey (SelectType type, String[] keysArray, String[] asArray) {
