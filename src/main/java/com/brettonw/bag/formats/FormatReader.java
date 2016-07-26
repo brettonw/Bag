@@ -173,7 +173,12 @@ abstract public class FormatReader {
 
     private static FormatReader getFormatReader (String stringData, String mimeType) {
         // deduce the format, and create the format reader
-        return ((mimeType != null) && formatReaders.containsKey(mimeType)) ? formatReaders.get(mimeType).apply(stringData) : null;
+        String foundMimeType = MimeType.getFromMimeType (mimeType);
+        if ((foundMimeType != null) && formatReaders.containsKey(foundMimeType)) {
+            return formatReaders.get(foundMimeType).apply (stringData);
+        }
+        log.error ("No reader for format (" + mimeType + ")");
+        return null;
     }
 
     public static BagArray read (BagArray bagArray, SourceAdapter sourceAdapter) {

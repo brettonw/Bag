@@ -4,10 +4,13 @@ import com.brettonw.bag.formats.MimeType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import javax.net.ssl.*;
 import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
 public class SourceAdapterHttp extends SourceAdapter {
     private static final Logger log = LogManager.getLogger (SourceAdapterHttp.class);
@@ -25,6 +28,28 @@ public class SourceAdapterHttp extends SourceAdapter {
     public SourceAdapterHttp (String urlString, Bag postData, String postDataMimeType) throws IOException {
         this (new URL (urlString), postData, postDataMimeType);
     }
+
+    public static void trustAllHosts () {
+        // Create a trust manager that does not validate certificate chains
+        TrustManager[] trustAllCerts = new TrustManager[] {
+                new X509TrustManager () {
+                    public X509Certificate[] getAcceptedIssuers() { return new X509Certificate[] {}; }
+                    public void checkClientTrusted(X509Certificate[] chain, String authType) throws CertificateException {}
+                    public void checkServerTrusted(X509Certificate[] chain, String authType) throws CertificateException {}
+                }
+        };
+
+        // Install the all-trusting trust manager
+        try {
+            SSLContext sslContext = SSLContext.getInstance("TLS");
+            sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory (sslContext.getSocketFactory());
+            HttpsURLConnection.setDefaultHostnameVerifier ((String var1, SSLSession var2) -> { return true; });
+        } catch (Exception exception) {
+            log.error (exception);
+        }
+    }
+
 
     public SourceAdapterHttp (URL url, Bag postData, String postDataMimeType) throws IOException {
         // create the connection, see if it was successful
@@ -67,6 +92,9 @@ public class SourceAdapterHttp extends SourceAdapter {
                 if (contentType.length > 1) {
                     charset = contentType[1].split ("=", 2)[1];
                 }
+                log.debug ("'Content-Type' is " + mimeType + " (charset: " + charset + ")");
+            } else {
+                log.warn ("'Content-Type' is not set at the host (" + url.toString () + ")");
             }
 
             // get the response data
