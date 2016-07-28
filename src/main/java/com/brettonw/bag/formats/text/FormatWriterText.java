@@ -4,12 +4,16 @@ import com.brettonw.bag.BagArray;
 import com.brettonw.bag.BagObject;
 import com.brettonw.bag.formats.FormatWriter;
 import com.brettonw.bag.formats.MimeType;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * The FormatWriterText is a configurable text format writer for any format that uses a divider
  * between entries, and a divider between pairs.
  */
 public class FormatWriterText extends FormatWriter {
+    private static final Logger log = LogManager.getLogger (FormatWriterText.class);
+
     String entrySeparator;
     String pairSeparator;
 
@@ -35,7 +39,18 @@ public class FormatWriterText extends FormatWriter {
         StringBuilder stringBuilder = new StringBuilder ();
         String[] keys = bagObject.keys ();
         for (String key : keys) {
-            stringBuilder.append (key).append (pairSeparator).append (bagObject.getString (key)).append (entrySeparator);
+            String value;
+            // the reader has a flag to accumulate values or overwrite them. accumulated values will be gathered into
+            // an array - as the writer, we will assume the presence of the array means multiple lines
+            BagArray bagArray = bagObject.getBagArray (key);
+            if (bagArray != null) {
+                for (int i = 0, end = bagArray.getCount (); i < end; ++i) {
+                    value = bagArray.getString (i);
+                    stringBuilder.append (key).append (pairSeparator).append (value).append (entrySeparator);
+                }
+            } else if ((value = bagObject.getString (key)) != null) {
+                stringBuilder.append (key).append (pairSeparator).append (value).append (entrySeparator);
+            }
         }
         return stringBuilder.toString ();
     }

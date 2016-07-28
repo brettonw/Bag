@@ -21,4 +21,12 @@ public class FormatWriterTextTest {
         assertTrue (queryString != null);
         assertTrue (queryString.equalsIgnoreCase ("aaa=bbb&xxx=yyy&"));
     }
+    @Test
+
+    public void testFormatWriterAccumulated () {
+        BagObject queryBagObject = new BagObject ().put ("xxx", "yyy").put ("aaa", "bbb").add ("bbb", "abc").add ("bbb", "def");
+        String queryString = queryBagObject.toString (MimeType.URL);
+        assertTrue (queryString != null);
+        assertTrue (queryString.equalsIgnoreCase ("aaa=bbb&bbb=abc&bbb=def&xxx=yyy&"));
+    }
 }

@@ -13,16 +13,18 @@ import com.brettonw.bag.formats.MimeType;
 public class FormatReaderText extends FormatReader {
     String entrySeparator;
     String ignoreEntryMarker;
+    boolean accumulateEntries;
     String pairSeparator;
 
-    public FormatReaderText (String input, String entrySeparator, String pairSeparator) {
-        this (input, entrySeparator, " ", pairSeparator);
+    public FormatReaderText (String input, String entrySeparator, boolean accumulateEntries, String pairSeparator) {
+        this (input, entrySeparator, " ", accumulateEntries, pairSeparator);
     }
 
-    public FormatReaderText (String input, String entrySeparator, String ignoreEntryMarker, String pairSeparator) {
+    public FormatReaderText (String input, String entrySeparator, String ignoreEntryMarker, boolean accumulateEntries, String pairSeparator) {
         super (input);
         this.entrySeparator = entrySeparator;
         this.ignoreEntryMarker = ignoreEntryMarker;
+        this.accumulateEntries = accumulateEntries;
         this.pairSeparator = pairSeparator;
     }
 
@@ -51,7 +53,11 @@ public class FormatReaderText extends FormatReader {
                     String key = pair[0].trim ();
                     String value = pair[1].trim ();
                     if ((key.length () > 0) && (value.length () > 0)) {
-                        bagObject.put (key, value);
+                        if (accumulateEntries) {
+                            bagObject.add (key, value);
+                        } else {
+                            bagObject.put (key, value);
+                        }
                     }
                 }
             }
@@ -63,10 +69,10 @@ public class FormatReaderText extends FormatReader {
     static {
         MimeType.addExtensionMapping (MimeType.PROP, "properties");
         MimeType.addMimeTypeMapping (MimeType.PROP);
-        FormatReader.registerFormatReader (MimeType.PROP, false, (input) -> new FormatReaderText (input, "\n", "#", "="));
+        FormatReader.registerFormatReader (MimeType.PROP, false, (input) -> new FormatReaderText (input, "\n", "#", false, "="));
 
         MimeType.addExtensionMapping (MimeType.URL, "url");
         MimeType.addMimeTypeMapping (MimeType.URL);
-        FormatReader.registerFormatReader (MimeType.URL, false, (input) -> new FormatReaderText (input, "&", "="));
+        FormatReader.registerFormatReader (MimeType.URL, false, (input) -> new FormatReaderText (input, "&", false, "="));
     }
 }
