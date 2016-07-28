@@ -11,10 +11,11 @@ public class MimeType {
     private static final Logger log = LogManager.getLogger (MimeType.class);
 
     public static final String JSON = "application/json";
-    public static final String XML = "application/xml";
-    public static final String CSV = "application/csv";
+    //public static final String XML = "application/xml";
+    //public static final String CSV = "application/csv";
     public static final String URL = "application/url";
     public static final String TEXT = "application/text";
+    public static final String PROP = "text/x-java-properties";
 
     public static final String DEFAULT = JSON;
 

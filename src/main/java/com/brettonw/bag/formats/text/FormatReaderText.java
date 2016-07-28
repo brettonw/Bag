@@ -1,31 +1,39 @@
 package com.brettonw.bag.formats.text;
 
-// The FormatReaderJson is loosely modeled after a JSON parser grammar from the site (http://www.json.org).
-// The main difference is that we ignore differences between value types (all of them will be
-// strings internally), and assume the input is a well formed string representation of a BagObject
-// or BagArray in JSON-ish format
-
 import com.brettonw.bag.BagArray;
 import com.brettonw.bag.BagObject;
 import com.brettonw.bag.formats.FormatReader;
 import com.brettonw.bag.formats.MimeType;
 
+/**
+ * The FormatReaderText is a configurable text format reader for any format that uses a divider
+ * between entries, and a divider between pairs. An optional "comment" character is supported to
+ * allow some entries to be skipped on load
+ */
 public class FormatReaderText extends FormatReader {
-    public FormatReaderText (String input) {
+    String entrySeparator;
+    String ignoreEntryMarker;
+    String pairSeparator;
+
+    public FormatReaderText (String input, String entrySeparator, String pairSeparator) {
+        this (input, entrySeparator, " ", pairSeparator);
+    }
+
+    public FormatReaderText (String input, String entrySeparator, String ignoreEntryMarker, String pairSeparator) {
         super (input);
+        this.entrySeparator = entrySeparator;
+        this.ignoreEntryMarker = ignoreEntryMarker;
+        this.pairSeparator = pairSeparator;
     }
 
     @Override
     public BagArray read (BagArray bagArray) {
         if (bagArray == null) bagArray = new BagArray ();
-        // treat each line as an element in the array
-        String[] lines = input.split ("\n");
-        for (String line : lines) {
-            line = line.trim ();
-            if (! (line.startsWith ("#") || line.startsWith ("//"))) {
-                if (line.length () > 0) {
-                    bagArray.add (line);
-                }
+        String[] entries = input.split (entrySeparator);
+        for (String entry : entries) {
+            entry = entry.trim ();
+            if ((entry.length () > 0) && (! (entry.startsWith (ignoreEntryMarker)))) {
+                bagArray.add (entry);
             }
         }
         return bagArray;
@@ -34,27 +42,31 @@ public class FormatReaderText extends FormatReader {
     @Override
     public BagObject read (BagObject bagObject) {
         if (bagObject == null) bagObject = new BagObject ();
-        // treat each line as an element description
-        String[] lines = input.split ("\n");
-        for (String line : lines) {
-            line = line.trim ();
-            if (! (line.startsWith ("#") || line.startsWith ("//"))) {
-                // merge : and = characters, they seem to be used consistently one way or another
-                line = line.replace (":", "=");
-                String[] pair = line.split ("=");
+        String[] entries = input.split (entrySeparator);
+        for (String entry : entries) {
+            entry = entry.trim ();
+            if ((entry.length () > 0) && (! (entry.startsWith (ignoreEntryMarker)))) {
+                String[] pair = entry.split (pairSeparator, 2);
                 if (pair.length == 2) {
-                    bagObject.put (pair[0], pair[1]);
+                    String key = pair[0].trim ();
+                    String value = pair[1].trim ();
+                    if ((key.length () > 0) && (value.length () > 0)) {
+                        bagObject.put (key, value);
+                    }
                 }
             }
         }
-
         return bagObject;
     }
 
     public FormatReaderText () { super (); }
     static {
-        MimeType.addExtensionMapping (MimeType.TEXT, "txt", "text");
-        MimeType.addMimeTypeMapping (MimeType.TEXT, "text/text");
-        FormatReader.registerFormatReader (MimeType.TEXT, false, FormatReaderText::new);
+        MimeType.addExtensionMapping (MimeType.PROP, "properties");
+        MimeType.addMimeTypeMapping (MimeType.PROP);
+        FormatReader.registerFormatReader (MimeType.PROP, false, (input) -> new FormatReaderText (input, "\n", "#", "="));
+
+        MimeType.addExtensionMapping (MimeType.URL, "url");
+        MimeType.addMimeTypeMapping (MimeType.URL);
+        FormatReader.registerFormatReader (MimeType.URL, false, (input) -> new FormatReaderText (input, "&", "="));
     }
 }

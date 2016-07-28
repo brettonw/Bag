@@ -18,12 +18,10 @@ import org.junit.runners.Suite;
         SerializerTest.class,
 
         FormatReaderTest.class,
-        FormatReaderUrlTest.class,
         FormatReaderTextTest.class,
         FormatReaderJsonTest.class,
 
         FormatWriterTest.class,
-        FormatWriterUrlTest.class,
         FormatWriterTextTest.class,
         FormatWriterJsonTest.class,
 

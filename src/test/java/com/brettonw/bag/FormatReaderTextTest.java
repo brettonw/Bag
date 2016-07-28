@@ -1,17 +1,16 @@
 package com.brettonw.bag;
 
+import com.brettonw.bag.formats.MimeType;
 import com.brettonw.bag.formats.text.FormatReaderText;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
 public class FormatReaderTextTest {
-
     @Test
-    public void testArray () {
-
-        String testQuery = "command\nparam1\nparam2";
-        FormatReaderText frt = new FormatReaderText (testQuery);
+    public void testPropArray () {
+        String testQuery = "command\nparam1\nparam2\n";
+        FormatReaderText frt = new FormatReaderText (testQuery, "\n", "=");
         BagArray bagArray = frt.read (new BagArray ());
         assertTrue ("command".equals (bagArray.getString (0)));
         assertTrue ("param1".equals (bagArray.getString (1)));
@@ -19,12 +18,51 @@ public class FormatReaderTextTest {
     }
 
     @Test
-    public void testObject () {
-        String testQuery = "command=goodbye\nparam1=1\nparam2=2";
-        FormatReaderText frt = new FormatReaderText (testQuery);
+    public void testPropObject () {
+        String testQuery = "command=goodbye\nparam1=1\nparam2=2\n";
+        FormatReaderText frt = new FormatReaderText (testQuery, "\n", "=");
         BagObject bagObject = frt.read (new BagObject ());
         assertTrue ("goodbye".equals (bagObject.getString ("command")));
         assertTrue ("1".equals (bagObject.getString ("param1")));
         assertTrue ("2".equals (bagObject.getString ("param2")));
     }
+
+    @Test
+    public void testMimeTypePropMapping () {
+        String testQuery = "command=goodbye\nparam1=1\nparam2=2\n";
+        BagObject bagObject = BagObjectFrom.string (testQuery, MimeType.PROP);
+        assertTrue ("goodbye".equals (bagObject.getString ("command")));
+        assertTrue ("1".equals (bagObject.getString ("param1")));
+        assertTrue ("2".equals (bagObject.getString ("param2")));
+    }
+
+    @Test
+    public void testUrlArray () {
+        String testQuery = "command&param1&param2";
+        FormatReaderText frt = new FormatReaderText (testQuery, "&", "#", "=");
+        BagArray bagArray = frt.read (new BagArray ());
+        assertTrue ("command".equals (bagArray.getString (0)));
+        assertTrue ("param1".equals (bagArray.getString (1)));
+        assertTrue ("param2".equals (bagArray.getString (2)));
+    }
+
+    @Test
+    public void testUrlObject () {
+        String testQuery = "command=goodbye&param1=1&param2=2";
+        FormatReaderText frt = new FormatReaderText (testQuery, "&", "#", "=");
+        BagObject bagObject = frt.read (new BagObject ());
+        assertTrue ("goodbye".equals (bagObject.getString ("command")));
+        assertTrue ("1".equals (bagObject.getString ("param1")));
+        assertTrue ("2".equals (bagObject.getString ("param2")));
+    }
+
+    @Test
+    public void testMimeTypeUrlMapping () {
+        String testQuery = "command=goodbye&param1=1&param2=2";
+        BagObject bagObject = BagObjectFrom.string (testQuery, MimeType.URL);
+        assertTrue ("goodbye".equals (bagObject.getString ("command")));
+        assertTrue ("1".equals (bagObject.getString ("param1")));
+        assertTrue ("2".equals (bagObject.getString ("param2")));
+    }
+
 }
