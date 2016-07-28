@@ -18,11 +18,11 @@ public class FormatReaderUrl extends FormatReader {
     @Override
     public BagArray read (BagArray bagArray) {
         if (bagArray == null) bagArray = new BagArray ();
-            String conditionedInput = input.trim ();
-            String[] queryParameters = conditionedInput.split ("&");
-            for (String queryParameter : queryParameters) {
-                bagArray.add (queryParameter);
-            }
+        String conditionedInput = input.trim ();
+        String[] queryParameters = conditionedInput.split ("&");
+        for (String queryParameter : queryParameters) {
+            bagArray.add (queryParameter);
+        }
 
         return bagArray;
     }
@@ -43,6 +43,8 @@ public class FormatReaderUrl extends FormatReader {
 
     public FormatReaderUrl () { super (); }
     static {
+        MimeType.addExtensionMapping (MimeType.URL, "url");
+        MimeType.addMimeTypeMapping (MimeType.URL);
         FormatReader.registerFormatReader (MimeType.URL, false, FormatReaderUrl::new);
     }
 }

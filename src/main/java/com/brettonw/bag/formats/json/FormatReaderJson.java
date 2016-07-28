@@ -177,6 +177,8 @@ public class FormatReaderJson extends FormatReader {
 
     public FormatReaderJson () {}
     static {
-        FormatReader.registerFormatReader (MimeType.DEFAULT, false, FormatReaderJson::new);
+        MimeType.addExtensionMapping (MimeType.JSON, "json");
+        MimeType.addMimeTypeMapping (MimeType.JSON, "text/json");
+        FormatReader.registerFormatReader (MimeType.JSON, false, FormatReaderJson::new);
     }
 }

@@ -1,24 +1,33 @@
 package com.brettonw.bag.formats;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
 public class MimeType {
+    private static final Logger log = LogManager.getLogger (MimeType.class);
+
     public static final String JSON = "application/json";
     public static final String XML = "application/xml";
     public static final String CSV = "application/csv";
     public static final String URL = "application/url";
+    public static final String TEXT = "application/text";
 
     public static final String DEFAULT = JSON;
 
-    private static final Map<String, String> extensions;
-    static  {
-        extensions = new HashMap<> ();
-        extensions.put ("json", JSON);
-        extensions.put ("xml", XML);
-        extensions.put ("csv", CSV);
-        extensions.put ("url", URL);
+    private static final Map<String, String> extensionMappings = new HashMap<> ();
+
+    public static void addExtensionMapping (String mimeType, String... extensions) {
+        for (String extension : extensions) {
+            if (extensionMappings.containsKey (extension)) {
+                log.error ("Duplicate file extension mapping (" + extension + ") for MIME type (" + mimeType +")");
+            } else {
+                extensionMappings.put (extension, mimeType);
+            }
+        }
     }
 
     /**
@@ -27,24 +36,16 @@ public class MimeType {
      * @return
      */
     public static String getFromExtension (String extension) {
-        return extensions.get(extension.toLowerCase ());
+        return extensionMappings.get(extension.toLowerCase ());
     }
 
-    private static final Map<String, String> mimeTypes;
+    private static final Map<String, String> mimeTypeRemappings = new HashMap<> ();
 
-    private static void addMimeType (String mimeType, String... synonyms) {
-        mimeTypes.put (mimeType, mimeType);
+    public static void addMimeTypeMapping (String mimeType, String... synonyms) {
+        mimeTypeRemappings.put (mimeType, mimeType);
         for (String synonym : synonyms) {
-            mimeTypes.put (synonym, mimeType);
+            mimeTypeRemappings.put (synonym, mimeType);
         }
-    }
-
-    static {
-        mimeTypes = new HashMap<> ();
-        addMimeType (JSON, "text/json");
-        addMimeType (XML, "text/xml");
-        addMimeType (CSV, "text/csv");
-        addMimeType (URL);
     }
 
     /**
@@ -54,7 +55,7 @@ public class MimeType {
      * to support.
      */
     public static String getFromMimeType (String mimeType, Supplier<String> notFound) {
-        return mimeTypes.containsKey (mimeType) ? mimeTypes.get (mimeType) : notFound.get ();
+        return mimeTypeRemappings.containsKey (mimeType) ? mimeTypeRemappings.get (mimeType) : notFound.get ();
     }
 
     /**

@@ -19,10 +19,12 @@ import org.junit.runners.Suite;
 
         FormatReaderTest.class,
         FormatReaderUrlTest.class,
+        FormatReaderTextTest.class,
         FormatReaderJsonTest.class,
 
         FormatWriterTest.class,
         FormatWriterUrlTest.class,
+        FormatWriterTextTest.class,
         FormatWriterJsonTest.class,
 
         SourceAdapterTest.class,
