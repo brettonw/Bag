@@ -66,7 +66,7 @@ public class SourceAdapterHttp extends SourceAdapter {
 
                 // setup the headers
                 connection.setRequestMethod("POST");
-                connection.setRequestProperty("Content-Type", postDataMimeType + ";charset=UTF-8"); // "application/json"
+                connection.setRequestProperty("Content-Type", postDataMimeType + ";charset=" + UTF_8); // "application/json"
                 connection.setRequestProperty("Content-Length", Integer.toString(postDataBytes.length));
 
                 // write out the request data

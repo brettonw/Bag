@@ -12,6 +12,7 @@
 - "public" sweep
 - javadoc sweep
 - replace logging with a BagObject that contains the "last error", kind of like an exception
+- look into the HttpRequest support for "Accepts" replies - do I need to add JOSN to the list?
 
 Formats to support
 - reader auto-detect the format?
