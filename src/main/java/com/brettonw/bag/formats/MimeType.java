@@ -13,7 +13,7 @@ public class MimeType {
     public static final String JSON = "application/json";
     //public static final String XML = "application/xml";
     //public static final String CSV = "application/csv";
-    public static final String URL = "application/url";
+    public static final String URL = "application/x-www-form-urlencoded";
     public static final String TEXT = "application/text";
     public static final String PROP = "text/x-java-properties";
 
