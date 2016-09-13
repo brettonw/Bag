@@ -1,6 +1,6 @@
 package com.brettonw.bag;
 
-class SortKey {
+public class SortKey {
     public static final String KEY = "key";
     public static final String TYPE = "type";
     public static final SortType DEFAULT_TYPE = SortType.ALPHABETIC;

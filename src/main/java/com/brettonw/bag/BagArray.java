@@ -356,7 +356,7 @@ public class BagArray extends Bag implements Selectable<BagArray> {
      * @param keys array of SortKey
      * @return
      */
-    public BagArray sort (SortKey[] keys) {
+    public BagArray sort (SortKey... keys) {
         // final value, so that lambda expressions can reference it
         final SortKey[] sortKeys = (keys != null) ? keys : SortKey.DEFAULT;
 
