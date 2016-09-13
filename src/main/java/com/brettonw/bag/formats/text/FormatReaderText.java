@@ -35,7 +35,20 @@ public class FormatReaderText extends FormatReader {
         for (String entry : entries) {
             entry = entry.trim ();
             if ((entry.length () > 0) && (! (entry.startsWith (ignoreEntryMarker)))) {
-                bagArray.add (entry);
+                if (pairSeparator != null) {
+                    String[] fields = entry.split (pairSeparator);
+                    if (fields.length > 1) {
+                        BagArray fieldArray = new BagArray (fields.length);
+                        for (String field : fields) {
+                            fieldArray.add (field);
+                        }
+                        bagArray.add (fieldArray);
+                    } else {
+                        bagArray.add (fields[0]);
+                    }
+                } else {
+                    bagArray.add (entry);
+                }
             }
         }
         return bagArray;
