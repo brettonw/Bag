@@ -32,9 +32,12 @@ public class Exprs {
     }
 
     static {
-        register ("=", Equality::new);
-        register ("key", Key::new);
-        register ("value", Value::new);
+        register (Equality.EQUALITY, Equality::new);
+        register (Not.NOT, Not::new);
+        register (Key.KEY, Key::new);
+        register (Value.VALUE, Value::new);
+        register (And.AND, And::new);
+        register (Or.OR, Or::new);
     }
 
     public static BooleanExpr equality (String key, Object value) {
