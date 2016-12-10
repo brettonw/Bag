@@ -357,6 +357,10 @@ public class BagObject extends Bag implements Selectable<BagObject> {
             BagObject bagObject = new BagObject ();
             String[] keys = keys ();
             for (String key : keys) {
+                // XXX I need to think about this a bit, so that the selection keys can hoist
+                // XXX sub-trees out of the object, I did this so it could be a simple yes/no
+                // XXX query on the keys in the object, so the select key could be include or
+                // XXX exclude... Maybe I should not try to be so clever...
                 String asKey = selectKey.select (key);
                 if (asKey != null) {
                     Object object = getObject (key);
