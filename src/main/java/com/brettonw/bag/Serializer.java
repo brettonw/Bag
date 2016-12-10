@@ -126,13 +126,23 @@ public class Serializer {
                 :  serializationType (getBoxedType (typeString));
     }
 
+    private static Set<Field> getAllFields (Set<Field> fields, Class type) {
+        // recursively walk up the class declaration to gather all of the fields, but stop when we
+        // hit the top of the class hierarchy
+        if (type != null) {
+            fields.addAll (Arrays.asList (type.getFields ()));
+            fields.addAll (Arrays.asList (type.getDeclaredFields ()));
+            getAllFields (fields, type.getSuperclass ());
+        }
+        return fields;
+    }
+
     private static BagObject serializeJavaObjectType (Object object, Class type) {
         // this bag object will hold the value(s) of the fields
         BagObject bagObject = new BagObject ();
 
         // gather all of the fields declared; public, private, static, etc., then loop over them
-        Set<Field> fieldSet = new HashSet<> (Arrays.asList (type.getFields ()));
-        fieldSet.addAll (Arrays.asList (type.getDeclaredFields ()));
+        Set<Field> fieldSet = getAllFields (new HashSet<> (), type);
         for (Field field : fieldSet) {
             // check if the field is static, we don't want to serialize any static values, as this
             // leads to recursion
@@ -146,15 +156,18 @@ public class Serializer {
 
                 // get the name and type, and get the value to encode
                 try {
-                    // if the type of the object is not a subclass of the field type, serialize it
-                    // directly - otherwise, serialize with type
+                    // only serialize this field if it has a value
                     Object fieldObject = field.get (object);
-                    Class fieldObjectType = getBoxedType (fieldObject.getClass ());
-                    Class fieldType = getBoxedType (field.getType ());
-                    if (fieldObjectType.isAssignableFrom (fieldType)) {
-                        bagObject.put (field.getName (), serialize (fieldObject));
-                    } else {
-                        bagObject.put (field.getName (), serializeWithType (fieldObject, WITHOUT_VERSION));
+                    if (fieldObject != null) {
+                        // if the type of the object is not a subclass of the field type, serialize it
+                        // directly - otherwise, serialize with type
+                        Class fieldObjectType = getBoxedType (fieldObject.getClass ());
+                        Class fieldType = getBoxedType (field.getType ());
+                        if (fieldObjectType.isAssignableFrom (fieldType)) {
+                            bagObject.put (field.getName (), serialize (fieldObject));
+                        } else {
+                            bagObject.put (field.getName (), serializeWithType (fieldObject, WITHOUT_VERSION));
+                        }
                     }
                 } catch (IllegalAccessException exception) {
                     // NOTE this shouldn't happen, per the comments above, and is untestable for
@@ -296,8 +309,7 @@ public class Serializer {
         if (target != null) {
             // gather all of the fields declared; public, private, static, etc., then loop over them
             BagObject bagObject = (BagObject) object;
-            Set<Field> fieldSet = new HashSet<> (Arrays.asList (type.getFields ()));
-            fieldSet.addAll (Arrays.asList (type.getDeclaredFields ()));
+            Set<Field> fieldSet = getAllFields (new HashSet<> (), type);
             for (Field field : fieldSet) {
                 // only populate this field if we serialized it
                 if (bagObject.has (field.getName ())) {
