@@ -28,8 +28,7 @@
     <scm>
         <connection>scm:git:git@github.com:brettonw/bag.git</connection>
         <developerConnection>scm:git:git@github.com:brettonw/bag.git</developerConnection>
-        <url>git@github.com:brettonw/bag.git</url>
-        <tag>HEAD</tag>
+        <url>https://ithub.com:brettonw/bag.git</url>
     </scm>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -62,10 +61,6 @@
     </dependencies>
 
     <distributionManagement>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/release</url>
-        </repository>
         <snapshotRepository>
             <id>ossrh</id>
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
@@ -132,7 +127,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <!--
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -144,7 +138,6 @@
                     <autoReleaseAfterClose>true</autoReleaseAfterClose>
                 </configuration>
             </plugin>
-            -->
         </plugins>
     </build>
 </project>
