@@ -20,6 +20,7 @@ import org.junit.runners.Suite;
         FormatReaderTest.class,
         FormatReaderTextTest.class,
         FormatReaderJsonTest.class,
+        FormatReaderFixedTest.class,
 
         FormatWriterTest.class,
         FormatWriterTextTest.class,

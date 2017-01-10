@@ -31,10 +31,8 @@ public class FormatReaderFixed extends FormatReader {
             expectedLineLength += fieldLength;
         }
 
-        // try to get the field names, either as provided, or from the first row - pass
-        // NO_FIELD_NAMES to force the reader to process each line as an array rather than
-        // as a bag
-        this.fieldNames = (fieldNames != null) ? ((fieldNames.length > 0) ? fieldNames : null) : getFieldValues ();
+        // store the provided field names
+        this.fieldNames = fieldNames;
     }
 
     private String getDataLine () {
@@ -68,6 +66,12 @@ public class FormatReaderFixed extends FormatReader {
 
     @Override
     public BagArray read (BagArray bagArray) {
+        // try to get the field names, either as provided, or from the first row - pass
+        // NO_FIELD_NAMES to force the reader to process each line as an array rather than
+        // as a bag
+        String[] fieldNames = (this.fieldNames != null) ? ((this.fieldNames.length > 0) ? this.fieldNames : null) : getFieldValues ();
+
+        // read the data rows
         if (bagArray == null) bagArray = new BagArray ();
         String[] fieldValues;
         while ((fieldValues = getFieldValues ()) != null) {
