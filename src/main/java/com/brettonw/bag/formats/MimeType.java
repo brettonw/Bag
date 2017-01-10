@@ -10,12 +10,16 @@ import java.util.function.Supplier;
 public class MimeType {
     private static final Logger log = LogManager.getLogger (MimeType.class);
 
+    // RFCs for Mime Types:
+    // CSV -> https://tools.ietf.org/html/rfc4180
+
     public static final String JSON = "application/json";
-    //public static final String XML = "application/xml";
-    //public static final String CSV = "application/csv";
+    public static final String XML = "application/xml";
+    public static final String CSV = "text/csv";
     public static final String URL = "application/x-www-form-urlencoded";
     public static final String TEXT = "application/text";
     public static final String PROP = "text/x-java-properties";
+    public static final String FIXED = "text/fixed";
 
     public static final String DEFAULT = JSON;
 
@@ -52,7 +56,7 @@ public class MimeType {
     /**
      * Returns a mime type with a known format reader from the given mime type. Some MIME types are
      * application or vendor specific examples that use a standard underlying format, like XML.
-     * There are also examples of synonym types, like "text/csv" and "application/csv" that we want
+     * There are also examples of synonym types, like "text/fixed" and "application/fixed" that we want
      * to support.
      */
     public static String getFromMimeType (String mimeType, Supplier<String> notFound) {

@@ -276,7 +276,7 @@ abstract public class Bag {
     }
 
     static {
-        // autoload all the readers
+        // autoload all the readers to force their static initializers to get called
         try {
             for (Class<?> type : ClassIndex.getSubclasses (FormatReader.class)) {
                 Class.forName (type.getName ()).newInstance ();
