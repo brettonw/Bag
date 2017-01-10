@@ -56,7 +56,7 @@ public class MimeType {
     /**
      * Returns a mime type with a known format reader from the given mime type. Some MIME types are
      * application or vendor specific examples that use a standard underlying format, like XML.
-     * There are also examples of synonym types, like "text/fixed" and "application/fixed" that we want
+     * There are also examples of synonym types, like "text/csv" and "application/csv" that we want
      * to support.
      */
     public static String getFromMimeType (String mimeType, Supplier<String> notFound) {
