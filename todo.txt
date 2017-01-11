@@ -1,5 +1,6 @@
 - Following release instructions at http://central.sonatype.org/pages/apache-maven.html
     * mvn release:clean release:prepare release:perform
+*** PREFER: go release ***
 
 - add a Database type, based on a bagarray, complete with sort, search, filter, etc. (or just do
   that on BagArray?) - with indices?
