@@ -4,10 +4,10 @@ import com.brettonw.bag.expr.BooleanExpr;
 import com.brettonw.bag.formats.FormatReader;
 import com.brettonw.bag.formats.FormatWriter;
 import com.brettonw.bag.formats.MimeType;
-import org.apache.logging.log4j.util.Supplier;
 import org.atteo.classindex.ClassIndex;
 
 import java.util.function.Function;
+import java.util.function.Supplier;
 
 abstract public class Bag {
     Object objectify (Object value) {
@@ -254,10 +254,15 @@ abstract public class Bag {
      */
     @Override
     public boolean equals (Object object) {
-        return (getClass ().equals (object.getClass ())) &&
+        return (object != null) &&
+                (getClass ().equals (object.getClass ())) &&
                 toString ().equals (object.toString ());
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public int hashCode () {
         return toString ().hashCode ();
@@ -276,7 +281,7 @@ abstract public class Bag {
     }
 
     static {
-        // autoload all the readers
+        // autoload all the readers to force their static initializers to get called
         try {
             for (Class<?> type : ClassIndex.getSubclasses (FormatReader.class)) {
                 Class.forName (type.getName ()).newInstance ();

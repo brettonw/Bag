@@ -337,4 +337,16 @@ public class BagObjectTest {
         BagObject fetched = bagObject.getBagObject ("q", () -> BagObjectFrom.file (new File ("bogus.txt")));
         AppTest.report (fetched, null, "BagObject should fail quietly");
     }
+
+    @Test
+    public void testEquals () {
+        BagObject bagObject = new BagObject ().put ("x", "y");
+        BagObject bagObject2 = new BagObject ().put ("x", "y");
+        BagObject bagObject3 = new BagObject ().put ("x", "x");
+        AppTest.report (bagObject.equals (bagObject), true, "BagObject should be equal to itself");
+        AppTest.report (bagObject.equals (bagObject2), true, "BagObject should be equal to an equivalent bag");
+        AppTest.report (bagObject.equals (bagObject3), false, "BagObject should not be equal to a different bag");
+        AppTest.report (bagObject.equals (null), false, "BagObject should not be equal to null");
+        AppTest.report (bagObject.equals (new Integer (5)), false, "BagObject should not be equal to a non-bag object");
+    }
 }

@@ -110,6 +110,25 @@ abstract public class FormatReader {
 
     /**
      *
+     * @return a string representing the line, including the carriage return. a 0 length
+     *         result indicates EOF
+     */
+    protected String line () {
+        int start = index;
+        while (check ()) {
+            char nextChar = input.charAt (index);
+            index++;
+            if (nextChar == '\n') {
+                ++lineNumber;
+                lastLineIndex = index;
+                break;
+            }
+        }
+        return input.substring (start, index);
+    }
+
+    /**
+     *
      * @param errorMessage
      */
     protected void onReadError (String errorMessage) {
