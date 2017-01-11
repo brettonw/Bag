@@ -3,7 +3,7 @@ package com.brettonw.bag.formats;
 import com.brettonw.bag.BagArray;
 import com.brettonw.bag.BagObject;
 
-public class FormatReaderComposite extends FormatReader {
+public class FormatReaderComposite extends FormatReader implements ArrayFormatReader, ObjectFormatReader {
     private EntryHandler entryHandler;
 
     public FormatReaderComposite (String input, EntryHandler entryHandler) {

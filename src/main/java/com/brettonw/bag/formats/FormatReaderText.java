@@ -8,11 +8,13 @@ import com.brettonw.bag.BagObject;
  * between entries, and a divider between pairs. An optional "comment" character is supported to
  * allow some entries to be skipped on load
  */
-public class FormatReaderText extends FormatReader {
+public class FormatReaderText extends FormatReader implements ArrayFormatReader, ObjectFormatReader {
     String entrySeparator;
     String ignoreEntryMarker;
     boolean accumulateEntries;
     String pairSeparator;
+
+    public FormatReaderText () {}
 
     public FormatReaderText (String input, String entrySeparator, boolean accumulateEntries, String pairSeparator) {
         this (input, entrySeparator, " ", accumulateEntries, pairSeparator);
@@ -76,7 +78,6 @@ public class FormatReaderText extends FormatReader {
         return bagObject;
     }
 
-    public FormatReaderText () { super (); }
     static {
         MimeType.addExtensionMapping (MimeType.PROP, "properties");
         MimeType.addMimeTypeMapping (MimeType.PROP);

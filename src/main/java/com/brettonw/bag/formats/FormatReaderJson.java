@@ -10,7 +10,9 @@ import com.brettonw.bag.BagObject;
 
 import java.util.Arrays;
 
-public class FormatReaderJson extends FormatReader {
+public class FormatReaderJson extends FormatReaderParsed implements ArrayFormatReader, ObjectFormatReader {
+    public FormatReaderJson () {}
+
     public FormatReaderJson (String input) {
         super (input);
     }
@@ -169,7 +171,6 @@ public class FormatReaderJson extends FormatReader {
         return value;
     }
 
-    public FormatReaderJson () {}
     static {
         MimeType.addExtensionMapping (MimeType.JSON, "json");
         MimeType.addMimeTypeMapping (MimeType.JSON, "text/json");

@@ -7,12 +7,14 @@ import com.brettonw.bag.BagObject;
  * The FormatReaderFixed is a fixed-width field format reader, with an option to
  * read the first data row as field names, or to take an array of field names
  */
-public class FormatReaderFixed extends FormatReader {
+public class FormatReaderFixed extends FormatReaderParsed implements ArrayFormatReader {
     public static final String[] NO_FIELD_NAMES = {};
 
     int expectedLineLength;
     int[] fieldLengths;
     String[] fieldNames;
+
+    public FormatReaderFixed () {}
 
     public FormatReaderFixed (String input, int[] fieldLengths) {
         this (input, fieldLengths, null);
@@ -89,15 +91,6 @@ public class FormatReaderFixed extends FormatReader {
         }
         return bagArray;
     }
-
-    @Override
-    public BagObject readBagObject () {
-        BagObject bagObject = new BagObject ();
-        // XXX not sure what this should do, perhaps use the first field in a line as a row name?
-        return bagObject;
-    }
-
-    public FormatReaderFixed () {}
 
     static {
         MimeType.addMimeTypeMapping (MimeType.FIXED);
