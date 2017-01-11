@@ -19,7 +19,7 @@
     <scm>
         <connection>scm:git:git@github.com:brettonw/bag.git</connection>
         <developerConnection>scm:git:git@github.com:brettonw/bag.git</developerConnection>
-        <url>https://ithub.com:brettonw/bag.git</url>
+        <url>https://github.com:brettonw/bag.git</url>
     </scm>
 
     <dependencies>
