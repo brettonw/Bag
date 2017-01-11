@@ -16,11 +16,9 @@ public class FormatReaderJson extends FormatReader {
     }
 
     @Override
-    public BagArray read (BagArray bagArray) {
-        if (bagArray == null) {
-            bagArray = new BagArray ();
-        }
+    public BagArray readBagArray () {
         // <Array> :: [ ] | [ <Elements> ]
+        BagArray bagArray = new BagArray ();
         return (expect('[') && readElements (bagArray) && require(']')) ? bagArray : null;
     }
 
@@ -54,11 +52,9 @@ public class FormatReaderJson extends FormatReader {
     }
 
     @Override
-    public BagObject read (BagObject bagObject) {
-        if (bagObject == null) {
-            bagObject = new BagObject ();
-        }
+    public BagObject readBagObject () {
         // <Object> ::= { } | { <Members> }
+        BagObject bagObject = new BagObject ();
         return (expect('{') && readMembers (bagObject) && require('}')) ? bagObject : null;
     }
 
@@ -157,11 +153,11 @@ public class FormatReaderJson extends FormatReader {
         if (check ()) {
             switch (input.charAt (index)) {
                 case '{':
-                    value = read (new BagObject ());
+                    value = readBagObject ();
                     break;
 
                 case '[':
-                    value = read (new BagArray ());
+                    value = readBagArray ();
                     break;
 
                 case '"':

@@ -24,7 +24,7 @@ public class FormatReaderFixedTest {
     public void testBasicFixedFormatNoFieldNames () {
         String test = " a comment line\n\nA  B  C  D   \naaabbbcccdddd\nabcd\n11 22 33 4444\n";
         FormatReaderFixed frf = new FormatReaderFixed (test, new int[]{3, 3, 3, 4}, FormatReaderFixed.NO_FIELD_NAMES);
-        BagArray bagArray = frf.read (new BagArray ());
+        BagArray bagArray = frf.readBagArray ();
 
         AppTest.report (bagArray.getCount (), 3, "3 valid rows were provided");
         AppTest.report (bagArray.getBagArray (0).getString (0), "A", "row 0, 1st element reads correctly");
@@ -40,7 +40,7 @@ public class FormatReaderFixedTest {
         String test = " a comment line\n\naaabbbcccdddd\nabcd\n11 22 33 4444\n";
         String[] fieldNames = {"A", "B", "C", "D" };
         FormatReaderFixed frf = new FormatReaderFixed (test, new int[]{3, 3, 3, 4}, fieldNames);
-        BagArray bagArray = frf.read (new BagArray ());
+        BagArray bagArray = frf.readBagArray ();
 
         AppTest.report (bagArray.getCount (), 2, "Only 2 valid rows were provided");
         AppTest.report (bagArray.getBagObject (0).getString ("A"), "aaa", "row 0, 1st element reads correctly");

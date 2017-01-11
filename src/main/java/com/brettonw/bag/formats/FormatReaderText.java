@@ -27,10 +27,8 @@ public class FormatReaderText extends FormatReader {
     }
 
     @Override
-    public BagArray read (BagArray bagArray) {
-        if (bagArray == null) {
-            bagArray = new BagArray ();
-        }
+    public BagArray readBagArray () {
+        BagArray bagArray = new BagArray ();
         String[] entries = input.split (entrySeparator);
         for (String entry : entries) {
             entry = entry.trim ();
@@ -55,10 +53,8 @@ public class FormatReaderText extends FormatReader {
     }
 
     @Override
-    public BagObject read (BagObject bagObject) {
-        if (bagObject == null) {
-            bagObject = new BagObject ();
-        }
+    public BagObject readBagObject () {
+        BagObject bagObject = new BagObject ();
         String[] entries = input.split (entrySeparator);
         for (String entry : entries) {
             entry = entry.trim ();

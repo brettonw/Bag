@@ -12,32 +12,13 @@ public class FormatReaderComposite extends FormatReader {
     }
 
     @Override
-    public BagArray read (BagArray bagArray) {
-        // build a bag array and copy its values over...
-        BagArray tmpBagArray = (BagArray) entryHandler.getEntry (input);
-        if (bagArray == null) {
-            bagArray = tmpBagArray;
-        } else {
-            for (int i = 0, end = tmpBagArray.getCount (); i < end; ++i) {
-                bagArray.add (tmpBagArray.getObject (i));
-            }
-        }
-        return bagArray;
+    public BagArray readBagArray () {
+        return (BagArray) entryHandler.getEntry (input);
     }
 
     @Override
-    public BagObject read (BagObject bagObject) {
-        // build a bag object and copy its values over...
-        BagObject tmpBagObject = (BagObject) entryHandler.getEntry (input);
-        if (bagObject == null) {
-            bagObject = tmpBagObject;
-        } else {
-            String[] keys = tmpBagObject.keys ();
-            for (String key : keys) {
-                bagObject.put (key, tmpBagObject.getObject (key));
-            }
-        }
-        return bagObject;
+    public BagObject readBagObject () {
+        return (BagObject) entryHandler.getEntry (input);
     }
 
     public FormatReaderComposite () {}

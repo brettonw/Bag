@@ -48,21 +48,22 @@ public class BagObject extends Bag implements Selectable<BagObject> {
     }
 
     BagObject (SourceAdapter sourceAdapter) throws ReadException {
-        this (UNKNOWN_SIZE, sourceAdapter);
-    }
-
-    BagObject (int size, SourceAdapter sourceAdapter) throws ReadException {
-        this (size);
-        if (FormatReader.read (this, sourceAdapter) == null) {
+        // make the victim
+        BagObject victim = FormatReader.readBagObject (sourceAdapter);
+        if (victim == null) {
             throw new ReadException ();
         }
+
+        // now steal the victim's soul and leave them to die
+        container = victim.container;
+        count = victim.count;
     }
 
     /**
      * Create a new BagObject as deep copy of another BagObject
      */
     public BagObject (BagObject bagObject) {
-        this (bagObject.getCount (), new SourceAdapter (bagObject.toString (MimeType.DEFAULT), MimeType.DEFAULT));
+        this (new SourceAdapter (bagObject.toString (MimeType.DEFAULT), MimeType.DEFAULT));
     }
 
     /**

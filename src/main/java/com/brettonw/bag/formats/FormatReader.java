@@ -162,17 +162,15 @@ abstract public class FormatReader {
 
     /**
      *
-     * @param bagArray
      * @return
      */
-    abstract public BagArray read (BagArray bagArray);
+    abstract public BagArray readBagArray ();
 
     /**
      *
-     * @param bagObject
      * @return
      */
-    abstract public BagObject read (BagObject bagObject);
+    abstract public BagObject readBagObject ();
 
     // static type registration by name
     private static final Map<String, Function<String, FormatReader>> formatReaders = new HashMap<> ();
@@ -200,14 +198,13 @@ abstract public class FormatReader {
         return null;
     }
 
-    public static BagArray read (BagArray bagArray, SourceAdapter sourceAdapter) {
+    public static BagArray readBagArray (SourceAdapter sourceAdapter) {
         FormatReader formatReader = getFormatReader(sourceAdapter.getStringData(), sourceAdapter.getMimeType());
-        return (formatReader != null) ? formatReader.read (bagArray) : null;
+        return (formatReader != null) ? formatReader.readBagArray () : null;
     }
 
-    public static BagObject read (BagObject bagObject, SourceAdapter sourceAdapter) {
+    public static BagObject readBagObject (SourceAdapter sourceAdapter) {
         FormatReader formatReader = getFormatReader(sourceAdapter.getStringData(), sourceAdapter.getMimeType());
-        return (formatReader != null) ? formatReader.read (bagObject) : null;
+        return (formatReader != null) ? formatReader.readBagObject () : null;
     }
-
 }

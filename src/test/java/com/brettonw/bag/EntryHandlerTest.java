@@ -16,7 +16,7 @@ public class EntryHandlerTest {
                 new EntryHandlerArrayFromDelimited ("=", ENTRY_HANDLER_VALUE),
                 ENTRY_HANDLER_VALUE
         ));
-        BagObject bagObject = frc.read (new BagObject ());
+        BagObject bagObject = frc.readBagObject ();
         AppTest.report (bagObject.getCount () == 3, true, "expect 3 elements in bagObject");
         AppTest.report (bagObject.getString ("command"), "goodbye", "expect text elements in bagObject");
         AppTest.report (bagObject.getInteger ("param2"), 2, "expect int elements in bagObject");

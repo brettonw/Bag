@@ -30,9 +30,7 @@ public class BagObjectFrom {
     static public BagObject string (String string, String mimeType, Supplier<BagObject> fail) {
         try {
             SourceAdapter sourceAdapter = new SourceAdapterReader(string, mimeType);
-            // XXX can I skip the middle man?
-            //return new BagObject (sourceAdapter);
-            return FormatReader.read ((BagObject) null, sourceAdapter);
+            return FormatReader.readBagObject (sourceAdapter);
         } catch (Exception exception) {
             log.error (exception);
         }
@@ -55,7 +53,7 @@ public class BagObjectFrom {
     static public BagObject file (File file, String mimeType, Supplier<BagObject> fail) {
         try {
             SourceAdapter sourceAdapter = new SourceAdapterReader(file, mimeType);
-            return new BagObject (sourceAdapter);
+            return FormatReader.readBagObject (sourceAdapter);
         } catch (Exception exception) {
             log.error (exception);
         }
@@ -78,7 +76,7 @@ public class BagObjectFrom {
     static public BagObject resource (Class context, String name, String mimeType, Supplier<BagObject> fail) {
         try {
             SourceAdapter sourceAdapter = new SourceAdapterReader (context, name, mimeType);
-            return new BagObject (sourceAdapter);
+            return FormatReader.readBagObject (sourceAdapter);
         } catch (Exception exception) {
             log.error (exception);
         }
@@ -101,7 +99,7 @@ public class BagObjectFrom {
     static public BagObject inputStream (InputStream inputStream, String mimeType, Supplier<BagObject> fail) {
         try {
             SourceAdapter sourceAdapter = new SourceAdapterReader(inputStream, mimeType);
-            return new BagObject (sourceAdapter);
+            return FormatReader.readBagObject (sourceAdapter);
         } catch (Exception exception) {
             log.error (exception);
         }
@@ -130,7 +128,7 @@ public class BagObjectFrom {
     static public BagObject url (URL url, Supplier<BagObject> fail) {
         try {
             SourceAdapter sourceAdapter = new SourceAdapterHttp(url);
-            return new BagObject (sourceAdapter);
+            return FormatReader.readBagObject (sourceAdapter);
         } catch (Exception exception) {
             log.error (exception);
         }
@@ -159,7 +157,7 @@ public class BagObjectFrom {
     static public BagObject url (URL url, Bag postData, String postDataMimeType, Supplier<BagObject> fail) {
         try {
             SourceAdapter sourceAdapter = new SourceAdapterHttp(url, postData, postDataMimeType);
-            return new BagObject (sourceAdapter);
+            return FormatReader.readBagObject (sourceAdapter);
         } catch (Exception exception) {
             log.error (exception);
         }
@@ -172,7 +170,7 @@ public class BagObjectFrom {
 
     static public BagObject sourceAdapter (SourceAdapter sourceAdapter, Supplier<BagObject> fail) {
         try {
-            return new BagObject (sourceAdapter);
+            return FormatReader.readBagObject (sourceAdapter);
         } catch (Exception exception) {
             log.error (exception);
         }

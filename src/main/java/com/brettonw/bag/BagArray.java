@@ -47,21 +47,22 @@ public class BagArray extends Bag implements Selectable<BagArray> {
     }
 
     BagArray (SourceAdapter sourceAdapter) throws ReadException {
-        this (UNKNOWN_SIZE, sourceAdapter);
-    }
-
-    BagArray (int size, SourceAdapter sourceAdapter) throws ReadException {
-        this (size);
-        if (FormatReader.read (this, sourceAdapter) == null) {
+        // make the victim
+        BagArray victim = FormatReader.readBagArray (sourceAdapter);
+        if (victim == null) {
             throw new ReadException ();
         }
+
+        // now steal the victim's soul and leave them to die
+        container = victim.container;
+        count = victim.count;
     }
 
     /**
      * Create a new BagArray as deep copy of another BagArray
      */
     public BagArray (BagArray bagArray) {
-        this (bagArray.getCount (), new SourceAdapter (bagArray.toString (MimeType.DEFAULT), MimeType.DEFAULT));
+        this (new SourceAdapter (bagArray.toString (MimeType.DEFAULT), MimeType.DEFAULT));
     }
 
     /**
