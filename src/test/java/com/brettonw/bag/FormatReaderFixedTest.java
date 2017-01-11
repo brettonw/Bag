@@ -3,7 +3,7 @@ package com.brettonw.bag;
 import com.brettonw.AppTest;
 import com.brettonw.bag.formats.FormatReader;
 import com.brettonw.bag.formats.MimeType;
-import com.brettonw.bag.formats.fixed.FormatReaderFixed;
+import com.brettonw.bag.formats.FormatReaderFixed;
 import org.junit.Test;
 
 public class FormatReaderFixedTest {

@@ -3,7 +3,7 @@ package com.brettonw.bag;
 import com.brettonw.AppTest;
 import com.brettonw.bag.formats.FormatWriter;
 import com.brettonw.bag.formats.MimeType;
-import com.brettonw.bag.formats.json.FormatWriterJson;
+import com.brettonw.bag.formats.FormatWriterJson;
 import org.junit.Test;
 
 public class FormatWriterTest {

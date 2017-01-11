@@ -1,9 +1,7 @@
-package com.brettonw.bag.formats.fixed;
+package com.brettonw.bag.formats;
 
 import com.brettonw.bag.BagArray;
 import com.brettonw.bag.BagObject;
-import com.brettonw.bag.formats.FormatReader;
-import com.brettonw.bag.formats.MimeType;
 
 /**
  * The FormatReaderFixed is a fixed-width field format reader, with an option to

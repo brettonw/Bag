@@ -1,7 +1,7 @@
 package com.brettonw.bag;
 
 import com.brettonw.bag.formats.MimeType;
-import com.brettonw.bag.formats.text.FormatReaderText;
+import com.brettonw.bag.formats.FormatReaderText;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;

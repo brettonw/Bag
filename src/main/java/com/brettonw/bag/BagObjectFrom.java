@@ -1,5 +1,6 @@
 package com.brettonw.bag;
 
+import com.brettonw.bag.formats.FormatReader;
 import com.brettonw.bag.formats.MimeType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,7 +30,9 @@ public class BagObjectFrom {
     static public BagObject string (String string, String mimeType, Supplier<BagObject> fail) {
         try {
             SourceAdapter sourceAdapter = new SourceAdapterReader(string, mimeType);
-            return new BagObject (sourceAdapter);
+            // XXX can I skip the middle man?
+            //return new BagObject (sourceAdapter);
+            return FormatReader.read ((BagObject) null, sourceAdapter);
         } catch (Exception exception) {
             log.error (exception);
         }
