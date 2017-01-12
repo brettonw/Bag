@@ -10,6 +10,8 @@ import org.apache.logging.log4j.Logger;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * A collection of text-based values stored in a zero-based indexed array.
@@ -330,6 +332,31 @@ public class BagArray extends Bag implements Selectable<BagArray> {
     @Override
     public String toString (String format) {
         return FormatWriter.write (this, format);
+    }
+
+    /**
+     *
+     * @param function
+     * @return
+     */
+    public BagArray map (Function<Object, Object> function) {
+        final BagArray bagArray = new BagArray (count);
+        for (int i = 0; i < count; ++i) {
+            bagArray.add (function.apply (container[i]));
+        }
+        return bagArray;
+    }
+
+    /**
+     *
+     * @param consumer
+     * @return
+     */
+    public BagArray forEach (Consumer<Object> consumer) {
+        for (int i = 0; i < count; ++i) {
+            consumer.accept (container[i]);
+        }
+        return this;
     }
 
     @Override

@@ -13,12 +13,7 @@ public abstract class EntryHandlerArray implements EntryHandler {
 
     @Override
     public Object getEntry (String input) {
-        BagArray bagArray = strategy (input);
-        if (bagArray != null) {
-            for (int i = 0, end = bagArray.getCount (); i < end; ++i) {
-                bagArray.replace (i, entryHandler.getEntry (bagArray.getString (i)));
-            }
-        }
-        return bagArray;
+        final BagArray bagArray = strategy (input);
+        return (bagArray != null) ? bagArray.map (object -> entryHandler.getEntry ((String)object)) : bagArray;
     }
 }

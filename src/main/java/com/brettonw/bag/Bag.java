@@ -285,7 +285,9 @@ abstract public class Bag {
     }
 
     static {
-        // autoload all the readers to force their static initializers to get called
+        // autoload all the reader subclasses to force their static initializers to get
+        // called (but only if the reader constructor is visible, i.e. it's an actual
+        // reader endpoint in the class hierarchy and not just a helper or base class.)
         for (Class<?> type : ClassIndex.getSubclasses (FormatReader.class)) {
             try {
                 Class.forName (type.getName ()).newInstance ();
@@ -296,7 +298,7 @@ abstract public class Bag {
             }
         }
 
-        // autoload all the writers
+        // autoload all the writers, same as above
         for (Class<?> type : ClassIndex.getSubclasses (FormatWriter.class)) {
             try {
                 Class.forName (type.getName ()).newInstance ();

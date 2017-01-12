@@ -2,10 +2,11 @@ package com.brettonw.bag.formats;
 
 import com.brettonw.bag.BagArray;
 
+import java.util.Arrays;
+
 public class EntryHandlerArrayFromFixed extends EntryHandlerArray {
     private int[] widths;
     private int totalWidth;
-    private String ignore;
 
     public EntryHandlerArrayFromFixed (int[] widths, EntryHandler entryHandler) {
         super (entryHandler);
@@ -14,11 +15,6 @@ public class EntryHandlerArrayFromFixed extends EntryHandlerArray {
         for (int width : widths) {
             totalWidth += width;
         }
-    }
-
-    public EntryHandlerArrayFromFixed ignore (String ignore) {
-        this.ignore = ignore;
-        return this;
     }
 
     /**
@@ -32,7 +28,7 @@ public class EntryHandlerArrayFromFixed extends EntryHandlerArray {
      * @return
      */
     public static int[] widthsFromPositions (int first, int... positions) {
-        int[] widths = new int[positions.length];
+        final int[] widths = new int[positions.length];
         for (int i = 0; i < positions.length; ++i) {
             widths[i] = positions[i] - first;
             first = positions[i];
@@ -42,18 +38,12 @@ public class EntryHandlerArrayFromFixed extends EntryHandlerArray {
 
     @Override
     protected BagArray strategy (String input) {
-        // skip any kind of comment line
-        if ((ignore != null) && input.startsWith (ignore)) {
-            return null;
-        }
-
         // pad the input with spaces to match the expected width
         input = String.format ("%1$-" + totalWidth + "s", input);
 
         // split the input up into all the little substrings...
         BagArray bagArray = new BagArray (widths.length);
-        int start = 0;
-        for (int i = 0; i < widths.length; ++i) {
+        for (int i = 0, start = 0; i < widths.length; ++i) {
             int end = start + widths[i];
             bagArray.add (input.substring (start, end).trim ());
             start = end;

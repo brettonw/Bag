@@ -79,9 +79,11 @@ public class FormatReaderText extends FormatReader implements ArrayFormatReader,
     }
 
     static {
+        /*
         MimeType.addExtensionMapping (MimeType.PROP, "properties");
         MimeType.addMimeTypeMapping (MimeType.PROP);
         FormatReader.registerFormatReader (MimeType.PROP, false, (input) -> new FormatReaderText (input, "\n", "#", false, "="));
+        */
 
         MimeType.addExtensionMapping (MimeType.URL, "url");
         MimeType.addMimeTypeMapping (MimeType.URL);

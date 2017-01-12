@@ -27,15 +27,12 @@ public class EntryHandlerObjectFromPairsArray extends EntryHandlerObject {
         BagArray bagArray = (BagArray) arrayHandler.getEntry (input);
         if (bagArray != null) {
             // loop over the array, processing the pairs
-            int count = bagArray.getCount ();
-            for (int i = 0; i < count; ++i) {
-                bagArray.replace (i, pairHandler.getEntry (bagArray.getString (i)));
-            }
+            bagArray = bagArray.map (string -> pairHandler.getEntry ((String) string));
 
             // create a bag object from the array of pairs
-            BagObject bagObject = new BagObject (count);
-            for (int i = 0; i < count; ++i) {
-                BagArray pair = bagArray.getBagArray (i);
+            BagObject bagObject = new BagObject (bagArray.getCount ());
+            bagArray.forEach (object -> {
+                BagArray pair = (BagArray) object;
                 if (pair != null) {
                     if (accumulateEntries) {
                         bagObject.add (pair.getString (0), pair.getString (1));
@@ -43,7 +40,7 @@ public class EntryHandlerObjectFromPairsArray extends EntryHandlerObject {
                         bagObject.put (pair.getString (0), pair.getString (1));
                     }
                 }
-            }
+            });
 
             // return the result
             return bagObject;

@@ -2,6 +2,8 @@ package com.brettonw.bag.formats;
 
 import com.brettonw.bag.BagObject;
 
+import java.util.Arrays;
+
 public abstract class EntryHandlerObject implements EntryHandler {
     private EntryHandler entryHandler;
 
@@ -15,10 +17,7 @@ public abstract class EntryHandlerObject implements EntryHandler {
     public Object getEntry (String input) {
         BagObject bagObject = strategy (input);
         if (bagObject != null) {
-            String[] keys = bagObject.keys ();
-            for (String key : keys) {
-                bagObject.put (key, entryHandler.getEntry (bagObject.getString (key)));
-            }
+            Arrays.stream (bagObject.keys ()).forEach (key ->bagObject.put (key, entryHandler.getEntry (bagObject.getString (key))));
         }
         return bagObject;
     }

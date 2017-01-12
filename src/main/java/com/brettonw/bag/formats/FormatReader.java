@@ -66,11 +66,21 @@ public class FormatReader {
         return null;
     }
 
+    /**
+     *
+     * @param sourceAdapter
+     * @return
+     */
     public static BagArray readBagArray (SourceAdapter sourceAdapter) {
         FormatReader formatReader = getFormatReader(sourceAdapter.getStringData(), sourceAdapter.getMimeType(), ArrayFormatReader.class);
         return (formatReader != null) ? ((ArrayFormatReader)formatReader).readBagArray () : null;
     }
 
+    /**
+     *
+     * @param sourceAdapter
+     * @return
+     */
     public static BagObject readBagObject (SourceAdapter sourceAdapter) {
         FormatReader formatReader = getFormatReader(sourceAdapter.getStringData(), sourceAdapter.getMimeType(), ObjectFormatReader.class);
         return (formatReader != null) ? ((ObjectFormatReader)formatReader).readBagObject () : null;

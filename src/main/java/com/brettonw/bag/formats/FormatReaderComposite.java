@@ -24,11 +24,13 @@ public class FormatReaderComposite extends FormatReader implements ArrayFormatRe
     public FormatReaderComposite () {}
 
     static {
-        /*
         MimeType.addExtensionMapping (MimeType.PROP, "properties");
         MimeType.addMimeTypeMapping (MimeType.PROP);
-        FormatReader.registerFormatReader (MimeType.PROP, false, (input) -> new FormatReaderComposite (input,
-                new "\n", "#", false, "="));
-        */
+        FormatReader.registerFormatReader (MimeType.PROP, false, (input) ->
+                        new FormatReaderComposite (input, new EntryHandlerObjectFromPairsArray (
+                                new EntryHandlerArrayFromDelimited ("\n", EntryHandlerValue.ENTRY_HANDLER_VALUE),
+                                new EntryHandlerArrayFromDelimited ("=", EntryHandlerValue.ENTRY_HANDLER_VALUE),
+                                EntryHandlerValue.ENTRY_HANDLER_VALUE
+                        )));
     }
 }
