@@ -8,6 +8,10 @@ public class EntryHandlerArrayFromDelimited extends EntryHandlerArray {
     private String delimiter;
     private String ignore;
 
+    public EntryHandlerArrayFromDelimited (String delimiter) {
+        this (delimiter, EntryHandlerValue.ENTRY_HANDLER_VALUE);
+    }
+
     public EntryHandlerArrayFromDelimited (String delimiter, EntryHandler entryHandler) {
         super(entryHandler);
         this.delimiter = delimiter;

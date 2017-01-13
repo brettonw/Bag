@@ -2,11 +2,13 @@ package com.brettonw.bag.formats;
 
 import com.brettonw.bag.BagArray;
 
-import java.util.Arrays;
-
 public class EntryHandlerArrayFromFixed extends EntryHandlerArray {
     private int[] widths;
     private int totalWidth;
+
+    public EntryHandlerArrayFromFixed (int[] widths) {
+        this (widths, EntryHandlerValue.ENTRY_HANDLER_VALUE);
+    }
 
     public EntryHandlerArrayFromFixed (int[] widths, EntryHandler entryHandler) {
         super (entryHandler);

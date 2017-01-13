@@ -5,7 +5,7 @@ import com.brettonw.bag.BagArray;
 public abstract class EntryHandlerArray implements EntryHandler {
     private EntryHandler entryHandler;
 
-    public EntryHandlerArray (EntryHandler entryHandler) {
+    protected EntryHandlerArray (EntryHandler entryHandler) {
         this.entryHandler = entryHandler;
     }
 

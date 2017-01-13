@@ -19,7 +19,7 @@ import org.junit.runners.Suite;
 
         EntryHandlerTest.class,
         FormatReaderTest.class,
-        FormatReaderTextTest.class,
+        FormatReaderCompositeTest.class,
         FormatReaderJsonTest.class,
         FormatReaderFixedTest.class,
 

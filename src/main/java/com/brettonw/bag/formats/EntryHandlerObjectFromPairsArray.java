@@ -6,19 +6,16 @@ import com.brettonw.bag.BagObject;
 public class EntryHandlerObjectFromPairsArray extends EntryHandlerObject {
     private EntryHandler arrayHandler;
     private EntryHandler pairHandler;
-    private boolean accumulateEntries;
 
+
+    public EntryHandlerObjectFromPairsArray (EntryHandler arrayHandler, EntryHandler pairHandler) {
+        this (arrayHandler, pairHandler, EntryHandlerValue.ENTRY_HANDLER_VALUE);
+    }
 
     public EntryHandlerObjectFromPairsArray (EntryHandler arrayHandler, EntryHandler pairHandler, EntryHandler entryHandler) {
         super (entryHandler);
         this.arrayHandler = arrayHandler;
         this.pairHandler = pairHandler;
-        accumulateEntries = false;
-    }
-
-    public EntryHandlerObjectFromPairsArray accumulateEntries (boolean accumulateEntries) {
-        this.accumulateEntries = accumulateEntries;
-        return this;
     }
 
     @Override

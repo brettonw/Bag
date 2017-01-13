@@ -6,6 +6,8 @@ import com.brettonw.bag.BagObject;
 public class FormatReaderComposite extends FormatReader implements ArrayFormatReader, ObjectFormatReader {
     private EntryHandler entryHandler;
 
+    public FormatReaderComposite () {}
+
     public FormatReaderComposite (String input, EntryHandler entryHandler) {
         super (input);
         this.entryHandler = entryHandler;
@@ -21,16 +23,32 @@ public class FormatReaderComposite extends FormatReader implements ArrayFormatRe
         return (BagObject) entryHandler.getEntry (input);
     }
 
-    public FormatReaderComposite () {}
+    public static FormatReaderComposite basicArrayReader (String input, String arrayDelimiter, String ignore) {
+        return new FormatReaderComposite (input, new EntryHandlerArrayFromDelimited (arrayDelimiter).ignore (ignore));
+    }
+
+    public static FormatReaderComposite basicArrayReader (String input, String arrayDelimiter) {
+        return new FormatReaderComposite (input, new EntryHandlerArrayFromDelimited (arrayDelimiter));
+    }
+
+    public static FormatReaderComposite basicObjectReader (String input, String arrayDelimiter, String pairDelimiter, boolean accumulateEntries) {
+        return new FormatReaderComposite (input, new EntryHandlerObjectFromPairsArray (
+                new EntryHandlerArrayFromDelimited (arrayDelimiter),
+                new EntryHandlerArrayFromDelimited (pairDelimiter)
+        ).accumulateEntries (accumulateEntries));
+    }
+
+    public static FormatReaderComposite basicObjectReader (String input, String arrayDelimiter, String pairDelimiter) {
+        return basicObjectReader (input, arrayDelimiter, pairDelimiter, false);
+    }
 
     static {
         MimeType.addExtensionMapping (MimeType.PROP, "properties");
         MimeType.addMimeTypeMapping (MimeType.PROP);
-        FormatReader.registerFormatReader (MimeType.PROP, false, (input) ->
-                        new FormatReaderComposite (input, new EntryHandlerObjectFromPairsArray (
-                                new EntryHandlerArrayFromDelimited ("\n", EntryHandlerValue.ENTRY_HANDLER_VALUE),
-                                new EntryHandlerArrayFromDelimited ("=", EntryHandlerValue.ENTRY_HANDLER_VALUE),
-                                EntryHandlerValue.ENTRY_HANDLER_VALUE
-                        )));
+        FormatReader.registerFormatReader (MimeType.PROP, false, (input) -> basicObjectReader (input, "\n", "="));
+
+        MimeType.addExtensionMapping (MimeType.URL, "url");
+        MimeType.addMimeTypeMapping (MimeType.URL);
+        FormatReader.registerFormatReader (MimeType.URL, false, (input) -> basicObjectReader (input, "&", "="));
     }
 }
