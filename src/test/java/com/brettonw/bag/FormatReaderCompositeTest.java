@@ -1,14 +1,39 @@
 package com.brettonw.bag;
 
-import com.brettonw.bag.formats.ArrayFormatReader;
-import com.brettonw.bag.formats.FormatReaderComposite;
-import com.brettonw.bag.formats.MimeType;
-import com.brettonw.bag.formats.ObjectFormatReader;
+import com.brettonw.AppTest;
+import com.brettonw.bag.formats.*;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
 
 public class FormatReaderCompositeTest {
+    @Test
+    public void testCompositeReader () {
+        String test = "command=goodbye&param1=1&param2=2";
+
+        FormatReaderComposite frc = new FormatReaderComposite (test, new EntryHandlerObjectFromPairsArray (
+                new EntryHandlerArrayFromDelimited ("&", new EntryHandlerArrayFromDelimited ("="))
+        ));
+        BagObject bagObject = frc.readBagObject ();
+        AppTest.report (bagObject.getCount () == 3, true, "expect 3 elements in bagObject");
+        AppTest.report (bagObject.getString ("command"), "goodbye", "expect text elements in bagObject");
+        AppTest.report (bagObject.getInteger ("param2"), 2, "expect int elements in bagObject");
+    }
+
+    @Test
+    public void testRegisteredCompositeReader () {
+        String test = "command=goodbye&param1=1&param2=2";
+        final String testMimeType = "test/test2";
+        MimeType.addMimeTypeMapping (testMimeType);
+        FormatReader.registerFormatReader (testMimeType, false, (input) -> new FormatReaderComposite (input, new EntryHandlerObjectFromPairsArray (
+                new EntryHandlerArrayFromDelimited ("&", new EntryHandlerArrayFromDelimited ("="))
+        )));
+        BagObject bagObject = BagObjectFrom.string (test, testMimeType);
+        AppTest.report (bagObject.getCount () == 3, true, "expect 3 elements in bagObject");
+        AppTest.report (bagObject.getString ("command"), "goodbye", "expect text elements in bagObject");
+        AppTest.report (bagObject.getInteger ("param2"), 2, "expect int elements in bagObject");
+    }
+
     @Test
     public void testAccumulate () {
 

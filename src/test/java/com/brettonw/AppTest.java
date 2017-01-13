@@ -21,7 +21,7 @@ import org.junit.runners.Suite;
         FormatReaderTest.class,
         FormatReaderCompositeTest.class,
         FormatReaderJsonTest.class,
-        FormatReaderFixedTest.class,
+        FormatReaderTableTest.class,
 
         FormatWriterTest.class,
         FormatWriterTextTest.class,

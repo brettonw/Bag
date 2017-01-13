@@ -39,7 +39,7 @@ public class EntryHandlerArrayFromFixed extends EntryHandlerArray {
     }
 
     @Override
-    protected BagArray strategy (String input) {
+    public Object getEntry (String input) {
         // pad the input with spaces to match the expected width
         input = String.format ("%1$-" + totalWidth + "s", input);
 
@@ -47,8 +47,9 @@ public class EntryHandlerArrayFromFixed extends EntryHandlerArray {
         BagArray bagArray = new BagArray (widths.length);
         for (int i = 0, start = 0; i < widths.length; ++i) {
             int end = start + widths[i];
-            bagArray.add (input.substring (start, end).trim ());
+            String entry = input.substring (start, end).trim ();
             start = end;
+            bagArray.add (entryHandler.getEntry (entry));
         }
         return bagArray;
     }
