@@ -30,26 +30,32 @@ public class FormatReaderTable extends FormatReader implements ArrayFormatReader
 
     @Override
     public BagArray readBagArray () {
+        // get the processed array
         BagArray bagArray = (BagArray) arrayHandler.getEntry (input);
-        if ((bagArray != null) && (bagArray.getCount () > 0)) {
-            // if we have a titles array, use it, otherwise use the first row of the array
-            final BagArray titlesArray = (this.titlesArray != null) ? this.titlesArray : (BagArray) bagArray.dequeue ();
-            final int count = titlesArray.getCount ();
+        if (bagArray != null) {
+            // filter it for actual entries, check to see if anything is left
+            bagArray = bagArray.filter (object -> ((BagArray) object).getCount () > 0);
+            if (bagArray.getCount () > 0) {
+                // if we have a titles array, use it, otherwise use the first row of the array
+                BagArray titlesArray = (this.titlesArray != null) ? this.titlesArray : (BagArray) bagArray.dequeue ();
+                final int count = titlesArray.getCount ();
 
-            // walk over the array replacing each entry with a bag object using the titles array
-            bagArray = bagArray.map (object -> {
-                BagArray entryArray = (BagArray) object;
-                if (count == entryArray.getCount ()) {
-                    BagObject bagObject = new BagObject (count);
-                    for (int i = 0; i < count; ++i) {
-                        bagObject.put (titlesArray.getString (i), entryArray.getObject (i));
+                // map each entry to a new bag object using the titles array
+                BagArray mappedBagArray = new BagArray (bagArray.getCount ());
+                bagArray.forEach (object -> {
+                    BagArray entryArray = (BagArray) object;
+                    if (count == entryArray.getCount ()) {
+                        BagObject bagObject = new BagObject (count);
+                        for (int i = 0; i < count; ++i) {
+                            bagObject.put (titlesArray.getString (i), entryArray.getObject (i));
+                        }
+                        mappedBagArray.add (bagObject);
+                    } else {
+                        log.warn ("Mismatched size of entry and titles (skipping row)");
                     }
-                    return bagObject;
-                } else {
-                    log.warn ("Mismatched size of entry and titles (skipping row)");
-                    return null;
-                }
-            });
+                });
+                bagArray = mappedBagArray;
+            }
         }
         return bagArray;
     }
