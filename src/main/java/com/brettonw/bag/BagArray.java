@@ -12,6 +12,7 @@ import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.function.Function;
+import java.util.function.Predicate;
 
 /**
  * A collection of text-based values stored in a zero-based indexed array.
@@ -378,6 +379,16 @@ public class BagArray extends Bag implements Selectable<BagArray>, Iterable<Obje
         final BagArray bagArray = new BagArray (count);
         for (int i = 0; i < count; ++i) {
             bagArray.add (function.apply (container[i]));
+        }
+        return bagArray;
+    }
+
+    public BagArray filter (Predicate<Object> predicate) {
+        final BagArray bagArray = new BagArray ();
+        for (int i = 0; i < count; ++i) {
+            if (predicate.test (container[i])) {
+                bagArray.add (container[i]);
+            }
         }
         return bagArray;
     }
