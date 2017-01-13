@@ -33,8 +33,7 @@ public class FormatReaderComposite extends FormatReader implements ArrayFormatRe
 
     public static FormatReaderComposite basicObjectReader (String input, String arrayDelimiter, String pairDelimiter, boolean accumulateEntries) {
         return new FormatReaderComposite (input, new EntryHandlerObjectFromPairsArray (
-                new EntryHandlerArrayFromDelimited (arrayDelimiter),
-                new EntryHandlerArrayFromDelimited (pairDelimiter)
+                new EntryHandlerArrayFromDelimited (arrayDelimiter, new EntryHandlerArrayFromDelimited (pairDelimiter))
         ).accumulateEntries (accumulateEntries));
     }
 

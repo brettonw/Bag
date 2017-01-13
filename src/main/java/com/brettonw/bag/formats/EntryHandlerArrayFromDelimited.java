@@ -23,12 +23,12 @@ public class EntryHandlerArrayFromDelimited extends EntryHandlerArray {
     }
 
     @Override
-    protected BagArray strategy (String input) {
+    public Object getEntry (String input) {
         String[] entries = input.split (delimiter);
         final BagArray bagArray = new BagArray (entries.length);
         Arrays.stream (entries)
                 .filter ((entry) -> ((ignore == null) || (! entry.startsWith (ignore))))
-                .forEachOrdered (entry -> bagArray.add (entry));
+                .forEachOrdered (entry -> bagArray.add (entryHandler.getEntry (entry)));
         return bagArray;
     }
 }
