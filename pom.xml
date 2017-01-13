@@ -8,7 +8,7 @@
     </parent>
 
     <artifactId>bag</artifactId>
-    <version>5.7.0</version>
+    <version>5.7.1-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Bag</name>
