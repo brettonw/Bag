@@ -1,9 +1,7 @@
-package com.brettonw.bag.formats.json;
+package com.brettonw.bag.formats;
 
 import com.brettonw.bag.BagArray;
 import com.brettonw.bag.BagObject;
-import com.brettonw.bag.formats.FormatWriter;
-import com.brettonw.bag.formats.MimeType;
 
 public class FormatWriterJson extends FormatWriter {
     static final String[] CURLY_BRACKETS = { "{", "}" };

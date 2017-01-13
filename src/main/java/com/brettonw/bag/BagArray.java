@@ -10,6 +10,9 @@ import org.apache.logging.log4j.Logger;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * A collection of text-based values stored in a zero-based indexed array.
@@ -18,7 +21,7 @@ import java.util.Arrays;
  * efficiently with dynamic storage of very large numbers of elements (more than 1,000s). It will
  * work, but we have not chosen to focus on this as a potential use-case.
  */
-public class BagArray extends Bag implements Selectable<BagArray> {
+public class BagArray extends Bag implements Selectable<BagArray>, Iterable<Object> {
     private static final Logger log = LogManager.getLogger (BagArray.class);
 
     private static final int UNKNOWN_SIZE = -1;
@@ -47,21 +50,22 @@ public class BagArray extends Bag implements Selectable<BagArray> {
     }
 
     BagArray (SourceAdapter sourceAdapter) throws ReadException {
-        this (UNKNOWN_SIZE, sourceAdapter);
-    }
-
-    BagArray (int size, SourceAdapter sourceAdapter) throws ReadException {
-        this (size);
-        if (FormatReader.read (this, sourceAdapter) == null) {
+        // make the victim
+        BagArray victim = FormatReader.readBagArray (sourceAdapter);
+        if (victim == null) {
             throw new ReadException ();
         }
+
+        // now steal the victim's soul and leave them to die
+        container = victim.container;
+        count = victim.count;
     }
 
     /**
      * Create a new BagArray as deep copy of another BagArray
      */
     public BagArray (BagArray bagArray) {
-        this (bagArray.getCount (), new SourceAdapter (bagArray.toString (MimeType.DEFAULT), MimeType.DEFAULT));
+        this (new SourceAdapter (bagArray.toString (MimeType.DEFAULT), MimeType.DEFAULT));
     }
 
     /**
@@ -331,6 +335,41 @@ public class BagArray extends Bag implements Selectable<BagArray> {
         return FormatWriter.write (this, format);
     }
 
+    /**
+     *
+     * @param function
+     * @return
+     */
+    public BagArray map (Function<Object, Object> function) {
+        final BagArray bagArray = new BagArray (count);
+        for (int i = 0; i < count; ++i) {
+            bagArray.add (function.apply (container[i]));
+        }
+        return bagArray;
+    }
+
+    @Override
+    public Iterator<Object> iterator () {
+        return new Iterator<Object> () {
+            private int i;
+
+            @Override
+            public boolean hasNext() {
+                return (i < count);
+            }
+
+            @Override
+            public Object next() {
+                return container[i++];
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException("no changes allowed");
+            }
+        };
+    }
+
     @Override
     public BagArray select (SelectKey selectKey) {
         if (selectKey != null) {
@@ -345,10 +384,6 @@ public class BagArray extends Bag implements Selectable<BagArray> {
             return bagArray;
         }
         return this;
-    }
-
-    private int compare (Double left, Double right) {
-        return (left < right) ? -1 : (left > right) ? 1 : 0;
     }
 
     /**

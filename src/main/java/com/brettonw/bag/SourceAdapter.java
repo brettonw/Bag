@@ -7,6 +7,12 @@ import java.io.IOException;
 import java.io.Reader;
 import java.util.function.Supplier;
 
+/**
+ * Source Adapter allows the Bag* constructors to be used with a variety of text-based
+ * inputs without clogging the Bag* class files. The adapter handles interfacing various
+ * external sources to one central string handler, routed into a format reader. The string
+ * and it's MIME-type are captured together.
+ */
 public class SourceAdapter {
     protected String mimeType;
     protected String stringData;

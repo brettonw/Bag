@@ -1,4 +1,4 @@
-package com.brettonw.bag.formats.json;
+package com.brettonw.bag.formats;
 
 // The FormatReaderJson is loosely modeled after a JSON parser grammar from the site (http://www.json.org).
 // The main difference is that we ignore differences between value types (all of them will be
@@ -7,22 +7,20 @@ package com.brettonw.bag.formats.json;
 
 import com.brettonw.bag.BagArray;
 import com.brettonw.bag.BagObject;
-import com.brettonw.bag.formats.FormatReader;
-import com.brettonw.bag.formats.MimeType;
 
 import java.util.Arrays;
 
-public class FormatReaderJson extends FormatReader {
+public class FormatReaderJson extends FormatReaderParsed implements ArrayFormatReader, ObjectFormatReader {
+    public FormatReaderJson () {}
+
     public FormatReaderJson (String input) {
         super (input);
     }
 
     @Override
-    public BagArray read (BagArray bagArray) {
-        if (bagArray == null) {
-            bagArray = new BagArray ();
-        }
+    public BagArray readBagArray () {
         // <Array> :: [ ] | [ <Elements> ]
+        BagArray bagArray = new BagArray ();
         return (expect('[') && readElements (bagArray) && require(']')) ? bagArray : null;
     }
 
@@ -56,11 +54,9 @@ public class FormatReaderJson extends FormatReader {
     }
 
     @Override
-    public BagObject read (BagObject bagObject) {
-        if (bagObject == null) {
-            bagObject = new BagObject ();
-        }
+    public BagObject readBagObject () {
         // <Object> ::= { } | { <Members> }
+        BagObject bagObject = new BagObject ();
         return (expect('{') && readMembers (bagObject) && require('}')) ? bagObject : null;
     }
 
@@ -159,11 +155,11 @@ public class FormatReaderJson extends FormatReader {
         if (check ()) {
             switch (input.charAt (index)) {
                 case '{':
-                    value = read (new BagObject ());
+                    value = readBagObject ();
                     break;
 
                 case '[':
-                    value = read (new BagArray ());
+                    value = readBagArray ();
                     break;
 
                 case '"':
@@ -175,7 +171,6 @@ public class FormatReaderJson extends FormatReader {
         return value;
     }
 
-    public FormatReaderJson () {}
     static {
         MimeType.addExtensionMapping (MimeType.JSON, "json");
         MimeType.addMimeTypeMapping (MimeType.JSON, "text/json");

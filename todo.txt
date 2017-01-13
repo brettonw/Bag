@@ -1,11 +1,15 @@
 - Following release instructions at http://central.sonatype.org/pages/apache-maven.html
     * mvn release:clean release:prepare release:perform
-- Now preferred: "go release"
+*** PREFER: go release ***
 
 - add a Database type, based on a bagarray, complete with sort, search, filter, etc. (or just do
   that on BagArray?) - with indices?
+- BagObject provides the relational component of bdatabase, indexing multiple tables by name
+
 - in BagArray, allow string based indexing for a 'put' operation
 - rename 'getObject' to 'get'?
+- consider hiding the anonymous type verion of put/add - users get confused that they can't
+  add any old type.
 - 'putType' and 'getType' methods that invoke the Serializer?
 - should the serializer be automatically invoked when objectify fails with an unknown type? I think
   not, because the user will otherwise have to know to extract via the serializer

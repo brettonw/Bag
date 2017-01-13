@@ -17,8 +17,9 @@ import org.junit.runners.Suite;
         FromUrlTest.class,
         SerializerTest.class,
 
+        EntryHandlerTest.class,
         FormatReaderTest.class,
-        FormatReaderTextTest.class,
+        FormatReaderCompositeTest.class,
         FormatReaderJsonTest.class,
         FormatReaderFixedTest.class,
 

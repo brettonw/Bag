@@ -4,12 +4,16 @@ import com.brettonw.bag.expr.BooleanExpr;
 import com.brettonw.bag.formats.FormatReader;
 import com.brettonw.bag.formats.FormatWriter;
 import com.brettonw.bag.formats.MimeType;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.atteo.classindex.ClassIndex;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 abstract public class Bag {
+    private static final Logger log = LogManager.getLogger (Bag.class);
+
     Object objectify (Object value) {
         if (value != null) {
             Class type = value.getClass ();
@@ -281,22 +285,28 @@ abstract public class Bag {
     }
 
     static {
-        // autoload all the readers to force their static initializers to get called
-        try {
-            for (Class<?> type : ClassIndex.getSubclasses (FormatReader.class)) {
+        // autoload all the reader subclasses to force their static initializers to get
+        // called (but only if the reader constructor is visible, i.e. it's an actual
+        // reader endpoint in the class hierarchy and not just a helper or base class.)
+        for (Class<?> type : ClassIndex.getSubclasses (FormatReader.class)) {
+            try {
                 Class.forName (type.getName ()).newInstance ();
+            } catch (IllegalAccessException exception) {
+                // do nothing
+            } catch (ClassNotFoundException | InstantiationException exception) {
+                log.error (exception);
             }
-        } catch (Exception exception) {
-            exception.printStackTrace ();
         }
 
-        // autoload all the writers
-        try {
-            for (Class<?> type : ClassIndex.getSubclasses (FormatWriter.class)) {
+        // autoload all the writers, same as above
+        for (Class<?> type : ClassIndex.getSubclasses (FormatWriter.class)) {
+            try {
                 Class.forName (type.getName ()).newInstance ();
+            } catch (IllegalAccessException exception) {
+                // do nothing
+            } catch (ClassNotFoundException | InstantiationException exception) {
+                log.error (exception);
             }
-        } catch (Exception exception) {
-            exception.printStackTrace ();
         }
     }
 }

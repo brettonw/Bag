@@ -1,9 +1,7 @@
-package com.brettonw.bag.formats.text;
+package com.brettonw.bag.formats;
 
 import com.brettonw.bag.BagArray;
 import com.brettonw.bag.BagObject;
-import com.brettonw.bag.formats.FormatWriter;
-import com.brettonw.bag.formats.MimeType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

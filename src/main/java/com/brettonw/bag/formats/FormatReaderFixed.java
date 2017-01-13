@@ -1,20 +1,20 @@
-package com.brettonw.bag.formats.fixed;
+package com.brettonw.bag.formats;
 
 import com.brettonw.bag.BagArray;
 import com.brettonw.bag.BagObject;
-import com.brettonw.bag.formats.FormatReader;
-import com.brettonw.bag.formats.MimeType;
 
 /**
  * The FormatReaderFixed is a fixed-width field format reader, with an option to
  * read the first data row as field names, or to take an array of field names
  */
-public class FormatReaderFixed extends FormatReader {
+public class FormatReaderFixed extends FormatReaderParsed implements ArrayFormatReader {
     public static final String[] NO_FIELD_NAMES = {};
 
     int expectedLineLength;
     int[] fieldLengths;
     String[] fieldNames;
+
+    public FormatReaderFixed () {}
 
     public FormatReaderFixed (String input, int[] fieldLengths) {
         this (input, fieldLengths, null);
@@ -65,14 +65,14 @@ public class FormatReaderFixed extends FormatReader {
     }
 
     @Override
-    public BagArray read (BagArray bagArray) {
+    public BagArray readBagArray () {
         // try to get the field names, either as provided, or from the first row - pass
         // NO_FIELD_NAMES to force the reader to process each line as an array rather than
         // as a bag
         String[] fieldNames = (this.fieldNames != null) ? ((this.fieldNames.length > 0) ? this.fieldNames : null) : getFieldValues ();
 
         // read the data rows
-        if (bagArray == null) bagArray = new BagArray ();
+        BagArray bagArray = new BagArray ();
         String[] fieldValues;
         while ((fieldValues = getFieldValues ()) != null) {
             if (fieldNames != null) {
@@ -91,15 +91,6 @@ public class FormatReaderFixed extends FormatReader {
         }
         return bagArray;
     }
-
-    @Override
-    public BagObject read (BagObject bagObject) {
-        if (bagObject == null) bagObject = new BagObject ();
-        // XXX not sure what this should do, perhaps use the first field in a line as a row name?
-        return bagObject;
-    }
-
-    public FormatReaderFixed () {}
 
     static {
         MimeType.addMimeTypeMapping (MimeType.FIXED);

@@ -1,5 +1,6 @@
 package com.brettonw.bag;
 
+import com.brettonw.bag.formats.FormatReader;
 import com.brettonw.bag.formats.MimeType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,7 +30,7 @@ public class BagArrayFrom {
     static public BagArray string (String string, String mimeType, Supplier<BagArray> fail) {
         try {
             SourceAdapter sourceAdapter = new SourceAdapterReader(string, mimeType);
-            return new BagArray (sourceAdapter);
+            return FormatReader.readBagArray (sourceAdapter);
         } catch (Exception exception) {
             log.error (exception);
         }
@@ -52,7 +53,7 @@ public class BagArrayFrom {
     static public BagArray file (File file, String mimeType, Supplier<BagArray> fail) {
         try {
             SourceAdapter sourceAdapter = new SourceAdapterReader(file, mimeType);
-            return new BagArray (sourceAdapter);
+            return FormatReader.readBagArray (sourceAdapter);
         } catch (Exception exception) {
             log.error (exception);
         }
@@ -75,7 +76,7 @@ public class BagArrayFrom {
     static public BagArray resource (Class context, String name, String mimeType, Supplier<BagArray> fail) {
         try {
             SourceAdapter sourceAdapter = new SourceAdapterReader (context, name, mimeType);
-            return new BagArray (sourceAdapter);
+            return FormatReader.readBagArray (sourceAdapter);
         } catch (Exception exception) {
             log.error (exception);
         }
@@ -98,7 +99,7 @@ public class BagArrayFrom {
     static public BagArray inputStream (InputStream inputStream, String mimeType, Supplier<BagArray> fail) {
         try {
             SourceAdapter sourceAdapter = new SourceAdapterReader(inputStream, mimeType);
-            return new BagArray (sourceAdapter);
+            return FormatReader.readBagArray (sourceAdapter);
         } catch (Exception exception) {
             log.error (exception);
         }
@@ -127,7 +128,7 @@ public class BagArrayFrom {
     static public BagArray url (URL url, Supplier<BagArray> fail) {
         try {
             SourceAdapter sourceAdapter = new SourceAdapterHttp(url);
-            return new BagArray (sourceAdapter);
+            return FormatReader.readBagArray (sourceAdapter);
         } catch (Exception exception) {
             log.error (exception);
         }
@@ -156,7 +157,7 @@ public class BagArrayFrom {
     static public BagArray url (URL url, Bag postData, String postDataMimeType, Supplier<BagArray> fail) {
         try {
             SourceAdapter sourceAdapter = new SourceAdapterHttp(url, postData, postDataMimeType);
-            return new BagArray (sourceAdapter);
+            return FormatReader.readBagArray (sourceAdapter);
         } catch (Exception exception) {
             log.error (exception);
         }
@@ -169,7 +170,7 @@ public class BagArrayFrom {
 
     static public BagArray sourceAdapter (SourceAdapter sourceAdapter, Supplier<BagArray> fail) {
         try {
-            return new BagArray (sourceAdapter);
+            return FormatReader.readBagArray (sourceAdapter);
         } catch (Exception exception) {
             log.error (exception);
         }
