@@ -28,7 +28,8 @@
             <artifactId>lombok</artifactId>
             <version>1.16.12</version>
             <scope>provided</scope>
-        </dependency>        <dependency>
+        </dependency>
+        <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-core</artifactId>
             <version>RELEASE</version>
