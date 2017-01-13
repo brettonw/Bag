@@ -11,7 +11,6 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -169,6 +168,13 @@ public class BagArray extends Bag implements Selectable<BagArray>, Iterable<Obje
         return this;
     }
 
+    private void removeIndex (int index) {
+        // assumes index has already been checked for validity
+        int gapIndex = index + 1;
+        System.arraycopy (container, gapIndex, container, index, count - gapIndex);
+        --count;
+    }
+
     /**
      * Removes the element at the given index of the underlying array store. The underlying store
      * is shifted to cover the removed item. The underlying store will not be resized. Using invalid
@@ -179,15 +185,43 @@ public class BagArray extends Bag implements Selectable<BagArray>, Iterable<Obje
      */
     public BagArray remove (int index) {
         if ((index >= 0) && (index < count)) {
-            int gapIndex = index + 1;
-            System.arraycopy (container, gapIndex, container, index, count - gapIndex);
-            --count;
+            removeIndex (index);
         }
         return this;
     }
 
     public Object getObject (int index) {
         return ((index >= 0) && (index < count)) ? container[index] : null;
+    }
+
+    /**
+     *
+     * @param index
+     * @return
+     */
+    public Object getAndRemove (int index) {
+        if ((index >= 0) && (index < count)) {
+            Object object = container[index];
+            removeIndex (index);
+            return object;
+        }
+        return null;
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Object pop () {
+        return getAndRemove (count - 1);
+    }
+
+    /**
+     *
+     * @return
+     */
+    public Object dequeue () {
+        return getAndRemove (0);
     }
 
     private int keyToIndex (String key) {
