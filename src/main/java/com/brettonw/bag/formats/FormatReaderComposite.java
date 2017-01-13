@@ -43,11 +43,9 @@ public class FormatReaderComposite extends FormatReader implements ArrayFormatRe
 
     static {
         MimeType.addExtensionMapping (MimeType.PROP, "properties");
-        MimeType.addMimeTypeMapping (MimeType.PROP);
         FormatReader.registerFormatReader (MimeType.PROP, false, (input) -> basicObjectReader (input, "\n", "="));
 
         MimeType.addExtensionMapping (MimeType.URL, "url");
-        MimeType.addMimeTypeMapping (MimeType.URL);
         FormatReader.registerFormatReader (MimeType.URL, false, (input) -> basicObjectReader (input, "&", "="));
     }
 }

@@ -25,7 +25,8 @@ public class MimeType {
 
     private static final Map<String, String> extensionMappings = new HashMap<> ();
 
-    public static void addExtensionMapping (String mimeType, String... extensions) {
+    public static void addExtensionMapping (String mimeTypeIn, String... extensions) {
+        String mimeType = getFromMimeType (mimeTypeIn, () -> addMimeTypeMapping (mimeTypeIn));
         for (String extension : extensions) {
             if (extensionMappings.containsKey (extension)) {
                 log.error ("Duplicate file extension mapping (" + extension + ") for MIME type (" + mimeType +")");
@@ -46,11 +47,14 @@ public class MimeType {
 
     private static final Map<String, String> mimeTypeRemappings = new HashMap<> ();
 
-    public static void addMimeTypeMapping (String mimeType, String... synonyms) {
+    public static String addMimeTypeMapping (String mimeType, String... synonyms) {
+        mimeType = mimeType.toLowerCase ();
         mimeTypeRemappings.put (mimeType, mimeType);
         for (String synonym : synonyms) {
+            synonym = synonym.toLowerCase ();
             mimeTypeRemappings.put (synonym, mimeType);
         }
+        return mimeType;
     }
 
     /**
@@ -60,6 +64,7 @@ public class MimeType {
      * to support.
      */
     public static String getFromMimeType (String mimeType, Supplier<String> notFound) {
+        mimeType = mimeType.toLowerCase ();
         return mimeTypeRemappings.containsKey (mimeType) ? mimeTypeRemappings.get (mimeType) : notFound.get ();
     }
 

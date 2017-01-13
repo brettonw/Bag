@@ -7,7 +7,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.atteo.classindex.IndexSubclasses;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
@@ -35,14 +34,15 @@ public class FormatReader {
 
     /**
      *
-     * @param format
+     * @param mimeType
      * @param replace
      * @param factory
      */
-    public static void registerFormatReader (String format, boolean replace, Function<String, FormatReader> factory) {
-        format = format.toLowerCase ();
-        if ((! replace) || (! formatReaders.containsKey(format))) {
-            formatReaders.put(format, factory);
+    public static void registerFormatReader (String mimeType, boolean replace, Function<String, FormatReader> factory) {
+        // try to find the mime type first, and if it's not there, add it
+        String foundMimeType = MimeType.getFromMimeType (mimeType, () -> MimeType.addMimeTypeMapping (mimeType));
+        if ((! replace) || (! formatReaders.containsKey(foundMimeType))) {
+            formatReaders.put(foundMimeType, factory);
         }
     }
 
