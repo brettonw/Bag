@@ -25,7 +25,7 @@ public class EntryHandlerCollector implements EntryHandler {
             // gather up the collections, concatenating them into new array entries
             for (int i = 0; i < count; ++i) {
                 BagArray entry = new BagArray ();
-                for (int j = 0; j < count; ++j) {
+                for (int j = 0; j < collectCount; ++j) {
                     int k = (i * collectCount) + j;
                     entry = BagArray.concat (entry, bagArray.getBagArray (k));
                 }
