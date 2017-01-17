@@ -176,4 +176,12 @@ public class BagArrayFrom {
         }
         return fail.get ();
     }
+
+    static public <ArrayType> BagArray array (ArrayType... array) {
+        BagArray bagArray = new BagArray (array.length);
+        for (ArrayType element : array) {
+            bagArray.add (element);
+        }
+        return bagArray;
+    }
 }

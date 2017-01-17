@@ -4,6 +4,8 @@ import com.brettonw.AppTest;
 import com.brettonw.bag.formats.*;
 import org.junit.Test;
 
+import java.io.File;
+
 import static org.junit.Assert.assertTrue;
 
 public class FormatReaderCompositeTest {
@@ -24,7 +26,6 @@ public class FormatReaderCompositeTest {
     public void testRegisteredCompositeReader () {
         String test = "command=goodbye&param1=1&param2=2";
         final String testMimeType = "test/test2";
-        MimeType.addMimeTypeMapping (testMimeType);
         FormatReader.registerFormatReader (testMimeType, false, (input) -> new FormatReaderComposite (input, new EntryHandlerObjectFromPairsArray (
                 new EntryHandlerArrayFromDelimited ("&", new EntryHandlerArrayFromDelimited ("="))
         )));
@@ -94,4 +95,20 @@ public class FormatReaderCompositeTest {
         assertTrue ("2".equals (bagObject.getString ("param2")));
     }
 
+    @Test
+    public void test2le () {
+        final String tleFormat = "test/tle";
+        FormatReader.registerFormatReader (tleFormat, false, (input) ->
+                new FormatReaderComposite (input,
+                        new EntryHandlerObjectFromTitlesArray (new BagArray ()
+                                .add ("line number 1").add ("satellite catalog number").add ("classification").add ("designation").add ("epoch").add ("d1").add ("d2").add ("drag").add ("type").add ("number").add ("checksum 1")
+                                .add ("line number 2").add ("satellite catalog number 2").add ("orbit inclination").add ("ra of ascending node").add ("eccentricity").add ("argument of perigee").add ("mean anomaly").add ("mean motion").add ("revolution number").add ("checksum 2"),
+                new EntryHandlerCollector (3, new EntryHandlerArrayFromDelimited ("\n", new EntryHandlerRoller (
+                        // exemplars, from https://www.celestrak.com/NORAD/documentation/tle-fmt.asp
+                        new EntryHandlerArrayFromFixed (EntryHandlerArrayFromFixed.widthsFromExemplar ("AAAAAAAAAAAAAAAAAAAAAAAA", ' ')),
+                        new EntryHandlerArrayFromFixed (EntryHandlerArrayFromFixed.widthsFromExemplar ("1 NNNNNU NNNNNAAA NNNNN.NNNNNNNN +.NNNNNNNN +NNNNN-N +NNNNN-N N NNNNN", ' ')),
+                        new EntryHandlerArrayFromFixed (EntryHandlerArrayFromFixed.widthsFromExemplar ("2 NNNNN NNN.NNNN NNN.NNNN NNNNNNN NNN.NNNN NNN.NNNN NN.NNNNNNNNNNNNNN", ' '))
+        ))))));
+        BagObject bagObject = BagObjectFrom.file (new File ("data/2le.txt"), tleFormat);
+    }
 }

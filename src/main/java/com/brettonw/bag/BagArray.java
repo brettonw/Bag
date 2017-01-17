@@ -153,6 +153,21 @@ public class BagArray extends Bag implements Selectable<BagArray>, Iterable<Obje
     }
 
     /**
+     *
+     * @param left
+     * @param right
+     * @return
+     */
+    public static BagArray concat (BagArray left, BagArray right) {
+        int count = left.count + right.count;
+        BagArray bagArray = new BagArray (count);
+        bagArray.count = count;
+        System.arraycopy (left.container, 0, bagArray.container, 0, left.count);
+        System.arraycopy (right.container, 0, bagArray.container, left.count, right.count);
+        return bagArray;
+    }
+
+    /**
      * Replaces the element at the given index of the underlying array store. The underlying store
      * is not shifted, and will not be resized.
      * <p>

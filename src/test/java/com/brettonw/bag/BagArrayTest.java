@@ -290,4 +290,25 @@ public class BagArrayTest {
         }
         AppTest.report (true, true, "Got through a subset run in " + pages + " page(s)");
     }
+
+    @Test
+    public void testBagArrayFromArray () {
+        BagArray bagArray = BagArrayFrom.array ("hello", "world", "my", "name", "is", "Bob");
+        AppTest.report (bagArray.getCount () == 6, true, "Check that count is correct");
+        AppTest.report (bagArray.getString (0), "hello", "Check that 0 is 'hello'");
+        AppTest.report (bagArray.getString (4), "is", "Check that 4 is 'is'");
+    }
+    @Test
+    public void testBagArrayConcat () {
+        BagArray left = BagArrayFrom.array ("hello", "world", "my", "name", "is", "Bob");
+        BagArray right = BagArrayFrom.array ("the", "brown", "cow", "jumped", "over", "the", "moon");
+        BagArray bagArray = BagArray.concat (left, right);
+        AppTest.report (bagArray.getCount () == 13, true, "Check that count is correct");
+        AppTest.report (bagArray.getString (0), "hello", "Check that 0 is 'hello'");
+        AppTest.report (bagArray.getString (4), "is", "Check that 4 is 'is'");
+        AppTest.report (bagArray.getString (5), "Bob", "Check that 5 is 'Bob'");
+        AppTest.report (bagArray.getString (6), "the", "Check that 6 is 'the'");
+        AppTest.report (bagArray.getString (12), "moon", "Check that 12 is 'moon'");
+    }
+
 }
