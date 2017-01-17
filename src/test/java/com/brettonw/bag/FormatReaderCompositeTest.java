@@ -105,7 +105,7 @@ public class FormatReaderCompositeTest {
                                 .add ("line number 2").add ("satellite catalog number 2").add ("orbit inclination").add ("ra of ascending node").add ("eccentricity").add ("argument of perigee").add ("mean anomaly").add ("mean motion").add ("revolution number").add ("checksum 2"),
                 new EntryHandlerCollector (3, new EntryHandlerArrayFromDelimited ("\n", new EntryHandlerRoller (
                         // exemplars, from https://www.celestrak.com/NORAD/documentation/tle-fmt.asp
-                        new EntryHandlerArrayFromFixed (EntryHandlerArrayFromFixed.widthsFromExemplar ("AAAAAAAAAAAAAAAAAAAAAAAA", ' ')),
+                        //new EntryHandlerArrayFromFixed (EntryHandlerArrayFromFixed.widthsFromExemplar ("AAAAAAAAAAAAAAAAAAAAAAAA", ' ')),
                         new EntryHandlerArrayFromFixed (EntryHandlerArrayFromFixed.widthsFromExemplar ("1 NNNNNU NNNNNAAA NNNNN.NNNNNNNN +.NNNNNNNN +NNNNN-N +NNNNN-N N NNNNN", ' ')),
                         new EntryHandlerArrayFromFixed (EntryHandlerArrayFromFixed.widthsFromExemplar ("2 NNNNN NNN.NNNN NNN.NNNN NNNNNNN NNN.NNNN NNN.NNNN NN.NNNNNNNNNNNNNN", ' '))
         ))))));

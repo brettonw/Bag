@@ -276,7 +276,7 @@ public class BagArrayTest {
         for (int i = 0; i < 97; ++i) {
             bagArray.add (random.nextInt (100));
         }
-        bagArray.sort (null);
+        bagArray.sort ((SortKey) null);
 
         int start = 0;
         int pageSize = 10;
