@@ -39,10 +39,9 @@ public class FormatReaderTableTest {
         AppTest.report (bagArray.getBagObject (2).getInteger ("D"), 4444, "row 1, 4th element reads correctly");
     }
 
-
     @Test
     public void test2le () {
-        final String tleFormat = "test/tle";
+        final String tleFormat = "test/2le";
         FormatReader.registerFormatReader (tleFormat, false, (input) ->
                 new FormatReaderTable (input,
                         new EntryHandlerCollector (2, new EntryHandlerArrayFromDelimited ("\n", new EntryHandlerRoller (
@@ -52,8 +51,26 @@ public class FormatReaderTableTest {
                                 new EntryHandlerArrayFromFixed (EntryHandlerArrayFromFixed.fieldsFromExemplar ("2 NNNNN NNN.NNNN NNN.NNNN NNNNNNN NNN.NNNN NNN.NNNN NN.NNNNNNNNNNNNNN", ' '))
                         ))),
                         BagArrayFrom.array ("1", "a", "i", "c", "d", "e", "f", "g", "h",
-                                            "2", "b", "j", "k", "m", "n", "o", "p")));
+                                "2", "b", "j", "k", "m", "n", "o", "p")));
         BagArray bagArray = BagArrayFrom.file (new File ("data/2le.txt"), tleFormat);
+        AppTest.report (bagArray != null, true, "expect successful read");
+    }
+
+    @Test
+    public void test3le () {
+        final String tleFormat = "test/3le";
+        FormatReader.registerFormatReader (tleFormat, false, (input) ->
+                new FormatReaderTable (input,
+                        new EntryHandlerCollector (3, new EntryHandlerArrayFromDelimited ("\n", new EntryHandlerRoller (
+                                // exemplars, from https://www.celestrak.com/NORAD/documentation/tle-fmt.asp
+                                new EntryHandlerArrayFromFixed (EntryHandlerArrayFromFixed.fieldsFromExemplar ("0 AAAAAAAAAAAAAAAAAAAAAAAA", ' ')),
+                                new EntryHandlerArrayFromFixed (EntryHandlerArrayFromFixed.fieldsFromExemplar ("1 NNNNNU NNNNNAAA NNNNN.NNNNNNNN +.NNNNNNNN +NNNNN-N +NNNNN-N N NNNNN", ' ')),
+                                new EntryHandlerArrayFromFixed (EntryHandlerArrayFromFixed.fieldsFromExemplar ("2 NNNNN NNN.NNNN NNN.NNNN NNNNNNN NNN.NNNN NNN.NNNN NN.NNNNNNNNNNNNNN", ' '))
+                        ))),
+                        BagArrayFrom.array ("0", "name",
+                                "1", "a", "i", "c", "d", "e", "f", "g", "h",
+                                "2", "b", "j", "k", "m", "n", "o", "p")));
+        BagArray bagArray = BagArrayFrom.file (new File ("data/3le.txt"), tleFormat);
         AppTest.report (bagArray != null, true, "expect successful read");
     }
 }

@@ -270,6 +270,11 @@ public class BagArrayTest {
     }
 
     @Test
+    public void testSelect () {
+        // XXX TODO
+    }
+
+    @Test
     public void testSubset () {
         BagArray bagArray = new BagArray (97);
         Random random = new Random ();
@@ -298,6 +303,7 @@ public class BagArrayTest {
         AppTest.report (bagArray.getString (0), "hello", "Check that 0 is 'hello'");
         AppTest.report (bagArray.getString (4), "is", "Check that 4 is 'is'");
     }
+
     @Test
     public void testBagArrayConcat () {
         BagArray left = BagArrayFrom.array ("hello", "world", "my", "name", "is", "Bob");
@@ -311,4 +317,29 @@ public class BagArrayTest {
         AppTest.report (bagArray.getString (12), "moon", "Check that 12 is 'moon'");
     }
 
+    @Test
+    public void testMap () {
+        BagArray bagArray = new BagArray ()
+                .add ("abdefg")
+                .add (123456)
+                .add (123.456)
+                .add (true);
+        BagArray refCopy = bagArray.map (object -> object);
+        AppTest.report (refCopy, bagArray, "Test map operation copies elements as expected");
+    }
+
+    @Test
+    public void testPop () {
+        BagArray bagArray = new BagArray ()
+                .add ("abdefg")
+                .add (123456)
+                .add (123.456)
+                .add (true);
+        AppTest.report ((String) bagArray.pop (), "true", "Test pop");
+        AppTest.report (bagArray.getCount (), 3, "Test for correct size after pop");
+        AppTest.report ((String) bagArray.pop (), "123.456", "Test pop");
+        AppTest.report (bagArray.getCount (), 2, "Test for correct size after pop");
+        AppTest.report (bagArray.getAndRemove (1000), null, "Test getAndRemove with bogus index");
+
+    }
 }

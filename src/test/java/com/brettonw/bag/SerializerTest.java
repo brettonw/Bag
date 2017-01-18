@@ -45,6 +45,19 @@ public class SerializerTest {
     }
 
     @Test
+    public void testUnwrappedPojo() {
+        // serialize a POJO
+        TestClassA testClass = new TestClassA (5, true, 123.0, "pdq", TestEnumXYZ.ABC);
+        BagObject serialized = Serializer.toBagObject (testClass);
+        BagObject bagObject = Serializer.Unwrap (serialized);
+        log.info (bagObject.toString ());
+
+        TestClassA reconClass = Serializer.fromBagAsType (bagObject, TestClassA.class);
+        BagObject reconBagObject = Serializer.toBagObject (reconClass);
+        AppTest.report (reconBagObject.toString (), serialized.toString (), "Serializer test round trip");
+    }
+
+    @Test
     public void testArray() {
         Integer testArray[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
         BagObject bagObject = Serializer.toBagObject (testArray);

@@ -523,8 +523,7 @@ public class BagArray extends Bag implements Selectable<BagArray>, Iterable<Obje
     public <Type> Type[] toArray (Class<Type> type) {
         try {
             Constructor constructor = type.getConstructor (String.class);
-            int[] arraySizes = { count };
-            Type[] target = (Type[]) Array.newInstance (type, arraySizes);
+            Type[] target = (Type[]) Array.newInstance (type, new int[] { count });
             for (int i = 0; i < count; ++i) {
                 target[i] = (Type) constructor.newInstance (getString (i));
             }

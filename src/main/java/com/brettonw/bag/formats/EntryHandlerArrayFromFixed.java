@@ -38,15 +38,17 @@ public class EntryHandlerArrayFromFixed extends EntryHandlerArray {
      *              identify positions, and it counts the first column as '1', so I can
      *              set 'first' = 1, and then use the column number of the rest of the
      *              fields as reported by my text editor.
-     * @param positions An array of numbers indicating relative offsets between fields.
-     * @return
+     * @param positions An array of numbers indicating positions of fields in the data lines,
+     *                  starting at the first field.
+     * @return a two dimensional array of start and end positions for tokens
      */
     public static int[][] fieldsFromPositions (int offset, int... positions) {
-        int[][] fields = new int[positions.length][2];
+        int fieldCount = positions.length - 1;
+        int[][] fields = new int[fieldCount][2];
         int last = positions[0] - offset;
-        for (int i = 0; i < positions.length; ++i) {
+        for (int i = 0; i < fieldCount; ++i) {
             fields[i][0] = last;
-            last = positions[i] - offset;
+            last = positions[i + 1] - offset;
             fields[i][1] = last;
         }
         return fields;
@@ -56,7 +58,7 @@ public class EntryHandlerArrayFromFixed extends EntryHandlerArray {
      * this method returns a field description array given a set of widths (assuming there are no
      * pads in the intended string)
      * @param widths an array of numbers indicating the width of each field
-     * @return
+     * @return a two dimensional array of start and end positions for tokens
      */
     public static int[][] fieldsFromWidths (int... widths) {
         int[][] fields = new int[widths.length][2];
@@ -71,28 +73,38 @@ public class EntryHandlerArrayFromFixed extends EntryHandlerArray {
     /**
      *
      * @param exemplar a string representing an example record to extract the positions from,
-     *                 elements are assumed to be left-justified within the fields
-     * @param separator a character that is expected to separate the entries (at least one will
-     *                  appear before the next field)
-     * @return
+     *                 where positions are identified every time the exemplar value changes
+     * @param separator a character that represents an ignored region of the data line
+     * @return a two dimensional array of start and end positions for tokens
      */
     public static int[][] fieldsFromExemplar (String exemplar, char separator) {
         // walk the line to figure the positions
         Queue<Integer> queue = new ArrayDeque<> ();
-        boolean between = true;
-        for (int at = 0, end = exemplar.length (); at < end; ++at) {
-            char c = exemplar.charAt (at);
-            if (between) {
-                if (c != separator) {
-                    queue.add (at);
-                    between = false;
+        char lastChar = separator;
+        for (int i = 0, end = exemplar.length (); i < end; ++i) {
+            char nextChar = exemplar.charAt (i);
+            if (nextChar != lastChar) {
+                // emit this position
+                if (lastChar == separator) {
+                    // emit this position as a start
+                    queue.add (i);
+                } else {
+                    // emit this position as an end
+                    queue.add (i);
+
+                    // emit a start if the next character is not a separator
+                    if (nextChar != separator) {
+                        // emit this position as a start
+                        queue.add (i);
+                    }
                 }
-            } else if (c == separator) {
-                queue.add (at);
-                between = true;
+                lastChar = nextChar;
             }
         }
-        queue.add (exemplar.length ());
+        if (lastChar != separator) {
+            // emit this position as an end
+            queue.add (exemplar.length ());
+        }
 
         // convert the positions list into a fields description, we take them two at a time
         if ((queue.size () & 0x01) == 0) {

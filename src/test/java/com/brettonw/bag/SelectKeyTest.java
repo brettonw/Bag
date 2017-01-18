@@ -67,4 +67,13 @@ public class SelectKeyTest {
         AppTest.report (selectKey.select ("Hello"), null, "Test select (exclude) of value in select key");
         AppTest.report (selectKey.select ("Bye Bye"), "Bye Bye", "Test select (exclude) of value not in select key");
     }
+
+    @Test
+    public void testSetKeys () {
+        SelectKey selectKey = new SelectKey (SelectType.EXCLUDE);
+        selectKey.setKeys ("Hello").addKeys ("Bing Bong");
+        AppTest.report (selectKey.getType (), SelectType.EXCLUDE, "Test getType");
+        AppTest.report (selectKey.select ("Hello"), null, "Test select (exclude) of value in select key");
+        AppTest.report (selectKey.select ("Bye Bye"), "Bye Bye", "Test select (exclude) of value not in select key");
+    }
 }
