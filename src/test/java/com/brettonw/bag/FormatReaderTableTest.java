@@ -47,11 +47,12 @@ public class FormatReaderTableTest {
                         new EntryHandlerCollector (2, new EntryHandlerArrayFromDelimited ("\n", new EntryHandlerRoller (
                                 // exemplars, from https://www.celestrak.com/NORAD/documentation/tle-fmt.asp
                                 //new EntryHandlerArrayFromFixed (EntryHandlerArrayFromFixed.widthsFromExemplar ("AAAAAAAAAAAAAAAAAAAAAAAA", ' ')),
-                                new EntryHandlerArrayFromFixed (EntryHandlerArrayFromFixed.fieldsFromExemplar ("1 NNNNNU NNNNNAAA NNNNN.NNNNNNNN +.NNNNNNNN +NNNNN-N +NNNNN-N N NNNNN", ' ')),
-                                new EntryHandlerArrayFromFixed (EntryHandlerArrayFromFixed.fieldsFromExemplar ("2 NNNNN NNN.NNNN NNN.NNNN NNNNNNN NNN.NNNN NNN.NNNN NN.NNNNNNNNNNNNNN", ' '))
+                                new EntryHandlerArrayFromFixed (EntryHandlerArrayFromFixed.fieldsFromExemplar ("1 NNNNNU yyNNNAAA yyNNNNNNNNNNNN NNNNNNNNNN NNNNNNNN NNNNNNNN N NNNNc", ' ')),
+                                new EntryHandlerArrayFromFixed (EntryHandlerArrayFromFixed.fieldsFromExemplar ("2 NNNNN NNNNNNNN NNNNNNNN NNNNNNN NNNNNNNN NNNNNNNN NNNNNNNNNNNnnnnnc", ' '))
                         ))),
-                        BagArrayFrom.array ("1", "a", "i", "c", "d", "e", "f", "g", "h",
-                                "2", "b", "j", "k", "m", "n", "o", "p")));
+                        BagArrayFrom.array (
+                                "1", "A", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
+                                "2", "B", "O", "P", "Q", "R", "S", "T", "U", "V")));
         BagArray bagArray = BagArrayFrom.file (new File ("data/2le.txt"), tleFormat);
         AppTest.report (bagArray != null, true, "expect successful read");
     }
@@ -64,12 +65,12 @@ public class FormatReaderTableTest {
                         new EntryHandlerCollector (3, new EntryHandlerArrayFromDelimited ("\n", new EntryHandlerRoller (
                                 // exemplars, from https://www.celestrak.com/NORAD/documentation/tle-fmt.asp
                                 new EntryHandlerArrayFromFixed (EntryHandlerArrayFromFixed.fieldsFromExemplar ("0 AAAAAAAAAAAAAAAAAAAAAAAA", ' ')),
-                                new EntryHandlerArrayFromFixed (EntryHandlerArrayFromFixed.fieldsFromExemplar ("1 NNNNNU NNNNNAAA NNNNN.NNNNNNNN +.NNNNNNNN +NNNNN-N +NNNNN-N N NNNNN", ' ')),
-                                new EntryHandlerArrayFromFixed (EntryHandlerArrayFromFixed.fieldsFromExemplar ("2 NNNNN NNN.NNNN NNN.NNNN NNNNNNN NNN.NNNN NNN.NNNN NN.NNNNNNNNNNNNNN", ' '))
+                                new EntryHandlerArrayFromFixed (EntryHandlerArrayFromFixed.fieldsFromExemplar ("1 NNNNNU yyNNNAAA yyNNNNNNNNNNNN NNNNNNNNNN NNNNNNNN NNNNNNNN N NNNNc", ' ')),
+                                new EntryHandlerArrayFromFixed (EntryHandlerArrayFromFixed.fieldsFromExemplar ("2 NNNNN NNNNNNNN NNNNNNNN NNNNNNN NNNNNNNN NNNNNNNN NNNNNNNNNNNnnnnnc", ' '))
                         ))),
-                        BagArrayFrom.array ("0", "name",
-                                "1", "a", "i", "c", "d", "e", "f", "g", "h",
-                                "2", "b", "j", "k", "m", "n", "o", "p")));
+                        BagArrayFrom.array ("0", "NAME",
+                                "1", "A", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
+                                "2", "B", "O", "P", "Q", "R", "S", "T", "U", "V")));
         BagArray bagArray = BagArrayFrom.file (new File ("data/3le.txt"), tleFormat);
         AppTest.report (bagArray != null, true, "expect successful read");
     }
