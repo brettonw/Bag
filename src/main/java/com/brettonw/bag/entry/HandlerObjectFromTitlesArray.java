@@ -1,13 +1,13 @@
-package com.brettonw.bag.formats;
+package com.brettonw.bag.entry;
 
 import com.brettonw.bag.BagArray;
 import com.brettonw.bag.BagObject;
 
-public class EntryHandlerObjectFromTitlesArray implements EntryHandler {
+public class HandlerObjectFromTitlesArray implements Handler {
     private BagArray titlesArray;
-    private EntryHandler arrayHandler;
+    private Handler arrayHandler;
 
-    public EntryHandlerObjectFromTitlesArray (BagArray titlesArray, EntryHandler arrayHandler) {
+    public HandlerObjectFromTitlesArray (BagArray titlesArray, Handler arrayHandler) {
         this.titlesArray = titlesArray;
         this.arrayHandler = arrayHandler;
     }

@@ -1,27 +1,27 @@
-package com.brettonw.bag.formats;
+package com.brettonw.bag.entry;
 
 import com.brettonw.bag.BagArray;
 
 import java.util.ArrayDeque;
 import java.util.Queue;
 
-public class EntryHandlerArrayFromFixed extends EntryHandlerArray {
+public class HandlerArrayFromFixed extends HandlerArray {
     private int[][] fields;
     private int fieldCount;
     private int totalWidth;
 
-    public EntryHandlerArrayFromFixed (int[][] fields) {
-        this (fields, EntryHandlerValue.ENTRY_HANDLER_VALUE);
+    public HandlerArrayFromFixed (int[][] fields) {
+        this (fields, HandlerValue.HANDLER_VALUE);
     }
 
     /**
      *
      * @param fields an array of field descriptions, where each field description is a 2 element
      *               array (start and end - not inclusive)
-     * @param entryHandler
+     * @param handler
      */
-    public EntryHandlerArrayFromFixed (int[][] fields, EntryHandler entryHandler) {
-        super (entryHandler);
+    public HandlerArrayFromFixed (int[][] fields, Handler handler) {
+        super (handler);
         this.fields = fields;
         fieldCount = fields.length;
         totalWidth = 0;
@@ -132,7 +132,7 @@ public class EntryHandlerArrayFromFixed extends EntryHandlerArray {
             // split the input up into all the little substrings...
             for (int[] field : fields) {
                 String entry = input.substring (field[0], field[1]).trim ();
-                bagArray.add (entryHandler.getEntry (entry));
+                bagArray.add (handler.getEntry (entry));
             }
         }
 

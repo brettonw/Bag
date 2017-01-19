@@ -1,10 +1,13 @@
-package com.brettonw.bag;
+package com.brettonw.bag.formats;
 
 import com.brettonw.AppTest;
+import com.brettonw.bag.BagArray;
+import com.brettonw.bag.BagObject;
+import com.brettonw.bag.BagObjectFrom;
+import com.brettonw.bag.entry.HandlerArrayFromDelimited;
+import com.brettonw.bag.entry.HandlerObjectFromPairsArray;
 import com.brettonw.bag.formats.*;
 import org.junit.Test;
-
-import java.io.File;
 
 import static org.junit.Assert.assertTrue;
 
@@ -13,8 +16,8 @@ public class FormatReaderCompositeTest {
     public void testCompositeReader () {
         String test = "command=goodbye&param1=1&param2=2";
 
-        FormatReaderComposite frc = new FormatReaderComposite (test, new EntryHandlerObjectFromPairsArray (
-                new EntryHandlerArrayFromDelimited ("&", new EntryHandlerArrayFromDelimited ("="))
+        FormatReaderComposite frc = new FormatReaderComposite (test, new HandlerObjectFromPairsArray (
+                new HandlerArrayFromDelimited ("&", new HandlerArrayFromDelimited ("="))
         ));
         BagObject bagObject = frc.readBagObject ();
         AppTest.report (bagObject.getCount () == 3, true, "expect 3 elements in bagObject");
@@ -26,8 +29,8 @@ public class FormatReaderCompositeTest {
     public void testRegisteredCompositeReader () {
         String test = "command=goodbye&param1=1&param2=2";
         final String testMimeType = "test/test2";
-        FormatReader.registerFormatReader (testMimeType, false, (input) -> new FormatReaderComposite (input, new EntryHandlerObjectFromPairsArray (
-                new EntryHandlerArrayFromDelimited ("&", new EntryHandlerArrayFromDelimited ("="))
+        FormatReader.registerFormatReader (testMimeType, false, (input) -> new FormatReaderComposite (input, new HandlerObjectFromPairsArray (
+                new HandlerArrayFromDelimited ("&", new HandlerArrayFromDelimited ("="))
         )));
         BagObject bagObject = BagObjectFrom.string (test, testMimeType);
         AppTest.report (bagObject.getCount () == 3, true, "expect 3 elements in bagObject");

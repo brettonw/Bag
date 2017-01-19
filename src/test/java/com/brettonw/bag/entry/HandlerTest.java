@@ -1,19 +1,17 @@
-package com.brettonw.bag;
+package com.brettonw.bag.entry;
 
 import com.brettonw.AppTest;
-import com.brettonw.bag.formats.EntryHandler;
-import com.brettonw.bag.formats.EntryHandlerArrayFromDelimited;
-import com.brettonw.bag.formats.EntryHandlerArrayFromFixed;
-import com.brettonw.bag.formats.EntryHandlerObjectFromPairsArray;
+import com.brettonw.bag.BagArray;
+import com.brettonw.bag.BagObject;
 import org.junit.Test;
 
-public class EntryHandlerTest {
+public class HandlerTest {
     @Test
     public void test () {
         String test = "command=goodbye&param1=1&param2=2";
 
-        EntryHandler eh = new EntryHandlerObjectFromPairsArray (
-                new EntryHandlerArrayFromDelimited ("&", new EntryHandlerArrayFromDelimited ("="))
+        Handler eh = new HandlerObjectFromPairsArray (
+                new HandlerArrayFromDelimited ("&", new HandlerArrayFromDelimited ("="))
         );
 
         BagObject bagObject = (BagObject) eh.getEntry (test);
@@ -24,9 +22,9 @@ public class EntryHandlerTest {
     public void testMultiLine () {
         String test = "command=goodbye&param1=1&param2=2\ncommand=hello&param1=2&param2=3\ncommand=dolly&param1=3&param2=5";
 
-        EntryHandler eh = new EntryHandlerArrayFromDelimited ("\n",
-                new EntryHandlerObjectFromPairsArray (
-                        new EntryHandlerArrayFromDelimited ("&", new EntryHandlerArrayFromDelimited ("="))
+        Handler eh = new HandlerArrayFromDelimited ("\n",
+                new HandlerObjectFromPairsArray (
+                        new HandlerArrayFromDelimited ("&", new HandlerArrayFromDelimited ("="))
                 )
         );
 
@@ -38,7 +36,7 @@ public class EntryHandlerTest {
 
     @Test
     public void testFixedFieldsHelperFromPositions () {
-        int[][] fields = EntryHandlerArrayFromFixed.fieldsFromPositions (1, 1, 5, 9, 15);
+        int[][] fields = HandlerArrayFromFixed.fieldsFromPositions (1, 1, 5, 9, 15);
         AppTest.report (fields.length, 3, "check that the correct number of fields are returned");
         AppTest.report (fields[0][0], 0, "check that the first field starts in the correct place");
         AppTest.report (fields[0][1], 4, "check that the first field is the correct length");
@@ -50,7 +48,7 @@ public class EntryHandlerTest {
 
     @Test
     public void testFixedFieldsHelperFromWidths () {
-        int[][] fields = EntryHandlerArrayFromFixed.fieldsFromWidths (4, 4, 6);
+        int[][] fields = HandlerArrayFromFixed.fieldsFromWidths (4, 4, 6);
         AppTest.report (fields.length, 3, "check that the correct number of fields are returned");
         AppTest.report (fields[0][0], 0, "check that the first field starts in the correct place");
         AppTest.report (fields[0][1], 4, "check that the first field is the correct length");
@@ -64,7 +62,7 @@ public class EntryHandlerTest {
 
     @Test
     public void testFixedFieldsHelperFromExemplar () {
-        int[][] fields = EntryHandlerArrayFromFixed.fieldsFromExemplar ("aaa bbb ccccccc", ' ');
+        int[][] fields = HandlerArrayFromFixed.fieldsFromExemplar ("aaa bbb ccccccc", ' ');
         AppTest.report (fields.length, 3, "check that the correct number of fields are returned");
         AppTest.report (fields[0][0], 0, "check that the first field starts in the correct place");
         AppTest.report (fields[0][1], 3, "check that the first field is the correct length");
@@ -78,7 +76,7 @@ public class EntryHandlerTest {
 
     @Test
     public void testFixedFieldsHelperFromExemplar2 () {
-        int[][] fields = EntryHandlerArrayFromFixed.fieldsFromExemplar ("aaa.bbb..ccdddeeee.fff", '.');
+        int[][] fields = HandlerArrayFromFixed.fieldsFromExemplar ("aaa.bbb..ccdddeeee.fff", '.');
         AppTest.report (fields.length, 6, "check that the correct number of fields are returned");
         AppTest.report (fields[0][0], 0, "check that the first field starts in the correct place");
         AppTest.report (fields[0][1], 3, "check that the first field is the correct length");

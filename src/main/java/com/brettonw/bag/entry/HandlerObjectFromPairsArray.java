@@ -1,19 +1,19 @@
-package com.brettonw.bag.formats;
+package com.brettonw.bag.entry;
 
 import com.brettonw.bag.BagArray;
 import com.brettonw.bag.BagObject;
 
-public class EntryHandlerObjectFromPairsArray implements EntryHandler {
-    private EntryHandler arrayHandler;
+public class HandlerObjectFromPairsArray implements Handler {
+    private Handler arrayHandler;
     protected boolean accumulateEntries;
 
-    public EntryHandlerObjectFromPairsArray (EntryHandler arrayHandler) {
+    public HandlerObjectFromPairsArray (Handler arrayHandler) {
         super ();
         this.arrayHandler = arrayHandler;
         accumulateEntries = false;
     }
 
-    public EntryHandlerObjectFromPairsArray accumulateEntries (boolean accumulateEntries) {
+    public HandlerObjectFromPairsArray accumulateEntries (boolean accumulateEntries) {
         this.accumulateEntries = accumulateEntries;
         return this;
     }

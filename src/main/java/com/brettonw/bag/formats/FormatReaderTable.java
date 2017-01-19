@@ -2,18 +2,19 @@ package com.brettonw.bag.formats;
 
 import com.brettonw.bag.BagArray;
 import com.brettonw.bag.BagObject;
+import com.brettonw.bag.entry.Handler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class FormatReaderTable extends FormatReader implements ArrayFormatReader {
     private static final Logger log = LogManager.getLogger (FormatReaderTable.class);
 
-    private EntryHandler arrayHandler;
+    private Handler arrayHandler;
     private BagArray titlesArray;
 
     public FormatReaderTable () {}
 
-    public FormatReaderTable (String input, EntryHandler arrayHandler) {
+    public FormatReaderTable (String input, Handler arrayHandler) {
         this (input, arrayHandler, null);
     }
 
@@ -22,7 +23,7 @@ public class FormatReaderTable extends FormatReader implements ArrayFormatReader
      * @param arrayHandler a handler to return an array of arrays
      * @param titlesArray
      */
-    public FormatReaderTable (String input, EntryHandler arrayHandler, BagArray titlesArray) {
+    public FormatReaderTable (String input, Handler arrayHandler, BagArray titlesArray) {
         super (input);
         this.arrayHandler = arrayHandler;
         this.titlesArray = titlesArray;

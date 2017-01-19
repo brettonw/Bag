@@ -1,6 +1,9 @@
-package com.brettonw.bag;
+package com.brettonw.bag.formats;
 
 import com.brettonw.AppTest;
+import com.brettonw.bag.BagArray;
+import com.brettonw.bag.BagObject;
+import com.brettonw.bag.BagObjectFrom;
 import com.brettonw.bag.formats.FormatWriter;
 import com.brettonw.bag.formats.MimeType;
 import com.brettonw.bag.formats.FormatWriterJson;

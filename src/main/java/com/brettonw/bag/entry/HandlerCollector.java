@@ -1,4 +1,4 @@
-package com.brettonw.bag.formats;
+package com.brettonw.bag.entry;
 
 import com.brettonw.bag.BagArray;
 
@@ -6,11 +6,11 @@ import com.brettonw.bag.BagArray;
  * in an array of subarrays, collects the subarrays into new subarrays consisting of a number of the original subarrays
  * XXX need a better description than that
  */
-public class EntryHandlerCollector implements EntryHandler {
+public class HandlerCollector implements Handler {
     private int collectCount;
-    private EntryHandler arrayHandler;
+    private Handler arrayHandler;
 
-    public EntryHandlerCollector (int collectCount, EntryHandler arrayHandler) {
+    public HandlerCollector (int collectCount, Handler arrayHandler) {
         this.collectCount = collectCount;
         this.arrayHandler = arrayHandler;
     }

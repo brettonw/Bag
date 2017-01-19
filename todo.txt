@@ -2,21 +2,6 @@
     * mvn release:clean release:prepare release:perform
 *** PREFER: go release ***
 
-RELEASE PROCESS
-> go --clean package
-> git add --all . && git commit && git push
-> git checkout master
-> git pull
-> git merge develop
-> go --clean package
-> git add --all . && git commit && git push
-> go release
-> git checkout develop
-> git pull
-> git merge master
-> git push
-> go --clean package
-
 - add a Database type, based on a bagarray, complete with sort, search, filter, etc. (or just do
   that on BagArray?) - with indices?
 - BagObject provides the relational component of bdatabase, indexing multiple tables by name

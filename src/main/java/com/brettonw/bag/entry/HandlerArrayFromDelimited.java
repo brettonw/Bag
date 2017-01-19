@@ -1,23 +1,23 @@
-package com.brettonw.bag.formats;
+package com.brettonw.bag.entry;
 
 import com.brettonw.bag.BagArray;
 
 import java.util.Arrays;
 
-public class EntryHandlerArrayFromDelimited extends EntryHandlerArray {
+public class HandlerArrayFromDelimited extends HandlerArray {
     private String delimiter;
     private String ignore;
 
-    public EntryHandlerArrayFromDelimited (String delimiter) {
-        this (delimiter, EntryHandlerValue.ENTRY_HANDLER_VALUE);
+    public HandlerArrayFromDelimited (String delimiter) {
+        this (delimiter, HandlerValue.HANDLER_VALUE);
     }
 
-    public EntryHandlerArrayFromDelimited (String delimiter, EntryHandler entryHandler) {
-        super(entryHandler);
+    public HandlerArrayFromDelimited (String delimiter, Handler handler) {
+        super(handler);
         this.delimiter = delimiter;
     }
 
-    public EntryHandlerArrayFromDelimited ignore (String ignore) {
+    public HandlerArrayFromDelimited ignore (String ignore) {
         this.ignore = ignore;
         return this;
     }
@@ -28,7 +28,7 @@ public class EntryHandlerArrayFromDelimited extends EntryHandlerArray {
         final BagArray bagArray = new BagArray (entries.length);
         Arrays.stream (entries)
                 .filter ((entry) -> ((ignore == null) || (! entry.startsWith (ignore))))
-                .forEachOrdered (entry -> bagArray.add (entryHandler.getEntry (entry)));
+                .forEachOrdered (entry -> bagArray.add (handler.getEntry (entry)));
         return bagArray;
     }
 }

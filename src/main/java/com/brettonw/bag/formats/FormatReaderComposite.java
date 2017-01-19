@@ -2,38 +2,41 @@ package com.brettonw.bag.formats;
 
 import com.brettonw.bag.BagArray;
 import com.brettonw.bag.BagObject;
+import com.brettonw.bag.entry.Handler;
+import com.brettonw.bag.entry.HandlerArrayFromDelimited;
+import com.brettonw.bag.entry.HandlerObjectFromPairsArray;
 
 public class FormatReaderComposite extends FormatReader implements ArrayFormatReader, ObjectFormatReader {
-    private EntryHandler entryHandler;
+    private Handler handler;
 
     public FormatReaderComposite () {}
 
-    public FormatReaderComposite (String input, EntryHandler entryHandler) {
+    public FormatReaderComposite (String input, Handler handler) {
         super (input);
-        this.entryHandler = entryHandler;
+        this.handler = handler;
     }
 
     @Override
     public BagArray readBagArray () {
-        return (BagArray) entryHandler.getEntry (input);
+        return (BagArray) handler.getEntry (input);
     }
 
     @Override
     public BagObject readBagObject () {
-        return (BagObject) entryHandler.getEntry (input);
+        return (BagObject) handler.getEntry (input);
     }
 
     public static FormatReaderComposite basicArrayReader (String input, String arrayDelimiter, String ignore) {
-        return new FormatReaderComposite (input, new EntryHandlerArrayFromDelimited (arrayDelimiter).ignore (ignore));
+        return new FormatReaderComposite (input, new HandlerArrayFromDelimited (arrayDelimiter).ignore (ignore));
     }
 
     public static FormatReaderComposite basicArrayReader (String input, String arrayDelimiter) {
-        return new FormatReaderComposite (input, new EntryHandlerArrayFromDelimited (arrayDelimiter));
+        return new FormatReaderComposite (input, new HandlerArrayFromDelimited (arrayDelimiter));
     }
 
     public static FormatReaderComposite basicObjectReader (String input, String arrayDelimiter, String pairDelimiter, boolean accumulateEntries) {
-        return new FormatReaderComposite (input, new EntryHandlerObjectFromPairsArray (
-                new EntryHandlerArrayFromDelimited (arrayDelimiter, new EntryHandlerArrayFromDelimited (pairDelimiter))
+        return new FormatReaderComposite (input, new HandlerObjectFromPairsArray (
+                new HandlerArrayFromDelimited (arrayDelimiter, new HandlerArrayFromDelimited (pairDelimiter))
         ).accumulateEntries (accumulateEntries));
     }
 

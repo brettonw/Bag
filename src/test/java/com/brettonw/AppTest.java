@@ -1,6 +1,8 @@
 package com.brettonw;
 
 import com.brettonw.bag.*;
+import com.brettonw.bag.entry.HandlerTest;
+import com.brettonw.bag.formats.*;
 import junit.framework.TestCase;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,7 +19,7 @@ import org.junit.runners.Suite;
         FromUrlTest.class,
         SerializerTest.class,
 
-        EntryHandlerTest.class,
+        HandlerTest.class,
         FormatReaderTest.class,
         FormatReaderCompositeTest.class,
         FormatReaderJsonTest.class,

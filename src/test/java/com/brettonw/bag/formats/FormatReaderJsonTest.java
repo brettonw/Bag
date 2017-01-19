@@ -1,4 +1,4 @@
-package com.brettonw.bag;
+package com.brettonw.bag.formats;
 
 import org.junit.Test;
 
