@@ -5,7 +5,7 @@ import com.brettonw.bag.BagArray;
 import java.util.ArrayDeque;
 import java.util.Queue;
 
-public class HandlerArrayFromFixed extends HandlerArray {
+public class HandlerArrayFromFixed extends HandlerComposite {
     private int[][] fields;
     private int fieldCount;
     private int totalWidth;
@@ -131,12 +131,15 @@ public class HandlerArrayFromFixed extends HandlerArray {
 
             // split the input up into all the little substrings...
             for (int[] field : fields) {
-                String entry = input.substring (field[0], field[1]).trim ();
-                bagArray.add (handler.getEntry (entry));
+                String entryString = input.substring (field[0], field[1]).trim ();
+                Object entry = handler.getEntry (entryString);
+                if (entry != null) {
+                    bagArray.add (entry);
+                }
             }
         }
 
         // return the populated array
-        return bagArray;
+        return (bagArray.getCount () > 0) ? bagArray : null;
     }
 }

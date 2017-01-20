@@ -26,9 +26,11 @@ public class FormatReaderComposite extends FormatReader implements ArrayFormatRe
         return (BagObject) handler.getEntry (input);
     }
 
+    /*
     public static FormatReaderComposite basicArrayReader (String input, String arrayDelimiter, String ignore) {
         return new FormatReaderComposite (input, new HandlerArrayFromDelimited (arrayDelimiter).ignore (ignore));
     }
+    */
 
     public static FormatReaderComposite basicArrayReader (String input, String arrayDelimiter) {
         return new FormatReaderComposite (input, new HandlerArrayFromDelimited (arrayDelimiter));

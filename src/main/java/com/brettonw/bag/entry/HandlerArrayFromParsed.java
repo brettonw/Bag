@@ -3,7 +3,7 @@ package com.brettonw.bag.entry;
 /**
  * supporting a parsed format that uses an entry delimiter, with entries being quoted
  */
-public class HandlerArrayFromParsed extends HandlerArray {
+public class HandlerArrayFromParsed extends HandlerComposite {
     private char delimiter;
 
     public HandlerArrayFromParsed (char delimiter, Handler handler) {

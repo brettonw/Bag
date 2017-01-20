@@ -3,11 +3,7 @@ package com.brettonw.bag.formats;
 import com.brettonw.AppTest;
 import com.brettonw.bag.BagArray;
 import com.brettonw.bag.BagArrayFrom;
-import com.brettonw.bag.entry.HandlerArrayFromDelimited;
-import com.brettonw.bag.entry.HandlerArrayFromFixed;
-import com.brettonw.bag.entry.HandlerCollector;
-import com.brettonw.bag.entry.HandlerRoller;
-import com.brettonw.bag.formats.*;
+import com.brettonw.bag.entry.*;
 import org.junit.Test;
 
 import java.io.File;
@@ -19,7 +15,11 @@ public class FormatReaderTableTest {
         MimeType.addMimeTypeMapping (MimeType.FIXED);
         int[][] fields = HandlerArrayFromFixed.fieldsFromWidths (new int[]{3, 3, 3, 4});
         FormatReader.registerFormatReader (MimeType.FIXED, false, (input) ->
-                new FormatReaderTable (test, new HandlerArrayFromDelimited ("\n", new HandlerArrayFromFixed (fields)).ignore (" "))
+                new FormatReaderTable (test, new HandlerArrayFromDelimited ("\n",
+                        new HandlerCompositeFiltered (str -> (str.length () > 0) && (! str.startsWith (" ")),
+                            new HandlerArrayFromFixed (fields)))
+
+                )
         );
         BagArray bagArray = BagArrayFrom.string (test, MimeType.FIXED);
 
@@ -35,7 +35,11 @@ public class FormatReaderTableTest {
         String test = " a comment line\n\naaabbbcccdddd\nabcd\n11 22 33 4444\n";
         BagArray fieldNames = new BagArray ().add ("A").add ("B").add ("C").add ("D");
         int[][] fields = HandlerArrayFromFixed.fieldsFromWidths (new int[]{3, 3, 3, 4});
-        FormatReaderTable frt = new FormatReaderTable (test, new HandlerArrayFromDelimited ("\n", new HandlerArrayFromFixed (fields)).ignore (" "), fieldNames);
+        FormatReaderTable frt = new FormatReaderTable (test, new HandlerArrayFromDelimited ("\n",
+                new HandlerCompositeFiltered (str -> (str.length () > 0) && (! str.startsWith (" ")),
+                        new HandlerArrayFromFixed (fields))
+                ), fieldNames
+        );
         BagArray bagArray = frt.readBagArray ();
 
         AppTest.report (bagArray.getCount (), 3, "3 valid rows were provided");
