@@ -49,20 +49,53 @@ public class FormatReaderTableTest {
         AppTest.report (bagArray.getBagObject (2).getInteger ("D"), 4444, "row 1, 4th element reads correctly");
     }
 
+    private static boolean checksum (String str) {
+        /*
+        The last column on each line (fields 1.14 and 2.10) represents a modulo-10 checksum of the
+        data on that line. To calculate the checksum, simply add the values of all the numbers on
+        each line—ignoring all letters, spaces, periods, and plus signs—and assigning a value of 1
+        to all minus signs. The checksum is the last digit of that sum.
+         */
+        if (str.length () > 0) {
+            int length = str.length () - 1;
+            int checksum = str.charAt (length) - '0';
+            int sum = 0;
+            for (int i = 0; i < length; ++i) {
+                char c = str.charAt (i);
+                if ((c >= '0') && (c <= '9')) {
+                    sum += c - '0';
+                } else if (c == '-') {
+                    sum += 1;
+                }
+            }
+            return (sum % 10) == checksum;
+        }
+        return false;
+    }
+
     @Test
     public void test2le () {
         final String tleFormat = "test/2le";
         FormatReader.registerFormatReader (tleFormat, false, (input) ->
                 new FormatReaderTable (input,
-                        new HandlerCollector (2, new HandlerArrayFromDelimited ("\n", new HandlerRoller (
-                                // exemplars, from https://www.celestrak.com/NORAD/documentation/tle-fmt.asp
-                                //new EntryHandlerArrayFromFixed (EntryHandlerArrayFromFixed.widthsFromExemplar ("AAAAAAAAAAAAAAAAAAAAAAAA", ' ')),
-                                new HandlerArrayFromFixed (HandlerArrayFromFixed.fieldsFromExemplar ("1 NNNNNU yyNNNAAA yyNNNNNNNNNNNN NNNNNNNNNN NNNNNNNN NNNNNNNN N NNNNc", ' ')),
-                                new HandlerArrayFromFixed (HandlerArrayFromFixed.fieldsFromExemplar ("2 NNNNN NNNNNNNN NNNNNNNN NNNNNNN NNNNNNNN NNNNNNNN NNNNNNNNNNNnnnnnc", ' '))
-                        ))),
-                        BagArrayFrom.array (
+                        new HandlerCollector (2,
+                                new HandlerArrayFromDelimited ("\n",
+                                        new HandlerRoller (
+                                                // exemplars, from https://www.celestrak.com/NORAD/documentation/tle-fmt.asp
+                                                new HandlerCompositeFiltered (str -> checksum (str),
+                                                        new HandlerArrayFromFixed (HandlerArrayFromFixed.fieldsFromExemplar ("1 NNNNNU yyNNNAAA yyNNNNNNNNNNNN NNNNNNNNNN NNNNNNNN NNNNNNNN N NNNNc", ' '))
+                                                ),
+                                                new HandlerCompositeFiltered (str -> checksum (str),
+                                                        new HandlerArrayFromFixed (HandlerArrayFromFixed.fieldsFromExemplar ("2 NNNNN NNNNNNNN NNNNNNNN NNNNNNN NNNNNNNN NNNNNNNN NNNNNNNNNNNnnnnnc", ' '))
+                                                )
+                                        )
+                                )
+                        ), BagArrayFrom.array (
                                 "1", "A", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
-                                "2", "B", "O", "P", "Q", "R", "S", "T", "U", "V")));
+                                "2", "B", "O", "P", "Q", "R", "S", "T", "U", "V"
+                        )
+                )
+        );
         BagArray bagArray = BagArrayFrom.file (new File ("data/2le.txt"), tleFormat);
         AppTest.report (bagArray != null, true, "expect successful read");
     }
@@ -75,8 +108,12 @@ public class FormatReaderTableTest {
                         new HandlerCollector (3, new HandlerArrayFromDelimited ("\n", new HandlerRoller (
                                 // exemplars, from https://www.celestrak.com/NORAD/documentation/tle-fmt.asp
                                 new HandlerArrayFromFixed (HandlerArrayFromFixed.fieldsFromExemplar ("0 AAAAAAAAAAAAAAAAAAAAAAAA", ' ')),
-                                new HandlerArrayFromFixed (HandlerArrayFromFixed.fieldsFromExemplar ("1 NNNNNU yyNNNAAA yyNNNNNNNNNNNN NNNNNNNNNN NNNNNNNN NNNNNNNN N NNNNc", ' ')),
-                                new HandlerArrayFromFixed (HandlerArrayFromFixed.fieldsFromExemplar ("2 NNNNN NNNNNNNN NNNNNNNN NNNNNNN NNNNNNNN NNNNNNNN NNNNNNNNNNNnnnnnc", ' '))
+                                new HandlerCompositeFiltered (str -> checksum (str),
+                                        new HandlerArrayFromFixed (HandlerArrayFromFixed.fieldsFromExemplar ("1 NNNNNU yyNNNAAA yyNNNNNNNNNNNN NNNNNNNNNN NNNNNNNN NNNNNNNN N NNNNc", ' '))
+                                ),
+                                new HandlerCompositeFiltered (str -> checksum (str),
+                                        new HandlerArrayFromFixed (HandlerArrayFromFixed.fieldsFromExemplar ("2 NNNNN NNNNNNNN NNNNNNNN NNNNNNN NNNNNNNN NNNNNNNN NNNNNNNNNNNnnnnnc", ' '))
+                                )
                         ))),
                         BagArrayFrom.array ("0", "NAME",
                                 "1", "A", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N",
