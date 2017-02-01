@@ -5,6 +5,7 @@ import com.brettonw.bag.BagObject;
 import com.brettonw.bag.SourceAdapter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.atteo.classindex.ClassIndex;
 import org.atteo.classindex.IndexSubclasses;
 
 import java.util.HashMap;
@@ -84,5 +85,31 @@ public class FormatReader {
     public static BagObject readBagObject (SourceAdapter sourceAdapter) {
         FormatReader formatReader = getFormatReader(sourceAdapter.getStringData(), sourceAdapter.getMimeType(), ObjectFormatReader.class);
         return (formatReader != null) ? ((ObjectFormatReader)formatReader).readBagObject () : null;
+    }
+
+    static {
+        // autoload all the reader subclasses to force their static initializers to get
+        // called (but only if the reader constructor is visible, i.e. it's an actual
+        // reader endpoint in the class hierarchy and not just a helper or base class.)
+        for (Class<?> type : ClassIndex.getSubclasses (FormatReader.class)) {
+            try {
+                Class.forName (type.getName ()).newInstance ();
+            } catch (IllegalAccessException exception) {
+                // do nothing
+            } catch (ClassNotFoundException | InstantiationException exception) {
+                log.error (exception);
+            }
+        }
+
+        // autoload all the writers, same as above
+        for (Class<?> type : ClassIndex.getSubclasses (FormatWriter.class)) {
+            try {
+                Class.forName (type.getName ()).newInstance ();
+            } catch (IllegalAccessException exception) {
+                // do nothing
+            } catch (ClassNotFoundException | InstantiationException exception) {
+                log.error (exception);
+            }
+        }
     }
 }

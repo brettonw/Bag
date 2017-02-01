@@ -14,7 +14,7 @@ public class FromUrlTest {
 
     @Test
     public void testGet () throws IOException {
-        BagObject brettonw = BagObjectFrom.url ("http://bag-test-server.azurewebsites.net/api?command=ip", () -> null);
+        BagObject brettonw = BagObjectFrom.url ("http://localhost:8080/bag-test-server/api?command=ip", () -> null);
         AppTest.report (brettonw.getString ("response/ip") != null, true, "Got a valid BagObject");
 
         BagArray repos = BagArrayFrom.url ("https://api.github.com/users/brettonw/repos", () -> null);
@@ -23,7 +23,7 @@ public class FromUrlTest {
 
     @Test
     public void testPost () throws IOException {
-        BagObject postResponseBagObject = BagObjectFrom.url ("http://bag-test-server.azurewebsites.net/api?command=echo",
+        BagObject postResponseBagObject = BagObjectFrom.url ("http://localhost:8080/bag-test-server/api?command=echo",
                 new BagObject ()
                         .put ("login", "brettonw")
                         .put ("First Name", "Bretton")
@@ -33,7 +33,7 @@ public class FromUrlTest {
         );
         AppTest.report (postResponseBagObject.getString ("post-data/login"), "brettonw", "Got a valid BagObject - 1");
 
-        postResponseBagObject = BagObjectFrom.url ("http://bag-test-server.azurewebsites.net/api?command=echo",
+        postResponseBagObject = BagObjectFrom.url ("http://localhost:8080/bag-test-server/api?command=echo",
                 new BagObject ()
                         .put ("login", "brettonw")
                         .put ("First Name", "Bretton")
@@ -42,7 +42,7 @@ public class FromUrlTest {
         );
         AppTest.report (postResponseBagObject.getString ("post-data/login"), "brettonw", "Got a valid BagObject - 2");
 
-        BagArray postResponseBagArray = BagArrayFrom.url ("http://bag-test-server.azurewebsites.net/api?command=post-data",
+        BagArray postResponseBagArray = BagArrayFrom.url ("http://localhost:8080/bag-test-server/api?command=post-data",
                 new BagArray ()
                         .add ("login")
                         .add ("brettonw")
@@ -54,7 +54,7 @@ public class FromUrlTest {
         );
         AppTest.report (postResponseBagArray.getString (1), "brettonw", "Got a valid BagArray - 1");
 
-        postResponseBagArray = BagArrayFrom.url ("http://bag-test-server.azurewebsites.net/api?command=post-data",
+        postResponseBagArray = BagArrayFrom.url ("http://localhost:8080/bag-test-server/api?command=post-data",
                 new BagArray ()
                         .add ("login")
                         .add ("brettonw")

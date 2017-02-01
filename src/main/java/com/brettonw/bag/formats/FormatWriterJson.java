@@ -7,6 +7,8 @@ public class FormatWriterJson extends FormatWriter {
     static final String[] CURLY_BRACKETS = { "{", "}" };
     static final String[] SQUARE_BRACKETS = { "[", "]" };
 
+    public FormatWriterJson () { super (); }
+
     private String getJsonString (Object object) {
         if (object != null) {
             switch (object.getClass ().getName ()) {
@@ -54,7 +56,6 @@ public class FormatWriterJson extends FormatWriter {
         return enclose(stringBuilder.toString(), SQUARE_BRACKETS);
     }
 
-    public FormatWriterJson () { super (); }
     static {
         FormatWriter.registerFormatWriter (MimeType.DEFAULT, false, FormatWriterJson::new);
     }

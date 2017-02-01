@@ -2,6 +2,9 @@ package com.brettonw.bag.formats;
 
 import com.brettonw.bag.BagArray;
 import com.brettonw.bag.BagObject;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.atteo.classindex.ClassIndex;
 import org.atteo.classindex.IndexSubclasses;
 
 import java.util.HashMap;
@@ -10,6 +13,8 @@ import java.util.function.Supplier;
 
 @IndexSubclasses
 abstract public class FormatWriter {
+    private static final Logger log = LogManager.getLogger (FormatReader.class);
+
     protected static final String[] QUOTES = { "\"" };
 
     protected String enclose (String input, String[] bracket) {
@@ -46,5 +51,20 @@ abstract public class FormatWriter {
             return formatWriters.get(format).write (bagArray);
         }
         return null;
+    }
+
+    static {
+        // autoload all the writer subclasses to force their static initializers to get
+        // called (but only if the writer constructor is visible, i.e. it's an actual
+        // writer endpoint in the class hierarchy and not just a helper or base class.)
+        for (Class<?> type : ClassIndex.getSubclasses (FormatWriter.class)) {
+            try {
+                Class.forName (type.getName ()).newInstance ();
+            } catch (IllegalAccessException exception) {
+                // do nothing
+            } catch (ClassNotFoundException | InstantiationException exception) {
+                log.error (exception);
+            }
+        }
     }
 }

@@ -1,12 +1,9 @@
 package com.brettonw.bag;
 
 import com.brettonw.bag.expr.BooleanExpr;
-import com.brettonw.bag.formats.FormatReader;
-import com.brettonw.bag.formats.FormatWriter;
 import com.brettonw.bag.formats.MimeType;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.atteo.classindex.ClassIndex;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -282,31 +279,5 @@ abstract public class Bag {
     @Override
     public String toString () {
         return toString(MimeType.DEFAULT);
-    }
-
-    static {
-        // autoload all the reader subclasses to force their static initializers to get
-        // called (but only if the reader constructor is visible, i.e. it's an actual
-        // reader endpoint in the class hierarchy and not just a helper or base class.)
-        for (Class<?> type : ClassIndex.getSubclasses (FormatReader.class)) {
-            try {
-                Class.forName (type.getName ()).newInstance ();
-            } catch (IllegalAccessException exception) {
-                // do nothing
-            } catch (ClassNotFoundException | InstantiationException exception) {
-                log.error (exception);
-            }
-        }
-
-        // autoload all the writers, same as above
-        for (Class<?> type : ClassIndex.getSubclasses (FormatWriter.class)) {
-            try {
-                Class.forName (type.getName ()).newInstance ();
-            } catch (IllegalAccessException exception) {
-                // do nothing
-            } catch (ClassNotFoundException | InstantiationException exception) {
-                log.error (exception);
-            }
-        }
     }
 }
