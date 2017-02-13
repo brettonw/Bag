@@ -115,7 +115,7 @@ public class BagArrayTest {
         AppTest.report (reconArray.getBagArray (1), null, "BagArray simple invalid type extraction as BagArray");
 
         // put a bag array in the bag array
-        BagArray childArray = new BagArray ().add ("hello").add ("world");
+        BagArray childArray = BagArray.open ("hello").add ("world");
         reconArray.replace (1, childArray);
         AppTest.report (reconArray.getBagArray (1), childArray, "BagArray store and retrieve a BagArray");
         AppTest.report (reconArray.getBagObject (1), null, "BagArray simple invalid type extraction as BagObject");
@@ -184,13 +184,13 @@ public class BagArrayTest {
             File testFile = new File ("data", "UCS_Satellite_Database_2-1-14.json");
             BagArray bagArray = BagArrayFrom.file (testFile);
             BooleanExpr equality = Exprs.equality ("Country of Operator/Owner", "USA");
-            SelectKey selectKey = new SelectKey (new BagObject ().put (SelectKey.TYPE_KEY, SelectType.INCLUDE.name ()).put (SelectKey.KEYS_KEY, new BagArray().add ("Current Official Name of Satellite").add ("Country of Operator")));
+            SelectKey selectKey = new SelectKey (BagObject.open  (SelectKey.TYPE_KEY, SelectType.INCLUDE.name ()).put (SelectKey.KEYS_KEY, new BagArray().add ("Current Official Name of Satellite").add ("Country of Operator")));
             BagArray queried = bagArray.query (equality, selectKey);
             AppTest.report (queried.getCount () > 0, true, "Queried Array returned some results");
             AppTest.report (queried.getString ("53/Country of Operator/Owner"), "USA", "Query results for #53 should match the query");
 
             // now try sorting
-            SortKey[] sortKeys = SortKey.keys (new BagArray ().add (new BagObject ().put (SortKey.KEY, "Current Official Name of Satellite")));
+            SortKey[] sortKeys = SortKey.keys (BagArray.open (BagObject.open  (SortKey.KEY, "Current Official Name of Satellite")));
             queried.sort (sortKeys);
             AppTest.report (queried.getString ("36/Country of Operator/Owner"), "USA", "Query results for #36 should match the query");
         } catch (Exception exception) {
@@ -217,7 +217,7 @@ public class BagArrayTest {
         for (int i = 0; i < count; ++i) {
             int random = (int) (Math.random () * 10 + 1);
             int random2 = (int) (Math.random () * 20 + 1);
-            bagArray.add (new BagObject ().put ("id", random).put ("value", random2));
+            bagArray.add (BagObject.open  ("id", random).put ("value", random2));
         }
 
         {

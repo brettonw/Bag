@@ -14,7 +14,7 @@ public class KeyTest {
         new Key ();
 
         // hierarchical values
-        BagObject bagObject = new BagObject ().put ("com/brettonw/bag/name", "test");
+        BagObject bagObject = BagObject.open  ("com/brettonw/bag/name", "test");
         String com = "com";
         String brettonw = "brettonw";
         String bag = "bag";

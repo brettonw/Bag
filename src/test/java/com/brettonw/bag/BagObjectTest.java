@@ -93,7 +93,7 @@ public class BagObjectTest {
     public void testEscapedStrings() {
             // test an escaped string
             String escapedString = "a longer string with a \\\"quote from shakespeare\\\" in \\\"it\\\"";
-            BagObject testObject = new BagObject ().put ("escaped", escapedString);
+            BagObject testObject = BagObject.open  ("escaped", escapedString);
             AppTest.report (testObject.getString ("escaped"), escapedString, "BagObject simple test escaped string");
             String testString = testObject.toString ();
             BagObject recon = BagObjectFrom.string (testString);
@@ -104,7 +104,7 @@ public class BagObjectTest {
     public void testBarePojo() {
         // try to put a bare POJO into a bagObject
         try {
-            BagObject bareBagObject = new BagObject ().put ("barecheck", new TestClassA (2, false, 123.456, "pdq", TestEnumXYZ.DEF));
+            BagObject bareBagObject = BagObject.open  ("barecheck", new TestClassA (2, false, 123.456, "pdq", TestEnumXYZ.DEF));
             AppTest.report (bareBagObject != null, false, "BagObject - test bare POJO rejection");
         } catch (UnsupportedTypeException exception) {
             AppTest.report (true, true, "BagObject - test bare POJO rejection");
@@ -177,7 +177,7 @@ public class BagObjectTest {
     @Test
     public void testHierarchical() {
         // hierarchical values
-        BagObject bagObject = new BagObject ().put ("com/brettonw/bag/name", "test");
+        BagObject bagObject = BagObject.open  ("com/brettonw/bag/name", "test");
         AppTest.report (bagObject.has ("com/brettonw/test"), false, "BagObject - test that an incorrect path returns false");
         AppTest.report (bagObject.has ("com/brettonw/bag/name/xxx"), false, "BagObject - test that a longer incorrect path returns false");
         AppTest.report (bagObject.has ("com/brettonw/bag/name"), true, "BagObject - test that a correct path returns true");
@@ -253,8 +253,8 @@ public class BagObjectTest {
                     .put ("c", true)
                     .put ("d", 3.141592654)
                     .put ("e", 1234567L)
-                    .put ("f", new BagObject ().put ("hello", "world"))
-                    .put ("g", new BagArray ().add (123));
+                    .put ("f", BagObject.open  ("hello", "world"))
+                    .put ("g", BagArray.open (123));
 
             // test the copy
             bagObject = new BagObject (bagObject);
@@ -284,12 +284,12 @@ public class BagObjectTest {
             AppTest.report (bagObject.getDouble ("ddd", () -> 6.28), 6.28, "BagObject - Test that 'notFound' method correctly returns notFound double value");
 
             AppTest.report (bagObject.getBagObject ("q"), null, "BagObject - test that method correctly fails on not found BagObject");
-            AppTest.report (bagObject.getBagObject ("f", () -> new BagObject ().put ("hello", "moto")).getString ("hello"), "world", "BagObject - test that 'notFound' method correctly returns found BagObject");
-            AppTest.report (bagObject.getBagObject ("fff", () -> new BagObject ().put ("hello", "moto")).getString ("hello"), "moto", "BagObject - test that 'notFound' method correctly returns notFound BagObject");
+            AppTest.report (bagObject.getBagObject ("f", () -> BagObject.open  ("hello", "moto")).getString ("hello"), "world", "BagObject - test that 'notFound' method correctly returns found BagObject");
+            AppTest.report (bagObject.getBagObject ("fff", () -> BagObject.open  ("hello", "moto")).getString ("hello"), "moto", "BagObject - test that 'notFound' method correctly returns notFound BagObject");
 
             AppTest.report (bagObject.getBagArray ("q"), null, "BagObject - test that method correctly fails on not found BagObject");
-            AppTest.report (bagObject.getBagArray ("g", () -> new BagArray ().add (345)).getInteger (0), 123, "BagObject - test that 'notFound' method correctly returns found BagArray");
-            AppTest.report (bagObject.getBagArray ("ggg", () -> new BagArray ().add (345)).getInteger (0), 345, "BagObject - test that 'notFound' method correctly returns notFound BagArray");
+            AppTest.report (bagObject.getBagArray ("g", () -> BagArray.open (345)).getInteger (0), 123, "BagObject - test that 'notFound' method correctly returns found BagArray");
+            AppTest.report (bagObject.getBagArray ("ggg", () -> BagArray.open (345)).getInteger (0), 345, "BagObject - test that 'notFound' method correctly returns notFound BagArray");
 
             try {
                 bagObject = new BagObject ((BagObject) null);
@@ -318,35 +318,46 @@ public class BagObjectTest {
 
     @Test
     public void testHashCode () {
-        BagObject bagObject = new BagObject ().put ("x", "abcdegoldfish");
+        BagObject bagObject = BagObject.open  ("x", "abcdegoldfish");
         int hash = bagObject.hashCode ();
         AppTest.report (hash != 0, true, "test hash code (" + hash + ")");
     }
 
     @Test
     public void testGetWithCopyConstructorFallback () throws IOException {
-        BagObject bagObject = new BagObject ().put ("x", "y");
-        BagObject bagObject2 = new BagObject ().put ("m", "n");
+        BagObject bagObject = BagObject.open  ("x", "y");
+        BagObject bagObject2 = BagObject.open  ("m", "n");
         BagObject fetched = bagObject.getBagObject ("q", () -> new BagObject (bagObject2));
         AppTest.report (fetched.getString ("m"), "n", "copy constructor doesn't throw");
     }
 
     @Test
     public void testBogusInstantiationFallback () {
-        BagObject bagObject = new BagObject ().put ("x", "y");
+        BagObject bagObject = BagObject.open  ("x", "y");
         BagObject fetched = bagObject.getBagObject ("q", () -> BagObjectFrom.file (new File ("bogus.txt")));
         AppTest.report (fetched, null, "BagObject should fail quietly");
     }
 
     @Test
     public void testEquals () {
-        BagObject bagObject = new BagObject ().put ("x", "y");
-        BagObject bagObject2 = new BagObject ().put ("x", "y");
-        BagObject bagObject3 = new BagObject ().put ("x", "x");
-        AppTest.report (bagObject.equals (bagObject), true, "BagObject should be equal to itself");
-        AppTest.report (bagObject.equals (bagObject2), true, "BagObject should be equal to an equivalent bag");
-        AppTest.report (bagObject.equals (bagObject3), false, "BagObject should not be equal to a different bag");
-        AppTest.report (bagObject.equals (null), false, "BagObject should not be equal to null");
-        AppTest.report (bagObject.equals (new Integer (5)), false, "BagObject should not be equal to a non-bag object");
+        BagObject bagObject = BagObject.open ("x", "y" );
+        BagObject bagObject2 = BagObject.open ("x", "y" );
+        BagObject bagObject3 = BagObject.open ("x", "x" );
+        AppTest.report (bagObject.equals (bagObject), true, "BagObject should be equal to itself" );
+        AppTest.report (bagObject.equals (bagObject2), true, "BagObject should be equal to an equivalent bag" );
+        AppTest.report (bagObject.equals (bagObject3), false, "BagObject should not be equal to a different bag" );
+        AppTest.report (bagObject.equals (null), false, "BagObject should not be equal to null" );
+        AppTest.report (bagObject.equals (new Integer (5)), false, "BagObject should not be equal to a non-bag object" );
+    }
+
+    @Test
+    public void testMerge () {
+        BagObject bagObject = BagObject.open ("x", "X" );
+        BagObject bagObject2 = BagObject.open ("y", "Y" );
+        BagObject bagObject3 = BagObject.open ("z", "Z" );
+
+        BagObject mergedBagObject = BagObject.merge (bagObject, bagObject2, bagObject3);
+        BagObject expectBagObject = BagObject.open ("x", "X" ).put ("y", "Y" ).put ("z", "Z" );
+        AppTest.report (mergedBagObject.equals (expectBagObject), true, "Merged BagObject matches Expected BgObject");
     }
 }

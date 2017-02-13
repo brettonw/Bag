@@ -209,6 +209,19 @@ public class BagObject extends Bag implements Selectable<BagObject> {
     }
 
     /**
+     * Create a new BagObject and "put" the object using its key value. The key may be a
+     * simple name, or it may be a path (with keys separated by "/") to create a
+     * hierarchical "bag-of-bags" that is indexed recursively.
+     * @param key A string value used to index the element, using "/" as separators, for example:
+     *             "com/brettonw/bag/key".
+     * @param object The element to store.
+     * @return The newly created BagObject.
+     */
+    public static BagObject open (String key, Object object) {
+        return new BagObject ().put (key, object);
+    }
+
+    /**
      * Add an object to a BagArray stored at the requested key. The key may be a simple name, or it may be a path
      * (with keys separated by "/") to create a hierarchical "bag-of-bags" that is indexed
      * recursively. If the key does not already exist a non-null value will be stored as a bare
@@ -371,5 +384,20 @@ public class BagObject extends Bag implements Selectable<BagObject> {
             return bagObject;
         }
         return this;
+    }
+
+    public static BagObject merge (BagObject... bagObjects) {
+        int totalCount = 0;
+        for (BagObject bagObject:bagObjects) {
+            totalCount += bagObject.getCount ();
+        }
+        BagObject mergedBagObject = new BagObject (totalCount);
+        for (BagObject bagObject : bagObjects) {
+            String[] keys = bagObject.keys ();
+            for (String key:keys) {
+                mergedBagObject.put (key, bagObject.getObject (key));
+            }
+        }
+        return mergedBagObject;
     }
 }

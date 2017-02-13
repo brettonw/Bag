@@ -76,7 +76,7 @@ public class FromUrlTest {
 
     @Test
     public void testBogusPost () throws IOException {
-        BagObject bogus = BagObjectFrom.url ("http://gojsonogle.com", new BagObject ().put ("a", "b"), MimeType.JSON, () -> null);
+        BagObject bogus = BagObjectFrom.url ("http://gojsonogle.com", BagObject.open  ("a", "b"), MimeType.JSON, () -> null);
         AppTest.report (bogus, null, "Not a valid URL");
     }
 }

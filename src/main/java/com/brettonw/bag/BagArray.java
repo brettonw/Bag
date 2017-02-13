@@ -153,6 +153,15 @@ public class BagArray extends Bag implements Selectable<BagArray>, Iterable<Obje
     }
 
     /**
+     * Create a new BagArray and "add" the object.
+     * @param object The element to store.
+     * @return The newly created BagArray.
+     */
+    public static BagArray open (Object object) {
+        return new BagArray ().insert (0, object);
+    }
+
+    /**
      *
      * @param left
      * @param right

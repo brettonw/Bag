@@ -23,7 +23,7 @@ public class Exprs {
             if (expr instanceof BagObject) {
                 bagObject = (BagObject) expr;
             } else if (expr instanceof String){
-                bagObject = new BagObject ().put (Expr.OPERATOR, Value.VALUE).put (Value.VALUE, expr);
+                bagObject = BagObject.open  (Expr.OPERATOR, Value.VALUE).put (Value.VALUE, expr);
             }
             ExprSupplier exprSupplier = exprSuppliers.get (bagObject.getString (Expr.OPERATOR));
             return (exprSupplier != null) ? exprSupplier.get (bagObject) : null;

@@ -33,7 +33,7 @@ public class FormatReaderTableTest {
     @Test
     public void testBasicFixedFormatWithFieldNames () {
         String test = " a comment line\n\naaabbbcccdddd\nabcd\n11 22 33 4444\n";
-        BagArray fieldNames = new BagArray ().add ("A").add ("B").add ("C").add ("D");
+        BagArray fieldNames = BagArray.open ("A").add ("B").add ("C").add ("D");
         int[][] fields = HandlerArrayFromFixed.fieldsFromWidths (new int[]{3, 3, 3, 4});
         FormatReaderTable frt = new FormatReaderTable (test, new HandlerArrayFromDelimited ("\n",
                 new HandlerCompositeFiltered (str -> (str.length () > 0) && (! str.startsWith (" ")),
