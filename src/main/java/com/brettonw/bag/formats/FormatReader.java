@@ -5,14 +5,11 @@ import com.brettonw.bag.BagObject;
 import com.brettonw.bag.SourceAdapter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.atteo.classindex.ClassIndex;
-import org.atteo.classindex.IndexSubclasses;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-@IndexSubclasses
 public class FormatReader {
     private static final Logger log = LogManager.getLogger (FormatReader.class);
 
@@ -88,26 +85,19 @@ public class FormatReader {
     }
 
     static {
-        // autoload all the reader subclasses to force their static initializers to get
-        // called (but only if the reader constructor is visible, i.e. it's an actual
-        // reader endpoint in the class hierarchy and not just a helper or base class.)
-        for (Class<?> type : ClassIndex.getSubclasses (FormatReader.class)) {
+        // rather than have a compile-time and run-time dependency, we just list the sub-
+        // classes of FormatReader here that need to be loaded.
+        Class[] formatReaders = {
+                FormatReaderComposite.class,
+                FormatReaderJson.class,
+                FormatReaderTable.class
+        };
+        for (Class type : formatReaders) {
             try {
-                Class.forName (type.getName ()).newInstance ();
+                type.newInstance ();
             } catch (IllegalAccessException exception) {
                 // do nothing
-            } catch (ClassNotFoundException | InstantiationException exception) {
-                log.error (exception);
-            }
-        }
-
-        // autoload all the writers, same as above
-        for (Class<?> type : ClassIndex.getSubclasses (FormatWriter.class)) {
-            try {
-                Class.forName (type.getName ()).newInstance ();
-            } catch (IllegalAccessException exception) {
-                // do nothing
-            } catch (ClassNotFoundException | InstantiationException exception) {
+            } catch (InstantiationException exception) {
                 log.error (exception);
             }
         }

@@ -4,14 +4,11 @@ import com.brettonw.bag.BagArray;
 import com.brettonw.bag.BagObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.atteo.classindex.ClassIndex;
-import org.atteo.classindex.IndexSubclasses;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
 
-@IndexSubclasses
 abstract public class FormatWriter {
     private static final Logger log = LogManager.getLogger (FormatReader.class);
 
@@ -54,15 +51,18 @@ abstract public class FormatWriter {
     }
 
     static {
-        // autoload all the writer subclasses to force their static initializers to get
-        // called (but only if the writer constructor is visible, i.e. it's an actual
-        // writer endpoint in the class hierarchy and not just a helper or base class.)
-        for (Class<?> type : ClassIndex.getSubclasses (FormatWriter.class)) {
+        // rather than have a compile-time and run-time dependency, we just list the sub-
+        // classes of FormatWriter here that need to be loaded.
+        Class[] formatWriters = {
+                FormatWriterJson.class,
+                FormatWriterText.class
+        };
+        for (Class type : formatWriters) {
             try {
-                Class.forName (type.getName ()).newInstance ();
+                type.newInstance ();
             } catch (IllegalAccessException exception) {
                 // do nothing
-            } catch (ClassNotFoundException | InstantiationException exception) {
+            } catch (InstantiationException exception) {
                 log.error (exception);
             }
         }

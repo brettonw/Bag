@@ -29,11 +29,6 @@
             <version>RELEASE</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>org.atteo.classindex</groupId>
-            <artifactId>classindex</artifactId>
-            <version>RELEASE</version>
-        </dependency>
     </dependencies>
 
     <build>
