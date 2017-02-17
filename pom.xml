@@ -33,7 +33,7 @@
             <groupId>org.atteo.classindex</groupId>
             <artifactId>classindex</artifactId>
             <version>RELEASE</version>
-            <scope>compile</scope>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
