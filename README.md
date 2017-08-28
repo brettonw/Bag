@@ -1,3 +1,7 @@
+# DEPRECATED
+
+Bag is now Bedrock (https://github.com/brettonw/Bedrock)
+
 # Bag (com.brettonw.bag)
 
 Bag provides text-based storage of objects and un-formatted data in a simple, hierarchical key/value
